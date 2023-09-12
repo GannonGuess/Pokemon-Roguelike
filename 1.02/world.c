@@ -290,89 +290,148 @@ int terraform(struct room *r) {
 }
 
 //Not allowed must remove
-int world_init(struct world *w) {
+struct world world_init(int start_x, int start_y) {
+     struct world *w;
+     if(!(w = malloc(sizeof(struct world)))) {
+          printf("FAILED TO CREATE");
+     }
+
      w->length = 401;
-     w->x = 200;
-     w->y = 200;
+     w->x = start_x;
+     w->y = start_y;
      
      //Create first room and assign its gates
      struct room *r;
      if(!(r = malloc(sizeof(struct room)))) {
           printf("FAILED TO CREATE");
-          return -1;
      }
      r->north_gate = (rand() % 78) + 1;
      r->south_gate = (rand() % 78) + 1;
      r->east_gate = (rand() % 19) + 1;
      r->west_gate = (rand() % 19) + 1;
 
-     w->world_map[w->y][w->x] = r;
-     w->world_map[w->y][w->x]->man_distance = 0;
+     w->world_map[start_y][start_x] = r;
+     r->man_distance = 0;
+     printf("man_dist: %d\n", r->man_distance);
      room_init(r);
      terraform(r);
-     return 0;
+
+     return *w;
 }
 
-int expand(struct world *w, int x, int y) {
+// int expand(struct world *w, int x, int y) {
 
+//      struct room *r;
+//      if(!(r = malloc(sizeof(struct room)))) {
+//           printf("failed to create room");
+//           return -1;
+//      }
+//      //Add North gate if it can exist
+//      if(y - 1 != -1) {
+//           if(!w->world_map[y - 1][x]) {
+//                r->north_gate = (rand() % 78) + 1;
+//           } else {
+//                r->north_gate = w->world_map[y - 1][x]->south_gate;
+//           }
+//      } else {
+//           r->north_gate = (rand() % 78) + 1; 
+//      }
+//      //Add South gate if it can exist
+//      if(y + 1 != 401) {
+//           if(!w->world_map[y + 1][x]) {
+//                r->south_gate = (rand() % 78) + 1;
+//           } else {
+//                printf("shouldnt");
+//                r->south_gate = w->world_map[y + 1][x]->north_gate;
+//           }     
+//      } else {
+//           r->south_gate = (rand() % 78) + 1;
+//      }
+//      printf("added south\n");
+//      //Add East gate if it can exist
+//      if(x + 1 != 401) {
+//           if(!w->world_map[y][x + 1]) {
+//                r->east_gate = (rand() % 19) + 1;
+//           } else {
+//                r->east_gate = w->world_map[y][x + 1]->west_gate;
+//           }
+//      } else {
+//           r->east_gate = (rand() % 19) + 1;
+//      }
+//      printf("added east\n");
+//      //Add West gate if it can exist
+//      if(x - 1 != -1) {
+//           if(!w->world_map[y][x - 1]) {
+//                r->west_gate = (rand() % 19) + 1;
+//           } else {
+//                r->west_gate = w->world_map[y][x - 1]->east_gate;
+//           }
+//      } else {
+//           r->west_gate = (rand() % 19) + 1;
+//      }
+//      printf("added west\n");
+//      printf("Truth: %d\n", r->north_gate == 0);
+
+//      w->world_map[y][x] = r;
+//      int dist = abs(x - 200) + abs(y - 200);
+//      r->man_distance = dist;
+//      printf("dist: %d", r->man_distance);
+
+//      room_init(r);
+//      terraform(r);
+     
+
+//      return 0;
+// }
+
+int expand(struct world *w, int new_x, int new_y) {
+     printf("making new room\n");
+     //create room for addition to world_map
      struct room *r;
      if(!(r = malloc(sizeof(struct room)))) {
-          printf("failed to create room");
+          printf("FAILED TO CREATE");
           return -1;
      }
-     
-     //Add North gate if it can exist
-     if(y - 1 != -1) {
-          if(w->world_map[y - 1][x] == NULL) {
-               r->north_gate = (rand() % 78) + 1;
-          } else {
-               r->north_gate = w->world_map[y - 1][x]->south_gate;
-          }
-     } 
-     //Add South gate if it can exist
-     if(y + 1 != 401) {
-          if(w->world_map[y + 1][x] == NULL) {
-               r->south_gate = (rand() % 78) + 1;
-          } else {
-               r->south_gate = w->world_map[y + 1][x]->north_gate;
-          }     
-     }
-     //Add East gate if it can exist
-     if(x + 1 != 401) {
-          if(w->world_map[y][x + 1] == NULL) {
-               r->east_gate = (rand() % 19) + 1;
-          } else {
-               r->east_gate = w->world_map[y][x + 1]->west_gate;
-          }
-     }
-     //Add West gate if it can exist
-     if(x - 1 != -1) {
-          if(w->world_map[y][x - 1] == NULL) {
-               r->west_gate = (rand() % 19) + 1;
-          } else {
-               r->west_gate = w->world_map[y][x - 1]->east_gate;
-          }
-     }
-     printf("Truth: %d\n", r->north_gate == NULL);
+     //determine pathing
+     bool hasNorth =  w->world_map[new_y - 1][new_x] != NULL;
+     printf("n");
+     bool hasSouth =  w->world_map[new_y + 1][new_x] != NULL;
+     printf("s");
+     bool hasEast =  w->world_map[new_y][new_x + 1] != NULL;
+     printf("e");
+     bool hasWest =  w->world_map[new_y][new_x - 1] != NULL;
+     printf("w\n");
+     printf("area_north: %d ", hasNorth);
+     printf("area_south: %d\n", hasSouth);
+     printf("area_east: %d ", hasEast);
+     printf("area_west: %d\n", hasWest);
 
-     w->world_map[y][x] = r;
-     int dist = abs(x - 200) + abs(y - 200);
-     w->world_map[y][x]->man_distance = dist;
 
+
+
+
+     //initilize the room
+     printf("problems:\n");
      room_init(r);
-     terraform(r);
-     
-
+     printf("init\n");
+     terraform(r);     
+     printf("terraformed\n");
+     w->world_map[new_y][new_x] = r;
+     printf("added room to map\n");
+     r->man_distance = abs(new_x - 200) + abs(new_y - 200);
      return 0;
 }
+
 
 //Prints out the room of world coordinates (x, y)
 //TODO - Change to external x, y mapping
-int coord_print(struct world *w, int x, int y) {
+int room_output(struct world *w, int x, int y) {
      struct room *r;
-     printf("x: %d y: %d inX: %d inY: %d\n", x - 200, y - 200, x, y);
-     r = w->world_map[y][x];
+     printf("user_x: %d user_y: %d world_mapX: %d world_mapY: %d\n", x - 200, y - 200, x, y);
      
+
+     //set room
+     r = w->world_map[y][x];
      room_print(r);
      return 0;
 }
@@ -388,52 +447,39 @@ int main(int argc, char *argv[])
      srand(time(NULL));
      
      //Initilize the world and (0,0)
-     struct world w;
-     world_init(&w);
+     struct world w = world_init(x, y);
      
      char user_in;
-     int fx, fy;
+     int fly_x, fly_y;
 
      do {
-          coord_print(&w, x, y);
+          room_output(&w, x, y);
           printf("Command: char ");
-          scanf(" %c", &user_in);
-          if(user_in == 'f') {
-               scanf(" %d", &fx);
-               scanf(" %d", &fy);
-               if(fx < - 200 || fx > 200 || fy < -200 || fy > 200) {
-                    printf("Invalid area to fly to");
-                    user_in = 'e';
-               }
-          }
+          scanf("%c", &user_in);
           switch(user_in) {
                case 'n':
                     y -= 1;
-                    if(y == -1) {
-                         y += 1;
+                    if(y < 0) {
+                         y = 0;
                     }
                     break;
                case 's':
                     y += 1;
-                    if(y == 401) {
-                         y -= 1;
+                    if (y > 400) {
+                         y = 400;
                     }
                     break;
                case 'e':
                     x += 1;
-                    if(x == 401) {
-                         x -= 1;
+                    if(x > 400) {
+                         x = 400;
                     }
                     break;
                case 'w':
                     x -= 1;
-                    if(x == -1) {
-                         x += 1;
+                    if(x < 0) {
+                         x = 0;
                     }
-                    break;
-               case 'f':
-                    x = fx + 200;
-                    y = fy + 200;
                     break;
                case 'q':
                     printf("Exiting Gannomon");
