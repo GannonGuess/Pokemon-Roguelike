@@ -3,7 +3,7 @@
 9/11 11:39 - Added Manhattan distances for each room. Centers and Marts will now be generated based on Manhattan
              distance.
 
-9/11 10:23 - Redesigned path creation so that rooms align. Still need to fix for edge cases
+9/11 10:23 - Redesigned path creation so that rooms align. Still need to fix for corner cases
 
 9/11 07:55 - Creating rooms as they are entered, saving them to an array of rooms
 

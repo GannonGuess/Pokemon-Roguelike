@@ -1,7 +1,7 @@
-all: room
+all: game
 
-room: room.c
-	gcc room.c -o room -lm
+game: world.c
+	gcc world.c -o game -lm
 
 clean:
 	rm -f room
