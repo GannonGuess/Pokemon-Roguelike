@@ -387,49 +387,8 @@ int expand(struct world *w, int x, int y) {
      return 0;
 }
 
-// int expand(struct world *w, int new_x, int new_y) {
-//      printf("making new room\n");
-//      //create room for addition to world_map
-//      struct room *r;
-//      printf("created");
-//      if(!(r = malloc(sizeof(struct room)))) {
-//           printf("FAILED TO CREATE");
-//           return -1;
-//      }
-//      printf("malloced");
-//      //determine pathing
-//      bool hasNorth =  w->world_map[new_y - 1][new_x] != NULL;
-//      printf("n");
-//      bool hasSouth =  w->world_map[new_y + 1][new_x] != NULL;
-//      printf("s");
-//      bool hasEast =  w->world_map[new_y][new_x + 1] != NULL;
-//      printf("e");
-//      bool hasWest =  w->world_map[new_y][new_x - 1] != NULL;
-//      printf("w\n");
-//      printf("area_north: %d ", hasNorth);
-//      printf("area_south: %d\n", hasSouth);
-//      printf("area_east: %d ", hasEast);
-//      printf("area_west: %d\n", hasWest);
-
-
-
-
-
-//      //initilize the room
-//      printf("problems:\n");
-//      room_init(r);
-//      printf("init\n");
-//      terraform(r);     
-//      printf("terraformed\n");
-//      w->world_map[new_y][new_x] = r;
-//      printf("added room to map\n");
-//      r->man_distance = abs(new_x - 200) + abs(new_y - 200);
-//      return 0;
-// }
-
 
 //Prints out the room of world coordinates (x, y)
-//TODO - Change to external x, y mapping
 int room_output(struct world *w, int x, int y) {
      struct room *r;
      printf("user_x: %d user_y: %d world_mapX: %d world_mapY: %d\n", x - 200, y - 200, x, y);
@@ -461,7 +420,11 @@ int main(int argc, char *argv[])
      do {
           room_output(&w, x, y);
           printf("Command: char ");
-          scanf(" %c %d %d", &user_in, &fly_x, fly_y);
+          scanf(" %1c", &user_in);
+          if(user_in == 'f') {
+               scanf(" %d %d", &fly_x, &fly_y);
+          }
+          printf("fx: %d fy: %d\n", fly_x, fly_y);
           switch(user_in) {
                case 'n':
                     y -= 1;
@@ -489,6 +452,16 @@ int main(int argc, char *argv[])
                     break;
                case 'q':
                     printf("Exiting Gannomon");
+                    break;
+               case 'f':
+                    if(fly_x + 200 ==x && fly_y + 200 == y) {
+                         printf("You are already in this room\n");
+                    } else if(fly_x > 200 || fly_x < -200 || fly_y > 200 || fly_y < -200) {
+                         printf("Selected room outside of range [-200:200]\n");
+                    } else {
+                         x = fly_x + 200;
+                         y = fly_y + 200;
+                    }
                     break;
                default:
                     printf("Input error. Please use valid input\n");
