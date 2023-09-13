@@ -15,9 +15,11 @@ int min(int num1, int num2)
 }
 
 //initilize room with border and short grass
-int room_init(struct room *r) {
+int room_init(struct room *r, int map_x, int map_y) {
      r->height = 21;
      r->width = 80;
+     r->map_x = map_x;
+     r->map_y = map_y;
      int y, x;
      for(y = 0; y < r->height; y++) {
           for(x = 0; x < r->width; x++) {
@@ -89,7 +91,7 @@ int make_boulders(struct room *r) {
 
 //TODO EDGE CASES FOR WORLD CORNER
 int make_paths(struct room *r) {
-     //generate turning points from
+     //generate turning points randomly
      int north_south = (rand() % 19) + 1;
      int east_west = (rand() % 78) + 1;
 
@@ -105,41 +107,33 @@ int make_paths(struct room *r) {
                r->tiles[r->east_gate][x] = PATH;
           }
      }
-     if(r->west_gate && r->east_gate) {
-          if(r->west_gate - r->east_gate < 0) {
-               for(y = r->west_gate + 1; y < r->east_gate; y++) {
-                    r->tiles[y][east_west] = PATH;
-               }
-          }
-          else if(r->west_gate - r->east_gate > 0) {
-               for(y = r->west_gate - 1; y > r->east_gate; y--) {
-                    r->tiles[y][east_west] = PATH;
-               }
+     //connect east-west
+     if(r->west_gate - r->east_gate < 0) {
+          for(y = r->west_gate + 1; y < r->east_gate; y++) {
+               r->tiles[y][east_west] = PATH;
           }
      }
-     
-     
+     else if(r->west_gate - r->east_gate > 0) {
+          for(y = r->west_gate - 1; y > r->east_gate; y--) {
+               r->tiles[y][east_west] = PATH;
+          }
+     }
      //fill in north-south path
-     if(r->north_gate) {
-          for(y = 0; y <= north_south; y++) {
-               r->tiles[y][r->north_gate] = PATH;
+     for(y = 0; y <= north_south; y++) {
+          r->tiles[y][r->north_gate] = PATH;
+     }
+     for(y = north_south; y <= 20; y++) {
+          r->tiles[y][r->south_gate] = PATH;
+     }
+     //connect north-south
+     if(r->north_gate - r->south_gate < 0) {
+          for(x = r->north_gate + 1; x < r->south_gate; x++) {
+               r->tiles[north_south][x] = PATH;
           }
      }
-     if(r->south_gate) {
-          for(y = north_south; y <= 20; y++) {
-               r->tiles[y][r->south_gate] = PATH;
-          }
-     }
-     if(r->north_gate && r->south_gate) {
-          if(r->north_gate - r->south_gate < 0) {
-               for(x = r->north_gate + 1; x < r->south_gate; x++) {
-                    r->tiles[north_south][x] = PATH;
-               }
-          }
-          else if(r->north_gate - r->south_gate > 0) {
-               for(x = r->north_gate - 1; x > r->south_gate; x--) {
-                    r->tiles[north_south][x] = PATH;
-               }
+     else if(r->north_gate - r->south_gate > 0) {
+          for(x = r->north_gate - 1; x > r->south_gate; x--) {
+               r->tiles[north_south][x] = PATH;
           }
      }
      
@@ -313,7 +307,7 @@ struct world world_init(int start_x, int start_y) {
      w->world_map[start_y][start_x] = r;
      r->man_distance = 0;
      printf("man_dist: %d\n", r->man_distance);
-     room_init(r);
+     room_init(r, start_x, start_y);
      terraform(r);
 
      return *w;
@@ -341,13 +335,11 @@ int expand(struct world *w, int x, int y) {
           if(!w->world_map[y + 1][x]) {
                r->south_gate = (rand() % 78) + 1;
           } else {
-               printf("shouldnt");
                r->south_gate = w->world_map[y + 1][x]->north_gate;
           }     
      } else {
           r->south_gate = (rand() % 78) + 1;
      }
-     printf("added south\n");
      //Add East gate if it can exist
      if(x + 1 != 401) {
           if(!w->world_map[y][x + 1]) {
@@ -358,7 +350,6 @@ int expand(struct world *w, int x, int y) {
      } else {
           r->east_gate = (rand() % 19) + 1;
      }
-     printf("added east\n");
      //Add West gate if it can exist
      if(x - 1 != -1) {
           if(!w->world_map[y][x - 1]) {
@@ -369,15 +360,13 @@ int expand(struct world *w, int x, int y) {
      } else {
           r->west_gate = (rand() % 19) + 1;
      }
-     printf("added west\n");
-     printf("Truth: %d\n", r->north_gate == 0);
 
      w->world_map[y][x] = r;
      int dist = abs(x - 200) + abs(y - 200);
      r->man_distance = dist;
      printf("dist: %d", r->man_distance);
 
-     room_init(r);
+     room_init(r, x, y);
      terraform(r);
      
 
@@ -492,12 +481,8 @@ int main(int argc, char *argv[])
                     break;
           }
           if(w.world_map[y][x] == NULL) {
-               printf("error?");
-               
                expand(&w, x, y);
-               printf("expanded");
           }
-          
      } while(user_in != 'q');
      
           
