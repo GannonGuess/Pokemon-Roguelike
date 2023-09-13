@@ -89,7 +89,6 @@ int make_boulders(struct room *r) {
      return 0;
 }
 
-//TODO EDGE CASES FOR WORLD CORNER
 int make_paths(struct room *r) {
      //generate turning points randomly
      int north_south = (rand() % 19) + 1;
@@ -136,6 +135,21 @@ int make_paths(struct room *r) {
                r->tiles[north_south][x] = PATH;
           }
      }
+
+     //Remove exits on world borders
+     if(r->map_x == 0) {
+          r->tiles[r->west_gate][0] = BOULDER;
+     }
+     if(r->map_x == 400) {
+          r->tiles[r->east_gate][79] = BOULDER;
+     }
+     if(r->map_y == 0) {
+          r->tiles[0][r->north_gate] = BOULDER;
+     }
+     if(r->map_y == 400) {
+          r->tiles[20][r->south_gate] = BOULDER;
+     }
+
      
      return 0;
 }
@@ -447,7 +461,7 @@ int main(int argc, char *argv[])
      do {
           room_output(&w, x, y);
           printf("Command: char ");
-          scanf(" %c", &user_in);
+          scanf(" %c %d %d", &user_in, &fly_x, fly_y);
           switch(user_in) {
                case 'n':
                     y -= 1;
