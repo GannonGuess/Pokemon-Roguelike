@@ -1,5 +1,9 @@
 ## Version 1.02
 
+9/13 10:28 - Added "flight" movement to quickly move to selected room
+
+9/13 10:04 - Paths should now no longer exit rooms on world border
+
 9/12 21:27 - Finally fixed world malloc(). Used to create world_map with filled rooms causing hours of headache
 
 9/11 11:39 - Added Manhattan distances for each room. Centers and Marts will now be generated based on Manhattan
