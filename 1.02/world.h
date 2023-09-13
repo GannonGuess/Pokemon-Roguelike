@@ -6,6 +6,8 @@
 struct room {
     int width;
     int height;
+    int map_x;
+    int map_y;
     int north_gate;
     int south_gate;
     int east_gate;
@@ -34,7 +36,7 @@ struct gate {
 };
 
 
-int room_init(struct room *r);
+int room_init(struct room *r, int map_x, int map_y);
 int room_print(struct room *r);
 int make_terrain(struct room *r, char terr_type);
 int make_paths(struct room *r);
