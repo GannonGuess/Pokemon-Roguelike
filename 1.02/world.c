@@ -91,8 +91,8 @@ int make_boulders(struct room *r) {
 
 int make_paths(struct room *r) {
      //generate turning points randomly
-     int north_south = (rand() % 19) + 1;
-     int east_west = (rand() % 78) + 1;
+     int north_south = (rand() % 17) + 2;
+     int east_west = (rand() % 76) + 2;
 
      //Fill in east-west path using r->gates
      int x, y;
@@ -230,8 +230,9 @@ int make_building(struct room *r, char build_type) {
           }
           right++;
      }
-     
+     //Choose smallest path
      int minimum = min(min(up * 2, down * 2), min(left, right));
+
      if(minimum == up * 2) {
           for(y = y_index - 1; y >= y_index - up - 1; y--) {
                r->tiles[y][x_index] = PATH;
@@ -260,13 +261,16 @@ int make_building(struct room *r, char build_type) {
      return 0;
 }
 
+// Add terrain and buildings to the room parameter
 int terraform(struct room *r) {
      //add terrains
      make_terrain(r, TALL_GRASS);
      make_terrain(r, TALL_GRASS);
+     make_terrain(r, TALL_GRASS);
      make_trees(r);
-     make_boulders(r);
      make_terrain(r, WATER);
+     make_boulders(r);
+
      //add paths
      make_paths(r);
 
@@ -277,34 +281,34 @@ int terraform(struct room *r) {
           make_building(r, MART);
           r->hasMart = true;
      }
-     //printf("dist: %d\n", r->man_distance);
+
      float build_prob = (((-45.0 * r->man_distance) / 200.0) + 50.0) / 100.0;
      if(r->man_distance > 200) {
           build_prob = 0.05;
      }
      float roll = rand() * 1.0 / (1.0 * RAND_MAX);
-     //printf("build_prob: %f\ncenter roll: %f\n", build_prob, roll);
+
      if(roll <= build_prob && !r->hasCenter) {
           make_building(r, CENTER);
+          r->hasCenter = true;
      }
      roll = rand() * 1.0 / (1.0 * RAND_MAX);
-     //printf("build_prob: %f\nmart roll: %f\n", build_prob, roll);
+
      if(roll <= build_prob && !r->hasMart) {
           make_building(r, MART);
+          r->hasMart = true;
      }
      
 
      return 0;
 }
 
-//Not allowed must remove
 struct world world_init(int start_x, int start_y) {
      struct world *w;
      if(!(w = malloc(sizeof(struct world)))) {
           printf("FAILED TO CREATE");
      }
 
-     w->length = 401;
      w->x = start_x;
      w->y = start_y;
      
@@ -320,13 +324,13 @@ struct world world_init(int start_x, int start_y) {
 
      w->world_map[start_y][start_x] = r;
      r->man_distance = 0;
-     printf("man_dist: %d\n", r->man_distance);
      room_init(r, start_x, start_y);
      terraform(r);
 
      return *w;
 }
 
+//initilizes a room at the input location
 int expand(struct world *w, int x, int y) {
 
      struct room *r;
@@ -375,15 +379,13 @@ int expand(struct world *w, int x, int y) {
           r->west_gate = (rand() % 19) + 1;
      }
 
-     w->world_map[y][x] = r;
+     w->world_map[y][x] = r; // Add the new room to the world_map
      int dist = abs(x - 200) + abs(y - 200);
-     r->man_distance = dist;
-     printf("dist: %d", r->man_distance);
+     r->man_distance = dist; //set rooms distance
 
-     room_init(r, x, y);
-     terraform(r);
+     room_init(r, x, y); //Initilize the new room
+     terraform(r); // Terraform the new room 
      
-
      return 0;
 }
 
@@ -391,12 +393,9 @@ int expand(struct world *w, int x, int y) {
 //Prints out the room of world coordinates (x, y)
 int room_output(struct world *w, int x, int y) {
      struct room *r;
-     printf("user_x: %d user_y: %d world_mapX: %d world_mapY: %d\n", x - 200, y - 200, x, y);
-     
-
-     //set room
-     r = w->world_map[y][x];
+     r = w->world_map[y][x]; //select room to output information about
      room_print(r);
+     printf("Man Distance: %d Current location (x, y): (%d, %d)\n", r->man_distance, x - 200, y - 200);
      return 0;
 }
 
@@ -441,9 +440,7 @@ int main(int argc, char *argv[])
                     printf("Aborting flight, the format is <f x y>\n");
                }
                canFly = false;
-          }
-          
-          
+          }   
           
           switch(user_in) {
                case 'n':
@@ -491,7 +488,7 @@ int main(int argc, char *argv[])
                     printf("Input error. Please use valid input\n");
                     break;
           }
-          if(w.world_map[y][x] == NULL) {
+          if(!w.world_map[y][x]) {
                expand(&w, x, y);
           }
      } while(user_in != 'q');
