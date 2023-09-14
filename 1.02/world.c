@@ -401,7 +401,6 @@ int room_output(struct world *w, int x, int y) {
 }
 
 
-
 int main(int argc, char *argv[]) 
 {
      int x = 200;
@@ -410,21 +409,42 @@ int main(int argc, char *argv[])
      //generate random room based on time
      srand(time(NULL));
      
-     //Initilize the world and (0,0)
+     //Initilize the world and room at (0,0) [200,200]
      struct world w = world_init(x, y);
-     int i, j;
      
      char user_in;
      int fly_x, fly_y;
+     int num_in;
+     char garbage[30];
+     bool canFly = true;
+
 
      do {
+          //display current room
           room_output(&w, x, y);
+          
           printf("Command: char ");
-          scanf(" %1c", &user_in);
+          int size = scanf(" %1c", &user_in);
+          // if(size == 1) {
+          //     scanf("%[^\n]", garbage); 
+          // }
           if(user_in == 'f') {
-               scanf(" %d %d", &fly_x, &fly_y);
+               size += scanf(" %4i %4i", &fly_x, &fly_y);
+               if(size >= 3) {
+                    scanf("%[^\n]", garbage);
+               }
           }
-          printf("fx: %d fy: %d\n", fly_x, fly_y);
+          printf("\n%c %d %d %d %s\n", user_in, fly_x, fly_y, size, garbage);
+          if(size != 1 && size != 3) {
+               if(user_in == 'f') {
+                    scanf("%[^\n]", garbage);
+                    printf("Aborting flight, the format is <f x y>\n");
+               }
+               canFly = false;
+          }
+          
+          
+          
           switch(user_in) {
                case 'n':
                     y -= 1;
@@ -454,14 +474,18 @@ int main(int argc, char *argv[])
                     printf("Exiting Gannomon");
                     break;
                case 'f':
+                    //scanf("%d %d", &fly_x, &fly_y);
                     if(fly_x + 200 ==x && fly_y + 200 == y) {
-                         printf("You are already in this room\n");
+                         printf("Aborting Flight: You are already in this room\n");
                     } else if(fly_x > 200 || fly_x < -200 || fly_y > 200 || fly_y < -200) {
-                         printf("Selected room outside of range [-200:200]\n");
+                         printf("Aborting flight: Selected room outside of range [-200:200]\n");
+                    } else if(!canFly){
+                         printf("Aborting flight: the format is <f x y>");             
                     } else {
                          x = fly_x + 200;
                          y = fly_y + 200;
                     }
+                    canFly = true;
                     break;
                default:
                     printf("Input error. Please use valid input\n");
@@ -471,8 +495,6 @@ int main(int argc, char *argv[])
                expand(&w, x, y);
           }
      } while(user_in != 'q');
-     
-          
           
      return 0;
 }
