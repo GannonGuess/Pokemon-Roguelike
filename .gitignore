@@ -2,4 +2,4 @@
 game
 learning
 .vscode*
-world.dSYM
+*.dSYM
