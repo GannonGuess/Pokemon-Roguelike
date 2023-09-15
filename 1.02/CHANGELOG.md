@@ -1,5 +1,9 @@
 ## Version 1.02
 
+9/14 12:13 - Paths should now no longer turn at border
+           - hasMart and hasCenter init properly
+           - printing map gives its room location and distance
+
 9/13 10:28 - Added "flight" movement method to quickly move to selected room. Need to define user input
 
 9/13 10:04 - Paths should now no longer exit rooms on world border
