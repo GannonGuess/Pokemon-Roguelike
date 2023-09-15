@@ -308,9 +308,6 @@ struct world world_init(int start_x, int start_y) {
      if(!(w = malloc(sizeof(struct world)))) {
           printf("FAILED TO CREATE");
      }
-
-     w->x = start_x;
-     w->y = start_y;
      
      //Create first room and assign its gates
      struct room *r;
@@ -424,9 +421,6 @@ int main(int argc, char *argv[])
           
           printf("Command: char ");
           int size = scanf(" %1c", &user_in);
-          // if(size == 1) {
-          //     scanf("%[^\n]", garbage); 
-          // }
           if(user_in == 'f') {
                size += scanf(" %4i %4i", &fly_x, &fly_y);
                if(size >= 3) {
@@ -437,7 +431,6 @@ int main(int argc, char *argv[])
           if(size != 1 && size != 3) {
                if(user_in == 'f') {
                     scanf("%[^\n]", garbage);
-                    printf("Aborting flight, the format is <f x y>\n");
                }
                canFly = false;
           }   
@@ -471,18 +464,17 @@ int main(int argc, char *argv[])
                     printf("Exiting Gannomon");
                     break;
                case 'f':
-                    //scanf("%d %d", &fly_x, &fly_y);
                     if(fly_x + 200 ==x && fly_y + 200 == y) {
                          printf("Aborting Flight: You are already in this room\n");
                     } else if(fly_x > 200 || fly_x < -200 || fly_y > 200 || fly_y < -200) {
                          printf("Aborting flight: Selected room outside of range [-200:200]\n");
                     } else if(!canFly){
-                         printf("Aborting flight: the format is <f x y>");             
+                         printf("Aborting flight: the format is <f x y>\n");             
                     } else {
                          x = fly_x + 200;
                          y = fly_y + 200;
                     }
-                    canFly = true;
+                    canFly = true; //reset fly to true
                     break;
                default:
                     printf("Input error. Please use valid input\n");

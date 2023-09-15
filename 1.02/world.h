@@ -24,8 +24,8 @@ struct tile {
 };
 
 struct world {
-    int x;
-    int y;
+    //int x;
+    //int y;
     struct room *world_map[401][401];
 };
 
