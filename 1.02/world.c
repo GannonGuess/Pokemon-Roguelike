@@ -9,20 +9,17 @@ enum Terrain{BOULDER = '%', TALL_GRASS = ':', TREE = '^', WATER = '~', PATH = '#
              SHORT_GRASS = '.', CENTER = 'C', MART = 'M'};
 
 //define min function for obtaining shortest path
-int min(int num1, int num2)
-{
+int min(int num1, int num2) {
     return (num1 > num2) ? num2 : num1;
 }
 
 //initilize room with border and short grass
 int room_init(struct room *r, int map_x, int map_y) {
-     r->height = 21;
-     r->width = 80;
      r->map_x = map_x;
      r->map_y = map_y;
      int y, x;
-     for(y = 0; y < r->height; y++) {
-          for(x = 0; x < r->width; x++) {
+     for(y = 0; y < 21; y++) {
+          for(x = 0; x < 80; x++) {
                if(x == 0 || x == 79 || y == 0 || y == 20) {
                     r->tiles[y][x] = BOULDER;
                } else {
@@ -36,8 +33,8 @@ int room_init(struct room *r, int map_x, int map_y) {
 //print rooms current state for user
 int room_print(struct room *r) {
      int y, x;
-     for(y = 0; y < r->height; y++) {
-          for(x = 0; x < r->width; x++) {
+     for(y = 0; y < 21; y++) {
+          for(x = 0; x < 80; x++) {
                printf("%c", r->tiles[y][x]);
           }
           printf("\n");
@@ -48,14 +45,13 @@ int room_print(struct room *r) {
 //Take input room and terrain type for adding terain
 int make_terrain(struct room *r, char terr_type) {
      //generate grass at random index with random width and length
-
      int x_index = (rand() % 77) + 1;
      int y_index = (rand() % 18) + 1;
      int width = (rand() % 30) + 3;
      int height = (rand() % 15) + 3;
 
      int y, x;
-     //add terrain of height x width to chosen random location
+     //add terrain of height * width to chosen random location
      for(y = y_index; y < y_index + height && y < 20; y++) {
           for(x = x_index; x < x_index + width && x < 79; x++) {
                if(r->tiles[y][x] != BOULDER) {
@@ -67,6 +63,7 @@ int make_terrain(struct room *r, char terr_type) {
      return 0;
 }
 
+//Add between 3 and 12 trees to room
 int make_trees(struct room *r) {
      int num_trees = rand() % 10 + 3;
      int x, y, i;
@@ -78,6 +75,7 @@ int make_trees(struct room *r) {
      return 0;
 }
 
+// Add between 1 and 4 boulders to room
 int make_boulders(struct room *r) {
      int num_boulders = rand() % 4 + 1;
      int x, y, i;
@@ -89,6 +87,7 @@ int make_boulders(struct room *r) {
      return 0;
 }
 
+// Add paths to room
 int make_paths(struct room *r) {
      //generate turning points randomly
      int north_south = (rand() % 17) + 2;
@@ -150,10 +149,10 @@ int make_paths(struct room *r) {
           r->tiles[20][r->south_gate] = BOULDER;
      }
 
-     
      return 0;
 }
 
+// Add building of type build_type to room
 int make_building(struct room *r, char build_type) {
      int x_index = (rand() % 76) + 2;
      int y_index = (rand() % 17) + 2;
@@ -271,8 +270,7 @@ int terraform(struct room *r) {
      make_terrain(r, WATER);
      make_boulders(r);
 
-     //add paths
-     make_paths(r);
+     make_paths(r); //add paths
 
      //add buildings
      if(r->man_distance == 0) {
@@ -303,26 +301,27 @@ int terraform(struct room *r) {
      return 0;
 }
 
+// Initilize a struct world
 struct world world_init(int start_x, int start_y) {
      struct world *w;
-     if(!(w = malloc(sizeof(struct world)))) {
-          printf("FAILED TO CREATE");
+     if(!(w = malloc(sizeof(struct world)))) { // Malloc space for world
+          printf("FAILED TO CREATE WORLD");
      }
      
      //Create first room and assign its gates
      struct room *r;
-     if(!(r = malloc(sizeof(struct room)))) {
-          printf("FAILED TO CREATE");
+     if(!(r = malloc(sizeof(struct room)))) { // Malloc space for room
+          printf("FAILED TO CREATE ROOM");
      }
-     r->north_gate = (rand() % 78) + 1;
+     r->north_gate = (rand() % 78) + 1; // Select gates
      r->south_gate = (rand() % 78) + 1;
      r->east_gate = (rand() % 19) + 1;
      r->west_gate = (rand() % 19) + 1;
 
      w->world_map[start_y][start_x] = r;
      r->man_distance = 0;
-     room_init(r, start_x, start_y);
-     terraform(r);
+     room_init(r, start_x, start_y); // create room at 200, 200
+     terraform(r); // add stuff to world map 0, 0
 
      return *w;
 }
@@ -330,7 +329,7 @@ struct world world_init(int start_x, int start_y) {
 //initilizes a room at the input location
 int expand(struct world *w, int x, int y) {
 
-     struct room *r;
+     struct room *r; // define room
      if(!(r = malloc(sizeof(struct room)))) {
           printf("failed to create room");
           return -1;
@@ -377,8 +376,7 @@ int expand(struct world *w, int x, int y) {
      }
 
      w->world_map[y][x] = r; // Add the new room to the world_map
-     int dist = abs(x - 200) + abs(y - 200);
-     r->man_distance = dist; //set rooms distance
+     r->man_distance = abs(x - 200) + abs(y - 200); //set room distance
 
      room_init(r, x, y); //Initilize the new room
      terraform(r); // Terraform the new room 
@@ -392,82 +390,79 @@ int room_output(struct world *w, int x, int y) {
      struct room *r;
      r = w->world_map[y][x]; //select room to output information about
      room_print(r);
-     printf("Man Distance: %d Current location (x, y): (%d, %d)\n", r->man_distance, x - 200, y - 200);
+     printf("Current location (x, y): (%d, %d)\n", x - 200, y - 200);
      return 0;
 }
 
-
+// Main method for running game
 int main(int argc, char *argv[]) 
 {
+     // default room coordinates
      int x = 200;
      int y = 200;
      
-     //generate random room based on time
-     srand(time(NULL));
+     srand(time(NULL)); //generate random room based on time
      
-     //Initilize the world and room at (0,0) [200,200]
-     struct world w = world_init(x, y);
+     struct world w = world_init(x, y); //Initilize the world and room at (0,0) [200,200]
      
-     char user_in;
-     int fly_x, fly_y;
-     int num_in;
-     char garbage[30];
-     bool canFly = true;
+     char user_in; // user input values
+     int fly_x, fly_y; // flight coordinates
+     char garbage[30]; // default garbage bin size. could be redone?
+     bool canFly = true; // determines if flight can be done
 
-
+     // main gameplay loop
      do {
-          //display current room
-          room_output(&w, x, y);
+          room_output(&w, x, y); // display current room
           
-          printf("Command: char ");
+          printf("\nCommand: char ");
           int size = scanf(" %1c", &user_in);
-          if(user_in == 'f') {
+          if(user_in == 'f') { // scan for <x, y> for flight
                size += scanf(" %4i %4i", &fly_x, &fly_y);
-               if(size >= 3) {
+               if(size >= 3) { // get rid of excess input if any
                     scanf("%[^\n]", garbage);
                }
           }
-          printf("\n%c %d %d %d %s\n", user_in, fly_x, fly_y, size, garbage);
-          if(size != 1 && size != 3) {
+          //printf("\n%c %d %d %d %s\n", user_in, fly_x, fly_y, size, garbage); //stats for printing
+          if(size != 1 && size != 3) { // get rid of excess input if any. Dont allow flight if wrong format
                if(user_in == 'f') {
                     scanf("%[^\n]", garbage);
                }
                canFly = false;
           }   
           
-          switch(user_in) {
-               case 'n':
+          switch(user_in) { // choose option based on user input
+               case 'n': // move north
                     y -= 1;
                     if(y < 0) {
                          y = 0;
                     }
                     break;
-               case 's':
+               case 's': // move south
                     y += 1;
                     if (y > 400) {
                          y = 400;
                     }
                     break;
-               case 'e':
+               case 'e': // move east
                     x += 1;
                     if(x > 400) {
                          x = 400;
                     }
                     break;
-               case 'w':
+               case 'w': // move west
                     x -= 1;
                     if(x < 0) {
                          x = 0;
                     }
                     break;
-               case 'q':
+               case 'q': // quit game
                     printf("Exiting Gannomon");
                     break;
-               case 'f':
+               case 'f': // fly to input <x, y>
                     if(fly_x + 200 ==x && fly_y + 200 == y) {
                          printf("Aborting Flight: You are already in this room\n");
                     } else if(fly_x > 200 || fly_x < -200 || fly_y > 200 || fly_y < -200) {
-                         printf("Aborting flight: Selected room outside of range [-200:200]\n");
+                         printf("Aborting flight: Selected room (%d, %d) outside of range [-200:200]\n", fly_x, fly_y);
                     } else if(!canFly){
                          printf("Aborting flight: the format is <f x y>\n");             
                     } else {
@@ -476,7 +471,7 @@ int main(int argc, char *argv[])
                     }
                     canFly = true; //reset fly to true
                     break;
-               default:
+               default: // if invalid input
                     printf("Input error. Please use valid input\n");
                     break;
           }
