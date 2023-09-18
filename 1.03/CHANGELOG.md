@@ -1,5 +1,9 @@
 ## Version 1.03
 
+
+
+9/17 22:41 - Added skeleton code for potential colorization of map
+
 9/17 21:54 - Copied files for 1.03
 
 ## Version 1.02
