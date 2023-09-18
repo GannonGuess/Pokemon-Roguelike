@@ -3,4 +3,5 @@ learning
 .vscode*
 *.dSYM
 .DS_Store
-
+guess_gannon.assignment*
+test
