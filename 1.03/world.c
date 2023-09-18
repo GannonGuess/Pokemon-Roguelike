@@ -3,10 +3,12 @@
 #include <math.h>
 #include <time.h>
 #include "world.h"
+#include "colors.c"
 
 //define terrain types for easy modification and readability
-enum Terrain{BOULDER = '%', TALL_GRASS = ':', TREE = '^', WATER = '~', PATH = '#',
+enum Terrain{BOULDER = '%', TALL_GRASS = ':', TREE = '?', WATER = '~', PATH = '#',
              SHORT_GRASS = '.', CENTER = 'C', MART = 'M'};
+
 
 //define min function for obtaining shortest path
 int min(int num1, int num2) {
@@ -33,9 +35,29 @@ int room_init(struct room *r, int map_x, int map_y) {
 //print rooms current state for user
 int room_print(struct room *r) {
      int y, x;
+     printf("\n");
      for(y = 0; y < 21; y++) {
           for(x = 0; x < 80; x++) {
+               /*if(r->tiles[y][x] == BOULDER) {
+                    black();
+               }
+               else if(r->tiles[y][x] == MART) {
+                    blue();
+               }
+               else if(r->tiles[y][x] == WATER) {
+                    cyan();
+               }
+               else if(r->tiles[y][x] == PATH) {
+                    yellow();
+               }
+               else if(r->tiles[y][x] == SHORT_GRASS || r->tiles[y][x] == TALL_GRASS) {
+                    green();
+               }
+               else if(r->tiles[y][x] == CENTER) {
+                    red();
+               }*/
                printf("%c", r->tiles[y][x]);
+               white();
           }
           printf("\n");
      }
