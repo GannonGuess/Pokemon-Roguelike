@@ -4,8 +4,6 @@
 #include <stdbool.h>
 
 struct room {
-    int width;
-    int height;
     int map_x;
     int map_y;
     int north_gate;
@@ -18,29 +16,25 @@ struct room {
     char tiles[21][80];
 };
 
-struct tile {
+struct tile { // Currently unused
     int x;
     int y;
 };
 
 struct world {
-    //int x;
-    //int y;
     struct room *world_map[401][401];
 };
-
-struct gate {
-    int x;
-    int y;
-};
-
 
 int room_init(struct room *r, int map_x, int map_y);
 int room_print(struct room *r);
 int make_terrain(struct room *r, char terr_type);
+int make_trees(struct room *r);
+int make_boulders(struct room *r);
 int make_paths(struct room *r);
 int make_building(struct room *r, char build_type);
-
-//int world_init(struct world *w);
+int terraform(struct room *r);
+struct world world_init(int start_x, int start_y);
+int expand(struct world *w, int x, int y);
+int room_output(struct world *w, int x, int y);
 
 #endif
