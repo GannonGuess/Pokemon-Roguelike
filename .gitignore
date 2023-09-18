@@ -3,3 +3,4 @@ game
 learning
 .vscode*
 *.dSYM
+.DS_Store
