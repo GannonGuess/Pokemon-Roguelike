@@ -1,10 +1,15 @@
 ## Version 1.02
 
-9/14 12:13 - Paths should now no longer turn at border
-           - hasMart and hasCenter init properly
-           - printing map gives its room location and distance
+9/17 21:30 - Packaged 1.02 for submission
 
-9/13 10:28 - Added "flight" movement method to quickly move to selected room. Need to define user input
+9/17 20:34 - Comments added and README updated
+
+9/14 12:13 - Paths should now no longer turn at border, so they no longer look as bad
+           - hasMart and hasCenter now init properly
+           - printing map gives its room location
+
+9/13 10:28 - Added "flight" movement method to quickly move to selected room. Error displayed if room cannot exist
+             or wrong input format
 
 9/13 10:04 - Paths should now no longer exit rooms on world border
 
@@ -13,11 +18,13 @@
 9/11 11:39 - Added Manhattan distances for each room. Centers and Marts will now be generated based on Manhattan
              distance.
 
+9/11 10:41 - Added commands for navigating between rooms. Error message displayed if wrong format. Still need flight
+
 9/11 10:23 - Redesigned path creation so that rooms align. Still need to fix for corner cases
 
 9/11 07:55 - Creating rooms as they are entered, saving them to an array of rooms
 
-9/10 22:08 - Creating struct for containing world: world_map
+9/10 22:08 - Creating struct for containing world
 
 ## Version 1.01
 
