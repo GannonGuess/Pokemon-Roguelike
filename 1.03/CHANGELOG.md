@@ -1,6 +1,6 @@
 ## Version 1.03
 
-
+9/18 11:17 - Added player struct for displaying PC location and storing its information
 
 9/17 22:41 - Added skeleton code for potential colorization of map
 

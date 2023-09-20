@@ -4,11 +4,14 @@
 #include <time.h>
 #include "world.h"
 #include "colors.c"
+#include "dijkstra.c"
 
 //define terrain types for easy modification and readability
 enum Terrain{BOULDER = '%', TALL_GRASS = ':', TREE = '?', WATER = '~', PATH = '#',
              SHORT_GRASS = '.', CENTER = 'C', MART = 'M'};
 
+//define PC and NPC types
+enum Actors{PLAYER = '@', HIKER = 'H', RIVAL = 'R'};
 
 //define min function for obtaining shortest path
 int min(int num1, int num2) {
@@ -38,8 +41,8 @@ int room_print(struct room *r) {
      printf("\n");
      for(y = 0; y < 21; y++) {
           for(x = 0; x < 80; x++) {
-               /*if(r->tiles[y][x] == BOULDER) {
-                    black();
+               if(r->tiles[y][x] == PLAYER) {
+                    purple();
                }
                else if(r->tiles[y][x] == MART) {
                     blue();
@@ -55,7 +58,7 @@ int room_print(struct room *r) {
                }
                else if(r->tiles[y][x] == CENTER) {
                     red();
-               }*/
+               }
                printf("%c", r->tiles[y][x]);
                white();
           }
@@ -349,7 +352,7 @@ struct world world_init(int start_x, int start_y) {
 }
 
 //initilizes a room at the input location
-int expand(struct world *w, int x, int y) {
+int expand(struct world *w, struct player *pc, int x, int y) {
 
      struct room *r; // define room
      if(!(r = malloc(sizeof(struct room)))) {
@@ -402,6 +405,7 @@ int expand(struct world *w, int x, int y) {
 
      room_init(r, x, y); //Initilize the new room
      terraform(r); // Terraform the new room 
+     player_place(pc, w->world_map[y][x]); // place player character in current map
      
      return 0;
 }
@@ -416,6 +420,25 @@ int room_output(struct world *w, int x, int y) {
      return 0;
 }
 
+int player_place(struct player *pc, struct room *r) { // for now, the player is placed at a random path location
+     int x, y;
+     bool isPath = false;
+     while(!isPath) {
+          x = rand() % 79 + 1;
+          y = rand() % 19 + 1;
+          if(r->tiles[y][x] == PATH) {
+               isPath = true;
+          }
+     }
+
+     pc->pc_terr = r->tiles[y][x];
+     pc->pc_x = x;
+     pc->pc_y = y;
+     printf("%d %d\n", pc->pc_x, pc->pc_y);
+     r->tiles[y][x] = PLAYER;
+     return 0;
+}
+
 // Main method for running game
 int main(int argc, char *argv[]) 
 {
@@ -426,6 +449,9 @@ int main(int argc, char *argv[])
      srand(time(NULL)); //generate random room based on time
      
      struct world w = world_init(x, y); //Initilize the world and room at (0,0) [200,200]
+
+     struct player *pc = malloc(sizeof(struct player)); 
+     player_place(pc, w.world_map[y][x]);
      
      char user_in; // user input values
      int fly_x, fly_y; // flight coordinates
@@ -498,7 +524,7 @@ int main(int argc, char *argv[])
                     break;
           }
           if(!w.world_map[y][x]) {
-               expand(&w, x, y);
+               expand(&w, pc, x, y);
           }
      } while(user_in != 'q');
           
