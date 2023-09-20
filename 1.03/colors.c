@@ -19,9 +19,13 @@ void green() {
 }
 
 void white() {
-    printf("\e[0;37m");
+    printf("\x1b[m");
 }
 
 void red() {
     printf("\e[0;31m");
+}
+
+void purple() {
+    printf("\e[0;35m");
 }
