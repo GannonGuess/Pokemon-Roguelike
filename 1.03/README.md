@@ -1,6 +1,20 @@
 # 327 Pokemon Game README - Gannon Guess
 
 ## Version 1.03
+This version adds Player Character placement and NPC movement cost map calculations for the Hiker and Rival type NPCs. Cost
+maps are generated for each NPC type and displayed below the current room on output.
+- First added the placement of a player character on a random path tile of a room when it is generated
+- Player location, room, and NPC type are passed into dijkstra algorithm for calculating a cost map using the heap provided by instructor
+- Heap is initilized and the players' location node is passed in to the queue with a value of 0. All other nodes are given a value of INT_MAX
+- The lowest cost node of the heap is removed and the neighbors costs are calculated using the removed nodes cost + the cost of the removed nodes type.
+   - The removed (center) nodes type cost is calculated using the passed in NPC type and the removed nodes terrain type
+- Node cost is updated if the calculated cost is less than the current cost. The updated nodes are then added to the heap.
+- If the NPC cannot traverse the terrain of the removed node, that node is skipped
+   - Node is skipped if the new cost is negative, meaning the cost overflowed INT_MAX
+   - Node is skipped if at the edge of the room so that the borders and gates cannot be traversed
+- This process continues until all nodes are removed from the heap
+- Finally, the dijkstra algorithm prints the cost maps for the NPC type provided
+- This is run for both the Hiker and Rival types every time a room is visited
 
 ## Version 1.02
 This version creates a world map, saving the grids greated in the previous version so that they can be reaccessed 

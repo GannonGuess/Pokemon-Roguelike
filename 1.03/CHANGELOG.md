@@ -1,5 +1,34 @@
 ## Version 1.03
 
+10/01 21:10 - Packaged 1.03 for submission
+
+10/01 18:23 - cleaned up code
+            - commented code for 1.03
+            - Updated README for 1.03
+
+9/27 19:21 - added printing of both hiker and rival maps. Both appear to be correct!
+
+9/27 17:42 - added checks for skipping unpassable terrain so costs are not updated
+           - nodes should now only be added to heap if cost is updated
+           - does not update node if new cost would exceed infinity (is negative)
+
+9/24 19:33 - Rewrote how dijkstra algorithm checks neighbors to be inside of a for-loop rather than having repeat code 8 times
+                - Easier to add changes in one place rather than 8
+
+9/23 13:55 - rewrote instructor dijkstra to try and get it to work with creating a cost map. currently not working
+           - sometimes cost exceeds infinity and overflows
+           - Added printing of cost maps
+
+9/24 12:07 - Added function for obtaining the costs of tiles based on npc type and tile type
+
+9/23 23:22 - copied over heap.c and heap.h from instructor 1.02 solution
+           - copied dijkstra algorithm used in instructor 1.02 path creation into dijkstra.c
+           - removed path creation elements and weighting
+
+9/23 20:41 - created dijkstra.c and dijkstra.h for creating cost maps
+
+9/18 20:24 - Added placing player at random map location and colorization of map elements
+
 9/18 11:17 - Added player struct for displaying PC location and storing its information
 
 9/17 22:41 - Added skeleton code for potential colorization of map
