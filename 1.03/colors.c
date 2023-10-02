@@ -1,3 +1,4 @@
+//File for colorizing output
 void blue() {
     printf("\e[1;34m");
 }
