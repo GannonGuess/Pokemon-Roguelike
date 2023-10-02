@@ -4,14 +4,16 @@
 #include <time.h>
 #include "world.h"
 #include "colors.c"
+#include "heap.c"
 #include "dijkstra.c"
 
+typedef uint8_t pair_t[num_dims];
 //define terrain types for easy modification and readability
-enum Terrain{BOULDER = '%', TALL_GRASS = ':', TREE = '?', WATER = '~', PATH = '#',
-             SHORT_GRASS = '.', CENTER = 'C', MART = 'M'};
+//enum Terrain{BOULDER = '%', TALL_GRASS = ':', TREE = '?', WATER = '~', PATH = '#',
+         //    SHORT_GRASS = '.', CENTER = 'C', MART = 'M'};
 
 //define PC and NPC types
-enum Actors{PLAYER = '@', HIKER = 'H', RIVAL = 'R'};
+//typedef enum Actors{PLAYER = '@', HIKER = 'H', RIVAL = 'R'}actor_t;
 
 //define min function for obtaining shortest path
 int min(int num1, int num2) {
@@ -424,7 +426,7 @@ int player_place(struct player *pc, struct room *r) { // for now, the player is 
      int x, y;
      bool isPath = false;
      while(!isPath) {
-          x = rand() % 79 + 1;
+          x = rand() % 78 + 1;
           y = rand() % 19 + 1;
           if(r->tiles[y][x] == PATH) {
                isPath = true;
@@ -434,7 +436,6 @@ int player_place(struct player *pc, struct room *r) { // for now, the player is 
      pc->pc_terr = r->tiles[y][x];
      pc->pc_x = x;
      pc->pc_y = y;
-     printf("%d %d\n", pc->pc_x, pc->pc_y);
      r->tiles[y][x] = PLAYER;
      return 0;
 }
@@ -461,8 +462,13 @@ int main(int argc, char *argv[])
      // main gameplay loop
      do {
           room_output(&w, x, y); // display current room
+          printf("HIKER:\n");
+          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, pc->pc_terr, 'h'); // print hiker costmap
+          printf("\n");
+          printf("RIVAL:\n");
+          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, pc->pc_terr, 'r'); // print rival costmap
           
-          printf("\nCommand: char ");
+          printf("\nCommand: ");
           int size = scanf(" %1c", &user_in);
           if(user_in == 'f') { // scan for <x, y> for flight
                size += scanf(" %4i %4i", &fly_x, &fly_y);
@@ -527,6 +533,5 @@ int main(int argc, char *argv[])
                expand(&w, pc, x, y);
           }
      } while(user_in != 'q');
-          
      return 0;
 }
