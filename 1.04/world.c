@@ -61,7 +61,13 @@ int room_print(struct room *r) {
                else if(r->tiles[y][x] == CENTER) {
                     red();
                }
-               printf("%c", r->tiles[y][x]);
+               // if(cmap[y][x]) {
+               //      printf("%c", cmap[y][x]->char);
+               // }
+               else {
+                    printf("%c", r->tiles[y][x]);
+               }
+               
                white();
           }
           printf("\n");
@@ -432,27 +438,54 @@ int player_place(struct player *pc, struct room *r) { // for now, the player is 
                isPath = true;
           }
      }
-
-     pc->pc_terr = r->tiles[y][x];
+     
      pc->pc_x = x;
      pc->pc_y = y;
-     r->tiles[y][x] = PLAYER;
+     return 0;
+}
+
+int generate_trainers(int numTrainers, struct room *r) {
+     int n;
+     for(n = 0; n < numTrainers; n++) {
+
+     }
      return 0;
 }
 
 // Main method for running game
 int main(int argc, char *argv[]) 
 {
+     srand(time(NULL)); //generate random room based on time
+     int numTrainers;
+     if(argc == 1) {
+          numTrainers = 8;
+     }
+     else if(argc == 3) {
+          if(!strcmp(argv[1], "--numtrainers")) {
+               numTrainers = atoi(argv[2]);
+          }
+          else {
+               //fprintf(stderr, "Usage: %s <letter>\n", argv[0]);
+               fprintf(stderr, "Invalid switch type: <--numtrainers>");
+               return -1;
+          }
+     }
+     else {
+          fprintf(stderr, "Invalid number of arguments. <1, 3>\n");
+          return -1;
+     }
+     
      // default room coordinates
      int x = 200;
      int y = 200;
-     
-     srand(time(NULL)); //generate random room based on time
-     
+          
      struct world w = world_init(x, y); //Initilize the world and room at (0,0) [200,200]
 
      struct player *pc = malloc(sizeof(struct player)); 
      player_place(pc, w.world_map[y][x]);
+     char pc_terr = w.world_map[y][x]->tiles[pc->pc_y][pc->pc_x];
+     printf("%c", pc_terr);
+
      
      char user_in; // user input values
      int fly_x, fly_y; // flight coordinates
@@ -461,12 +494,13 @@ int main(int argc, char *argv[])
 
      // main gameplay loop
      do {
+          generate_trainers(numTrainers, w.world_map[y][x]);
           room_output(&w, x, y); // display current room
           printf("HIKER:\n");
-          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, pc->pc_terr, 'h'); // print hiker costmap
+          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h'); // print hiker costmap
           printf("\n");
           printf("RIVAL:\n");
-          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, pc->pc_terr, 'r'); // print rival costmap
+          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r'); // print rival costmap
           
           printf("\nCommand: ");
           int size = scanf(" %1c", &user_in);
@@ -535,3 +569,56 @@ int main(int argc, char *argv[])
      } while(user_in != 'q');
      return 0;
 }
+
+/* prioritize on two values. Cost and sequence number. PC is sequence number 0. Every new character gets a new sequence number
+write comparator such that if the next turns are equal, then look at the sequence number
+
+
+struct character {
+     struct pc *pc;
+     struct npc *npc
+     //common data
+}
+in common data will be next turn and sequence number
+prioity queue is filled with characters
+
+Add a map of character pointers
+struct character *cmap[21][80] : initilize all pointers to null and stick the created characters into this map
+- check if place that character wants to move to in null or not int the character map
+Displaying character in map is a matter of checking if null. If not null get symbol from character struct, otherwise print the terrain
+
+
+
+1.05 INTERFACE
+Dont print typed characters
+raw()
+noecho()
+curs_set(0) to set cursor invisible
+keypad(stdscr, TRUE) turn on number pad
+
+void io_init_terminal(void) {
+     initscr();
+     raw();
+     noecho();
+     curs_set(0);
+     keypad(stdscr, TRUE);
+}
+
+Deinitlizatio
+int endwin(void) returns resources to the system
+- if program crashes and corrupts the terminal: run "reset" command
+
+reading input
+int getch(void)
+- reads single keystroke
+- blocking call
+
+Displaying
+int clear(void)
+- before redrawing potentially use
+int mvaddch(int y, int x, const chtype ch)
+- move cursor to (y, x) and write ch
+int refresh(void)
+- redraw the terminal: NEEDED
+usr/include/ncurses.h/
+*/
