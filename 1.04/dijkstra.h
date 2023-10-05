@@ -5,7 +5,7 @@
 #include <limits.h>
 
 typedef enum Actors{PLAYER = '@', HIKER = 'H', RIVAL = 'R'}actor_t;
-enum Terrain{BOULDER = '%', TALL_GRASS = ':', TREE = '?', WATER = '~', PATH = '#',
+enum Terrain{BOULDER = '%', TALL_GRASS = ':', TREE = '4', WATER = '~', PATH = '#',
              SHORT_GRASS = '.', CENTER = 'C', MART = 'M'};
 
 typedef struct cell_cost {
