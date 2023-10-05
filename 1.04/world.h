@@ -27,7 +27,6 @@ struct world {
 };
 
 struct player {
-    char pc_terr;
     int pc_x;
     int pc_y;
 };
@@ -36,7 +35,6 @@ struct npc {
     char npc_type;
     int npc_x;
     int npc_y;
-    char npc_terr;
 };
 
 
