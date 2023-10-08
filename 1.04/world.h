@@ -31,11 +31,6 @@ struct player {
     int pc_y;
 };
 
-struct npc {
-    int npc_x;
-    int npc_y;
-};
-
 
 int room_init(struct room *r, int map_x, int map_y);
 int room_print(struct room *r, actorMap *cmap);
