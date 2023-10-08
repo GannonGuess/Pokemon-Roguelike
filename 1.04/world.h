@@ -31,6 +31,10 @@ struct player {
     int pc_y;
 };
 
+typedef struct distanceMap {
+    int distances[19][78];
+}distanceMap;
+
 
 int room_init(struct room *r, int map_x, int map_y);
 int room_print(struct room *r, actorMap *cmap);
