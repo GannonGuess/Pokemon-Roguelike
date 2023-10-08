@@ -544,12 +544,13 @@ int main(int argc, char *argv[])
           
           printf("\n");
 
-          for(y = 0; y < 21; y++) {
-               for(x = 0; x < 80; x++) { // loop through cost array
+          for(y = 0; y < 19; y++) {
+               for(x = 0; x < 78; x++) { // loop through cost array
                     printf("%.2d ", hikerMap.distances[y][x] % 100);
                }
                printf("\n");
           }
+          return 0;
           
     
 
