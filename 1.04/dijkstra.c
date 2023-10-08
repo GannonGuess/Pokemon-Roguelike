@@ -43,9 +43,9 @@ int calculate_cost(char current_type, char npc_type) { // find the cost of the c
 }
 
 
-static void dijkstra(struct room *r, int pc_x, int pc_y, char npc_type) {
+static void dijkstra(struct room *r, int pc_x, int pc_y, char npc_type, int dist[21][80]) {
     static cell_cost_t costs[21][80], *c; // initilize array for holding cell costs
-    int dist[21][80]; // inintilize array for storing final distances
+    // int dist[21][80]; // inintilize array for storing final distances
     static uint32_t initilized = 0;
     heap_t h;
     int x, y;
@@ -66,8 +66,6 @@ static void dijkstra(struct room *r, int pc_x, int pc_y, char npc_type) {
             costs[y][x].cost = INT_MAX;
         }
     }
-    //TODO FIRST
-    char pc_terr = r->tiles[pc_y][pc_x];
 
     costs[pc_y][pc_x].cost = 0; // set player position to cost 0
     costs[pc_y][pc_x].hn = heap_insert(&h, &costs[pc_y][pc_x]); // insert player position into heap
@@ -113,11 +111,11 @@ static void dijkstra(struct room *r, int pc_x, int pc_y, char npc_type) {
             else {
                 dist[y][x] = costs[y][x].cost;
                 //if(dist[y][x] != INT_MAX) { //Removeable?
-                //printf("%.2d ", dist[y][x] % 100);
+                printf("%.2d ", dist[y][x] % 100);
                 //}
             }
         }
-        //printf("\n");
+        printf("\n");
     }
 }
 
