@@ -530,17 +530,17 @@ int main(int argc, char *argv[])
           // }
           
           
-          // for(int i = 0; i < 19; i++) { //display filled actor map
-          // for(int j = 0; j < 78; j++) {
-          //      if(cmap.actorMap[i][j]) {
-          //           printf("%c ", cmap.actorMap[i][j]->display);
-          //      }
-          //      else {
-          //           printf(". ");
-          //      }
-          // }
-          // printf("\n");
-          // }
+          for(int i = 0; i < 19; i++) { //display filled actor map
+          for(int j = 0; j < 78; j++) {
+               if(cmap.actorMap[i][j]) {
+                    printf("%c ", cmap.actorMap[i][j]->display);
+               }
+               else {
+                    printf(". ");
+               }
+          }
+          printf("\n");
+          }
 
           room_print(w.world_map[y][x], &cmap);
           printf("Current location (x, y): (%d, %d)\n", x - 200, y - 200);
@@ -549,15 +549,27 @@ int main(int argc, char *argv[])
           distanceMap rivalMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r'); // obtain rival costmap
           printf("\n");
 
-          for(y = 0; y < 19; y++) {
-               for(x = 0; x < 78; x++) { // loop through cost array
-                    printf("%.2d ", hikerMap.distances[y][x] % 100);
+          for(int j = 0; j < 19; j++) {
+               for(int i = 0; i < 78; i++) { // loop through cost array
+                    printf("%.2d ", hikerMap.distances[j][i] % 100);
                }
                printf("\n");
           }
 
-          int placeholder = move(numTrainers, &cmap, &hikerMap, &rivalMap);
-          printf("current: %c %d %d\n", currentActor->display, currentActor->seqNum, currentActor->moveTime);
+          move_loop(numTrainers, &cmap, &hikerMap, &rivalMap, w.world_map[y][x]);
+          for(int i = 0; i < 19; i++) { //display filled actor map
+          for(int j = 0; j < 78; j++) {
+               if(cmap.actorMap[i][j]) {
+                    printf("%c ", cmap.actorMap[i][j]->display);
+               }
+               else {
+                    printf(". ");
+               }
+          }
+          printf("\n");
+          }
+          room_print(w.world_map[y][x], &cmap);
+          //printf("current: %c %d %d\n", currentActor->display, currentActor->seqNum, currentActor->moveTime);
 
           return 0;
           
