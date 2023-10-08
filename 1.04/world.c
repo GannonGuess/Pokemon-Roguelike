@@ -3,8 +3,11 @@
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
+
 #include "trainer.c"
 #include "world.h"
+
+
 #include "colors.c"
 #include "heap.c"
 #include "dijkstra.c"
@@ -64,7 +67,7 @@ int room_print(struct room *r, actorMap *cmap) {
                else if(r->tiles[y][x] == CENTER) {
                     red();
                }
-               if(y != 0 && x != 0 && cmap->actorMap[y - 1][x - 1]) {
+               if(y != 0 && x != 0 && x != 79 && y != 20 && cmap->actorMap[y - 1][x - 1]) {
                     purple();
                     printf("%c", cmap->actorMap[y - 1][x - 1]->display);
                } else {
@@ -455,11 +458,14 @@ int main(int argc, char *argv[])
           numTrainers = 8;
      }
      else if(argc == 3) {
+          if(atoi(argv[2]) < 0) {
+               fprintf(stderr, "Number of trainser must be >= 0");
+               return -1;
+          }
           if(!strcmp(argv[1], "--numtrainers")) {
                numTrainers = atoi(argv[2]);
           }
           else {
-               //fprintf(stderr, "Usage: %s <letter>\n", argv[0]);
                fprintf(stderr, "Usage: --numtrainers <number of trainers>\n");
                return -1;
           }
@@ -513,14 +519,42 @@ int main(int argc, char *argv[])
 
      // main gameplay loop
      do {
-          generate_trainers(numTrainers);
+     
+          generate_trainers(numTrainers, &cmap, w.world_map[y][x]);
+          
+          
+          for(int i = 0; i < 19; i++) {
+          for(int j = 0; j < 78; j++) {
+               if(cmap.actorMap[i][j]) {
+                    printf("%c ", cmap.actorMap[i][j]->display);
+               }
+               else {
+                    printf(". ");
+               }
+          }
+          printf("\n");
+          }
 
           room_print(w.world_map[y][x], &cmap);
           printf("Current location (x, y): (%d, %d)\n", x - 200, y - 200);
+          int hikerMap[21][80] = malloc(sizeof(int) * 21 * 80);
+          int rivalMap[21][80] = malloc(sizeof(int) * 21 * 80);
+          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h', hikerMap); // print hiker costmap
+          printf("\n");
+          printf("\n");
+          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r', rivalMap); // print rival costmap
+          printf("\n");
+          printf("\n");
 
-          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h'); // print hiker costmap
-          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r'); // print rival costmap
-          return 0;
+          for(y = 0; y < 21; y++) {
+               for(x = 0; x < 80; x++) { // loop through cost array
+                    printf("%.2d ", hikerMap[y][x] % 100);
+               }
+               printf("\n");
+          }
+          
+    
+
           
           /*printf("\nCommand: ");
           int size = scanf(" %1c", &user_in);
