@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
 #include <time.h>
+#include "trainer.c"
 #include "world.h"
 #include "colors.c"
 #include "heap.c"
 #include "dijkstra.c"
+
 
 typedef uint8_t pair_t[num_dims];
 //define terrain types for easy modification and readability
@@ -38,7 +41,7 @@ int room_init(struct room *r, int map_x, int map_y) {
 }
 
 //print rooms current state for user
-int room_print(struct room *r) {
+int room_print(struct room *r, actorMap *cmap) {
      int y, x;
      printf("\n");
      for(y = 0; y < 21; y++) {
@@ -61,13 +64,12 @@ int room_print(struct room *r) {
                else if(r->tiles[y][x] == CENTER) {
                     red();
                }
-               // if(cmap[y][x]) {
-               //      printf("%c", cmap[y][x]->char);
-               // }
-               else {
+               if(y != 0 && x != 0 && cmap->actorMap[y - 1][x - 1]) {
+                    purple();
+                    printf("%c", cmap->actorMap[y - 1][x - 1]->display);
+               } else {
                     printf("%c", r->tiles[y][x]);
                }
-               
                white();
           }
           printf("\n");
@@ -359,6 +361,14 @@ struct world world_init(int start_x, int start_y) {
      return *w;
 }
 
+actorMap actorMapInit() {
+     actorMap *cmap;
+     if(!(cmap = malloc(sizeof(actorMap)))) {
+          printf("Failed to create character map");
+     }
+     return *cmap;
+}
+
 //initilizes a room at the input location
 int expand(struct world *w, struct player *pc, int x, int y) {
 
@@ -419,15 +429,6 @@ int expand(struct world *w, struct player *pc, int x, int y) {
 }
 
 
-//Prints out the room of world coordinates (x, y)
-int room_output(struct world *w, int x, int y) {
-     struct room *r;
-     r = w->world_map[y][x]; //select room to output information about
-     room_print(r);
-     printf("Current location (x, y): (%d, %d)\n", x - 200, y - 200);
-     return 0;
-}
-
 int player_place(struct player *pc, struct room *r) { // for now, the player is placed at a random path location
      int x, y;
      bool isPath = false;
@@ -444,13 +445,6 @@ int player_place(struct player *pc, struct room *r) { // for now, the player is 
      return 0;
 }
 
-int generate_trainers(int numTrainers, struct room *r) {
-     int n;
-     for(n = 0; n < numTrainers; n++) {
-
-     }
-     return 0;
-}
 
 // Main method for running game
 int main(int argc, char *argv[]) 
@@ -466,7 +460,7 @@ int main(int argc, char *argv[])
           }
           else {
                //fprintf(stderr, "Usage: %s <letter>\n", argv[0]);
-               fprintf(stderr, "Invalid switch type: <--numtrainers>");
+               fprintf(stderr, "Usage: --numtrainers <number of trainers>\n");
                return -1;
           }
      }
@@ -480,11 +474,36 @@ int main(int argc, char *argv[])
      int y = 200;
           
      struct world w = world_init(x, y); //Initilize the world and room at (0,0) [200,200]
+     actorMap cmap = actorMapInit(); //Initilize the map for storing actors
 
-     struct player *pc = malloc(sizeof(struct player)); 
+     actor *player = malloc(sizeof(actor));
+     struct player *pc = malloc(sizeof(struct player));
+
+     player->pc = pc;
+     player->seqNum = 0;
+     player->display = '@';
+
+     
      player_place(pc, w.world_map[y][x]);
-     char pc_terr = w.world_map[y][x]->tiles[pc->pc_y][pc->pc_x];
-     printf("%c", pc_terr);
+     cmap.actorMap[pc->pc_y - 1][pc->pc_x - 1] = player;
+
+
+     for(int i = 0; i < 19; i++) {
+          for(int j = 0; j < 78; j++) {
+               if(cmap.actorMap[i][j] == player) {
+                    printf("%c ", cmap.actorMap[i][j]->display);
+               }
+               else {
+                    printf(". ");
+               }
+          }
+          printf("\n");
+     }
+  
+
+
+     // char pc_terr = w.world_map[y][x]->tiles[pc->pc_y][pc->pc_x];
+     // printf("%c", pc_terr);
 
      
      char user_in; // user input values
@@ -494,15 +513,16 @@ int main(int argc, char *argv[])
 
      // main gameplay loop
      do {
-          generate_trainers(numTrainers, w.world_map[y][x]);
-          room_output(&w, x, y); // display current room
-          printf("HIKER:\n");
+          generate_trainers(numTrainers);
+
+          room_print(w.world_map[y][x], &cmap);
+          printf("Current location (x, y): (%d, %d)\n", x - 200, y - 200);
+
           dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h'); // print hiker costmap
-          printf("\n");
-          printf("RIVAL:\n");
           dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r'); // print rival costmap
+          return 0;
           
-          printf("\nCommand: ");
+          /*printf("\nCommand: ");
           int size = scanf(" %1c", &user_in);
           if(user_in == 'f') { // scan for <x, y> for flight
                size += scanf(" %4i %4i", &fly_x, &fly_y);
@@ -565,7 +585,8 @@ int main(int argc, char *argv[])
           }
           if(!w.world_map[y][x]) {
                expand(&w, pc, x, y);
-          }
+          }*/
+     usleep(5000000); //sleep for 5 second before output
      } while(user_in != 'q');
      return 0;
 }
