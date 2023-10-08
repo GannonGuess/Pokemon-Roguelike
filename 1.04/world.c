@@ -537,18 +537,16 @@ int main(int argc, char *argv[])
 
           room_print(w.world_map[y][x], &cmap);
           printf("Current location (x, y): (%d, %d)\n", x - 200, y - 200);
-          int hikerMap[21][80] = malloc(sizeof(int) * 21 * 80);
-          int rivalMap[21][80] = malloc(sizeof(int) * 21 * 80);
-          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h', hikerMap); // print hiker costmap
+          distanceMap hikerMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h'); // print hiker costmap
           printf("\n");
-          printf("\n");
-          dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r', rivalMap); // print rival costmap
-          printf("\n");
+          distanceMap rivalMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r'); // print rival costmap
+          
+          
           printf("\n");
 
           for(y = 0; y < 21; y++) {
                for(x = 0; x < 80; x++) { // loop through cost array
-                    printf("%.2d ", hikerMap[y][x] % 100);
+                    printf("%.2d ", hikerMap.distances[y][x] % 100);
                }
                printf("\n");
           }
