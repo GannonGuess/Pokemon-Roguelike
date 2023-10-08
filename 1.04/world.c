@@ -494,54 +494,59 @@ int main(int argc, char *argv[])
      cmap.actorMap[pc->pc_y - 1][pc->pc_x - 1] = player;
 
 
-     for(int i = 0; i < 19; i++) {
-          for(int j = 0; j < 78; j++) {
-               if(cmap.actorMap[i][j] == player) {
-                    printf("%c ", cmap.actorMap[i][j]->display);
-               }
-               else {
-                    printf(". ");
-               }
-          }
-          printf("\n");
-     }
-  
-
-
-     // char pc_terr = w.world_map[y][x]->tiles[pc->pc_y][pc->pc_x];
-     // printf("%c", pc_terr);
+     // for(int i = 0; i < 19; i++) {
+     //      for(int j = 0; j < 78; j++) {
+     //           if(cmap.actorMap[i][j] == player) {
+     //                printf("%c ", cmap.actorMap[i][j]->display);
+     //           }
+     //           else {
+     //                printf(". ");
+     //           }
+     //      }
+     //      printf("\n");
+     // }
+     
+     
 
      
      char user_in; // user input values
      int fly_x, fly_y; // flight coordinates
      char garbage[30]; // default garbage bin size. could be redone?
      bool canFly = true; // determines if flight can be done
+     int time = 0; //value of current time
+     actor *currentActor = malloc(sizeof(actor));
 
      // main gameplay loop
      do {
      
           generate_trainers(numTrainers, &cmap, w.world_map[y][x]);
+          printf("\ndata\n");
+          // for(int i = 0; i < 19; i++) { // display information about added actors
+          //      for(int j = 0; j < 78; j++) {
+          //           if(cmap.actorMap[i][j]) {
+          //                printf("dis: %c seqNum: %d moveTime: %d\n", cmap.actorMap[i][j]->display, cmap.actorMap[i][j]->seqNum, cmap.actorMap[i][j]->moveTime);
+          //           }
+          //      }
+          // }
           
           
-          for(int i = 0; i < 19; i++) {
-          for(int j = 0; j < 78; j++) {
-               if(cmap.actorMap[i][j]) {
-                    printf("%c ", cmap.actorMap[i][j]->display);
-               }
-               else {
-                    printf(". ");
-               }
-          }
-          printf("\n");
-          }
+          // for(int i = 0; i < 19; i++) { //display filled actor map
+          // for(int j = 0; j < 78; j++) {
+          //      if(cmap.actorMap[i][j]) {
+          //           printf("%c ", cmap.actorMap[i][j]->display);
+          //      }
+          //      else {
+          //           printf(". ");
+          //      }
+          // }
+          // printf("\n");
+          // }
 
           room_print(w.world_map[y][x], &cmap);
           printf("Current location (x, y): (%d, %d)\n", x - 200, y - 200);
-          distanceMap hikerMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h'); // print hiker costmap
+          distanceMap hikerMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h'); // obtain hiker costmap
           printf("\n");
-          distanceMap rivalMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r'); // print rival costmap
-          
-          
+          distanceMap rivalMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r'); // obtain rival costmap
           printf("\n");
 
           for(y = 0; y < 19; y++) {
@@ -550,6 +555,10 @@ int main(int argc, char *argv[])
                }
                printf("\n");
           }
+
+          int placeholder = move(numTrainers, &cmap, &hikerMap, &rivalMap);
+          printf("current: %c %d %d\n", currentActor->display, currentActor->seqNum, currentActor->moveTime);
+
           return 0;
           
     
@@ -638,7 +647,7 @@ prioity queue is filled with characters
 
 Add a map of character pointers
 struct character *cmap[21][80] : initilize all pointers to null and stick the created characters into this map
-- check if place that character wants to move to in null or not int the character map
+- check if place that character wants to move to in null or not in the character map
 Displaying character in map is a matter of checking if null. If not null get symbol from character struct, otherwise print the terrain
 
 
