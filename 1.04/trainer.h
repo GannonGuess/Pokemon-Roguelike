@@ -21,8 +21,13 @@ typedef struct {
 } actorMap;
 
 typedef struct actor_time {
+    // struct player *pc;
+    // struct npc *npc;
     int moveTime;
     int seqNum;
+    char display;
+    int x; // value between 0 and 77
+    int y; // value between 0 and 18
 } actor_time_t;
 
 
