@@ -1,4 +1,5 @@
 #include "dijkstra.h"
+#include "world.h"
 
 static int32_t path_cmp(const void *key, const void *with) {
     return ((cell_cost_t *) key)->cost - ((cell_cost_t *) with)->cost;
@@ -43,9 +44,12 @@ int calculate_cost(char current_type, char npc_type) { // find the cost of the c
 }
 
 
-static void dijkstra(struct room *r, int pc_x, int pc_y, char npc_type, int dist[21][80]) {
+static distanceMap dijkstra(struct room *r, int pc_x, int pc_y, char npc_type) {
     static cell_cost_t costs[21][80], *c; // initilize array for holding cell costs
-    // int dist[21][80]; // inintilize array for storing final distances
+    distanceMap *dist; // inintilize array for storing final distances
+    if(!(dist = malloc(sizeof(distanceMap)))) {
+        printf("Failed to allocate space for new distance map");
+    }
     static uint32_t initilized = 0;
     heap_t h;
     int x, y;
@@ -105,18 +109,19 @@ static void dijkstra(struct room *r, int pc_x, int pc_y, char npc_type, int dist
         for(x = 0; x < 78; x++) { // loop through cost array
             check = r->tiles[costs[y][x].pos[dim_y] + 1][costs[y][x].pos[dim_x] + 1];
             if(check == '~' || check == '?' || check == '%') { // skip printing of terrain that cannot be traversed
-                dist[y][x] = INT_MAX;
+                dist->distances[y][x] = INT_MAX;
                 printf("   ");
             }
             else {
-                dist[y][x] = costs[y][x].cost;
+                dist->distances[y][x] = costs[y][x].cost;
                 //if(dist[y][x] != INT_MAX) { //Removeable?
-                printf("%.2d ", dist[y][x] % 100);
+                printf("%.2d ", ((dist->distances[y][x]) % 100));
                 //}
             }
         }
         printf("\n");
     }
+    return *dist;
 }
 
 
