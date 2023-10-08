@@ -113,11 +113,11 @@ static void dijkstra(struct room *r, int pc_x, int pc_y, char npc_type) {
             else {
                 dist[y][x] = costs[y][x].cost;
                 //if(dist[y][x] != INT_MAX) { //Removeable?
-                printf("%.2d ", dist[y][x] % 100);
+                //printf("%.2d ", dist[y][x] % 100);
                 //}
             }
         }
-        printf("\n");
+        //printf("\n");
     }
 }
 
