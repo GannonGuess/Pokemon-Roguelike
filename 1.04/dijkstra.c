@@ -110,16 +110,16 @@ static distanceMap dijkstra(struct room *r, int pc_x, int pc_y, char npc_type) {
             check = r->tiles[costs[y][x].pos[dim_y] + 1][costs[y][x].pos[dim_x] + 1];
             if(check == '~' || check == '?' || check == '%') { // skip printing of terrain that cannot be traversed
                 dist->distances[y][x] = INT_MAX;
-                printf("   ");
+                //printf("   ");
             }
             else {
                 dist->distances[y][x] = costs[y][x].cost;
                 //if(dist[y][x] != INT_MAX) { //Removeable?
-                printf("%.2d ", ((dist->distances[y][x]) % 100));
+                //printf("%.2d ", ((dist->distances[y][x]) % 100));
                 //}
             }
         }
-        printf("\n");
+        //printf("\n");
     }
     return *dist;
 }
