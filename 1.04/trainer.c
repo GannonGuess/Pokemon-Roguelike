@@ -1,17 +1,19 @@
 #include "trainer.h"
-#include "world.h"
-#include "dijkstra.h"
-#include <limits.h>
 
+
+// comparator for finding smallest moveTime
 static int32_t time_cmp(const void *key, const void *with) {
     const actor_time_t *cost_1 = (const actor_time_t *)key;
     const actor_time_t *cost_2 = (const actor_time_t *)with;
     if(cost_1->moveTime != cost_2->moveTime) {
         return cost_1->moveTime - cost_2->moveTime;
     }
-    return cost_1->seqNum - cost_2->seqNum;
+    return cost_1->seqNum - cost_2->seqNum; //if move times are identical, get based off seqNum
 }
 
+/** Creates a new actor populates it, placing it into the cmap for future reference
+ * 
+*/
 int newActor(actorMap *cmap, int y, int x, int n) {
     actor *a;
     if(!(a = malloc(sizeof(a)))) {
@@ -29,25 +31,25 @@ int newActor(actorMap *cmap, int y, int x, int n) {
     cmap->actorMap[y][x]->seqNum = n + 1;
     cmap->actorMap[y][x]->npc = npc;
     cmap->actorMap[y][x]->moveTime = 0;
-    //all npcs at same address in memory may be an issue
     return 0;
 }
 
+/**
+ * Function to generate a given number of trainers and put them into the cmap
+*/
 int generate_trainers(int numTrainers, actorMap *cmap, struct room *r) {
     int n;
     for(n = 0; n < numTrainers; n++) {
         int x = rand() % 78; // select x and y value for location
         int y = rand() % 19;
-        char currentTile = r->tiles[y + 1][x + 1]; 
-        while(cmap->actorMap[y][x] || currentTile == '~' || currentTile == '%' || currentTile == '4') {
+        char currentTile = r->tiles[y + 1][x + 1]; //find tile type of where actor will be placed
+        while(cmap->actorMap[y][x] || currentTile == '~' || currentTile == '%' || currentTile == '4') { //if cannot be placed there or actor is already present
             x = rand() % 78;
             y = rand() % 19;
-            printf("tile:%c\n", currentTile);
             currentTile = r->tiles[y + 1][x + 1];
         }
-        printf("%d %d\n", y, x);
         
-        newActor(cmap, y, x, n);
+        newActor(cmap, y, x, n); // create new actor based off information
 
         
         if(n == 0) { // first actor added is a hiker
@@ -71,48 +73,47 @@ int generate_trainers(int numTrainers, actorMap *cmap, struct room *r) {
     return 0;
 }
 
-actor_time_t* createActorTime(struct player *pc, struct npc *npc, int moveTime, int seqNum, char display, int x, int y) {
-    actor_time_t* actor_time = (actor_time_t*)malloc(sizeof(actor_time_t));
+/** Creates an actor_time_t node to be put into the prioty queue
+ * 
+*/
+actor_time_t* createActorTime(int moveTime, int seqNum, char display, int x, int y) {
+    actor_time_t* actor_time = (actor_time_t*)malloc(sizeof(actor_time_t)); //allocate space
     if(actor_time == NULL) {
         printf("failed to allocate space for new actor");
         return NULL;
     }
-
-
-    // actor_time->pc = pc;
-    // actor_time->npc = npc;
+    //fill in values
     actor_time->display = display;
     actor_time->moveTime = moveTime;
     actor_time->seqNum = seqNum;
     actor_time->x = x;
     actor_time->y = y;
-
+    //return the actor_time_t
     return actor_time;
 }
 
+/**
+ * computes movement of actor_time_t using the provided distance map, room, and time
+*/
 void max_grad_move(actor_time_t *a, distanceMap *map, int currentTime, struct room *r, actorMap *cmap) {
-    printf("moving: seqNum: %d cost: %d dis: %c %d %d\n", a->seqNum, a->moveTime, a->display, a->x, a->y);
     int i, j;
-    int moveToX = a->x; 
+    int moveToX = a->x; //actor wont move if not updated
     int moveToY = a->y;
-    int lowest = map->distances[a->y][a->x];
-    int moved = 0;
+    int lowest = map->distances[a->y][a->x]; // looking for distance lower than actors current position
+    int moved = 0; // check if actor has valid moved
     for(j = -1; j <= 1; j++) { //check cells around the actor
         for(i = -1; i <= 1; i++) {
             if(a->x + i < 0 || a->x + i > 77 || a->y + j < 0 || a->y + j > 18 || (i == 0 && j == 0)) { // continue if checking neighbor out of bounds nodes current tile
-                printf("bounds\n");
                 continue;
             }
-            printf("%d ", map->distances[a->y +j][a->x +i]);
             if(cmap->actorMap[a->y + j][a->x + i]) { // if neighbor is occupied, dont move there
-                printf("occupied\n");
                 continue;
             }
-            char neighborTile = r->tiles[a->y + j + 1][a->x + i + 1];
+            char neighborTile = r->tiles[a->y + j + 1][a->x + i + 1]; // check neighbor tiles type
             if(map->distances[a->y + j][a->x + i] == INT_MAX || neighborTile == WATER || neighborTile == TREE || neighborTile == BOULDER) {
+                //dont check to move into a tile that has a value of INTM_MAX or a type that cannot be traverseds
                 continue;
             }
-            //printf("%d\n", map->distances[a->y + j][a->x + i]);
             if(map->distances[a->y + j][a->x + i] <= lowest) { // <= will increase runtime marginally but prevent actors form prefering to move up
                 lowest = map->distances[a->y + j][a->x + i];
                 moveToX = a->x + i;
@@ -120,72 +121,61 @@ void max_grad_move(actor_time_t *a, distanceMap *map, int currentTime, struct ro
                 moved = 1;
             }
         }
-        printf("\n");
     }
-    //printf("move to: %d %d\n", moveToX, moveToY);
     
-    char moveToTile = r->tiles[moveToY +1][moveToX + 1];
-    int moveTimeCost = calculate_cost(moveToTile, a->display);
-    // if(moveTimeCost == INT_MAX){
-    //     printf("\n\nWEEWOOEOWOWOWOWOOW\n\n");
-    // }
-    //printf("cost to move to tile: %d + %d\n", moveTimeCost, currentTime);
+    char moveToTile = r->tiles[moveToY +1][moveToX + 1]; // get tile type being moved into
+    int moveTimeCost = calculate_cost(moveToTile, a->display); // calculate cost of the tile being moved into
 
-    if(moved) {
-    //move actor in cmap to new position
-    actor *tmp = cmap->actorMap[a->y][a->x];
-    cmap->actorMap[moveToY][moveToX] = tmp;
-    cmap->actorMap[moveToY][moveToX]->moveTime = currentTime + moveTimeCost;
-    cmap->actorMap[a->y][a->x] = NULL; // remove old cost map location
-    a->x = moveToX;
-    a->y = moveToY;
-    
-    printf("moving to: seqNum: %d cost: %d dis: %c %d %d %c\n", a->seqNum, a->moveTime, a->display, a->x, a->y, moveToTile);
+    if(moved) { // only update actor position if it is moving
+        actor *tmp = cmap->actorMap[a->y][a->x];
+        cmap->actorMap[moveToY][moveToX] = tmp;
+        cmap->actorMap[a->y][a->x] = NULL; // remove old cost map location
+        a->x = moveToX;
+        a->y = moveToY;
     }
+    //update costs of actor passed in for its requeuing
+    cmap->actorMap[moveToY][moveToX]->moveTime = currentTime + moveTimeCost;
     a->moveTime = currentTime + moveTimeCost;
 
 }
 
-
-static void move_loop(int numTrainers, actorMap *cmap, distanceMap *hikerMap, distanceMap *rivalMap, struct room *r) { // should return the last actor to move
-    heap_t actorHeap;
-    actor_time_t *actor_store[numTrainers + 1], *a;
+/**
+ * Main loop for actor movement
+*/
+static void move_loop(int numTrainers, actorMap *cmap, distanceMap *hikerMap, distanceMap *rivalMap, struct room *r) {
+    heap_t actorHeap; // heap for storing actors
+    actor_time_t *actor_store[numTrainers + 1], *a; // array of actor_time_t and an actor reference
     int numActors = 0;
-    int currentTime = 0; 
-    heap_init(&actorHeap, time_cmp, NULL);
+    int currentTime = 0; // time starts at 0
+    heap_init(&actorHeap, time_cmp, NULL); // initilize heap
 
     int x, y;
     for(y = 0; y < 19; y++) {
         for(x = 0; x < 78; x++) {
-            if(cmap->actorMap[y][x]) {
-               // printf("%d %d \n");
-                actor_store[numActors++] = createActorTime(NULL, NULL, cmap->actorMap[y][x]->moveTime, cmap->actorMap[y][x]->seqNum, cmap->actorMap[y][x]->display, x, y);
+            if(cmap->actorMap[y][x]) { // if there is an actor at cmap location, add it to actor_store
+                actor_store[numActors++] = createActorTime(cmap->actorMap[y][x]->moveTime, cmap->actorMap[y][x]->seqNum, cmap->actorMap[y][x]->display, x, y);
             }
         }
     }
-    for(x = 0; x < numTrainers + 1; x++) {
-        //printf("%d \n", actor_store[x]->seqNum);
+    for(x = 0; x < numTrainers + 1; x++) { // insert actors from actor_store into heap
         heap_insert(&actorHeap, &actor_store[x]->moveTime);
     }
 
-    while((a = heap_remove_min(&actorHeap))) {
-        currentTime = a->moveTime;
-        if(a->display == 'h') {
+    while((a = heap_remove_min(&actorHeap))) { // remove lowest time actor from heap
+        currentTime = a->moveTime; // current time is the time of the most recently dequeued node
+        if(a->display == 'h') { // if selected actor is a hiker, compute based off that
             max_grad_move(a, hikerMap, currentTime, r, cmap);
         }
-        if(a->display == 'r') {
+        if(a->display == 'r') { // for rival
             max_grad_move(a, rivalMap, currentTime, r, cmap); 
         }
         
-        if(a->display == '@') {
+        if(a->display == '@') { // if Player is selected, increment its time and print the map
             a->moveTime = currentTime + 10;
-             
             room_print(r, cmap);
-            usleep(250000);
+            usleep(250000); // 4fps
         }
-        //printf("after: seqNum: %d cost: %d dis: %c %d %d\n", a->seqNum, a->moveTime, a->display, a->x, a->y);
-        heap_insert(&actorHeap, &a->moveTime);
-        // currentTime = a->moveTime
+        heap_insert(&actorHeap, &a->moveTime); // reinsert node with new moveTime back into heap
     }
 }
 
