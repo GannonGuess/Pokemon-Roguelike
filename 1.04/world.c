@@ -364,6 +364,7 @@ struct world world_init(int start_x, int start_y) {
      return *w;
 }
 
+//initilize a 21x80 array to hold actors
 actorMap actorMapInit() {
      actorMap *cmap;
      if(!(cmap = malloc(sizeof(actorMap)))) {
@@ -455,7 +456,7 @@ int main(int argc, char *argv[])
      srand(time(NULL)); //generate random room based on time
      int numTrainers;
      if(argc == 1) {
-          numTrainers = 8;
+          numTrainers = 10;
      }
      else if(argc == 3) {
           if(atoi(argv[2]) < 0) {
@@ -464,6 +465,10 @@ int main(int argc, char *argv[])
           }
           if(!strcmp(argv[1], "--numtrainers")) {
                numTrainers = atoi(argv[2]);
+               if(numTrainers > 75) {
+                    fprintf(stderr, "It looks like that many NPCs would be too difficult to play. Please choose a vlaue < 75");
+                    return -1;
+               }
           }
           else {
                fprintf(stderr, "Usage: --numtrainers <number of trainers>\n");
@@ -482,100 +487,42 @@ int main(int argc, char *argv[])
      struct world w = world_init(x, y); //Initilize the world and room at (0,0) [200,200]
      actorMap cmap = actorMapInit(); //Initilize the map for storing actors
 
+     //initilize an actor and store a player in it
      actor *player = malloc(sizeof(actor));
      struct player *pc = malloc(sizeof(struct player));
-
      player->pc = pc;
      player->seqNum = 0;
      player->display = '@';
 
-     
+     //place the player in the world and add it to the actor map
      player_place(pc, w.world_map[y][x]);
-     cmap.actorMap[pc->pc_y - 1][pc->pc_x - 1] = player;
-
-
-     // for(int i = 0; i < 19; i++) {
-     //      for(int j = 0; j < 78; j++) {
-     //           if(cmap.actorMap[i][j] == player) {
-     //                printf("%c ", cmap.actorMap[i][j]->display);
-     //           }
-     //           else {
-     //                printf(". ");
-     //           }
-     //      }
-     //      printf("\n");
-     // }
-     
-     
+     cmap.actorMap[pc->pc_y - 1][pc->pc_x - 1] = player; 
 
      
      char user_in; // user input values
      int fly_x, fly_y; // flight coordinates
      char garbage[30]; // default garbage bin size. could be redone?
      bool canFly = true; // determines if flight can be done
-     int time = 0; //value of current time
-     actor *currentActor = malloc(sizeof(actor));
 
      // main gameplay loop
      do {
      
-          generate_trainers(numTrainers, &cmap, w.world_map[y][x]);
-          printf("\ndata\n");
-          // for(int i = 0; i < 19; i++) { // display information about added actors
-          //      for(int j = 0; j < 78; j++) {
-          //           if(cmap.actorMap[i][j]) {
-          //                printf("dis: %c seqNum: %d moveTime: %d\n", cmap.actorMap[i][j]->display, cmap.actorMap[i][j]->seqNum, cmap.actorMap[i][j]->moveTime);
-          //           }
-          //      }
-          // }
-          
-          
-          for(int i = 0; i < 19; i++) { //display filled actor map
-          for(int j = 0; j < 78; j++) {
-               if(cmap.actorMap[i][j]) {
-                    printf("%c ", cmap.actorMap[i][j]->display);
-               }
-               else {
-                    printf(". ");
-               }
-          }
-          printf("\n");
-          }
+          generate_trainers(numTrainers, &cmap, w.world_map[y][x]); // generate trainers and put them into cmap   
+          room_print(w.world_map[y][x], &cmap); // print the room and actors using cmap
+          printf("Current location (x, y): (%d, %d)\n", x - 200, y - 200); // display map info
 
-          room_print(w.world_map[y][x], &cmap);
-          printf("Current location (x, y): (%d, %d)\n", x - 200, y - 200);
-          distanceMap hikerMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h'); // obtain hiker costmap
-          printf("\n");
-          distanceMap rivalMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r'); // obtain rival costmap
-          printf("\n");
+          distanceMap hikerMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'h'); // compute hiker costmap
+          distanceMap rivalMap = dijkstra(w.world_map[y][x], pc->pc_x - 1, pc->pc_y - 1, 'r'); // compute rival costmap
+          printf("\n\n");
 
-          for(int j = 0; j < 19; j++) {
-               for(int i = 0; i < 78; i++) { // loop through cost array
-                    printf("%.2d ", hikerMap.distances[j][i] % 100);
-               }
-               printf("\n");
-          }
+          move_loop(numTrainers, &cmap, &hikerMap, &rivalMap, w.world_map[y][x]); // begin movement of actors
 
-          move_loop(numTrainers, &cmap, &hikerMap, &rivalMap, w.world_map[y][x]);
-          for(int i = 0; i < 19; i++) { //display filled actor map
-          for(int j = 0; j < 78; j++) {
-               if(cmap.actorMap[i][j]) {
-                    printf("%c ", cmap.actorMap[i][j]->display);
-               }
-               else {
-                    printf(". ");
-               }
-          }
-          printf("\n");
-          }
-          room_print(w.world_map[y][x], &cmap);
-          //printf("current: %c %d %d\n", currentActor->display, currentActor->seqNum, currentActor->moveTime);
 
           return 0;
           
     
 
-          
+          //Command input commented out for 1.04
           /*printf("\nCommand: ");
           int size = scanf(" %1c", &user_in);
           if(user_in == 'f') { // scan for <x, y> for flight
@@ -640,7 +587,6 @@ int main(int argc, char *argv[])
           if(!w.world_map[y][x]) {
                expand(&w, pc, x, y);
           }*/
-     usleep(5000000); //sleep for 5 second before output
      } while(user_in != 'q');
      return 0;
 }

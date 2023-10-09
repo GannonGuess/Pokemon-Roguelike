@@ -1,6 +1,5 @@
 #ifndef WORLD_C
 #define WORLD_C
-
 #include <stdbool.h>
 
 struct room {
