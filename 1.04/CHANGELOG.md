@@ -1,5 +1,40 @@
 ## Version 1.04
 
+10/08 21:00 - Packaged 1.04 for submission
+
+10/08 20:45 - cleaned up code, commented, and updated README for 1.04
+
+10/08 17:22 - completely rewrote how movement works so that actors do not get stuck near impassable terrain
+            - prevent actors from gravitating towards the top of the screen
+
+10/08 16:30 - reinsert nodes to that everything will update multiple times
+            - segmentation fault, looking into movement function
+
+10/08 15:42 - move() function in trainer.c takes input of removed heap node and moves it
+            - updates actorMap with nodes new location and updates the actor's cost for its reinsertion
+            - prints the screen if the selected actor is the player actor
+            - sleep after printing
+
+10/08 12:32 - updated trainer.c to use a priority queue for obtaining actor with shortest time
+            - time_cmp() function used to determine which of two times is shorter, if the same uses shorter seqNumber
+            - Actor copies made from actorMap and inserted into heap (could maybe cut out copies in the future?)
+
+10/08 11:01 - finally fixed stupid error that prevented room struct from being passed into actor generation properly
+
+10/08 01:30 - Added debugging comments and update user switch
+            - Dijkstra now returns a distanceMap struct containing an array storing distances
+
+10/08 00:15 - created trainer.c which generates trainers and adds them to actormap
+
+10/07 23:32 - added trainer.h and structs for actors and actormap
+            - add initilizer for actormap
+            - removed redundant room_output function
+
+10/05 09:23 - Changed player struct to no longer store the tile its on top of
+            - Trees now represented as `4`
+            - Created switch for calling file with specified number of trainers
+
+10/01 21:20 - Copied files for 1.03
 
 ## Version 1.03
 
