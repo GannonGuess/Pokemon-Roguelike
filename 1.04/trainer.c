@@ -16,7 +16,7 @@ static int32_t time_cmp(const void *key, const void *with) {
 */
 int newActor(actorMap *cmap, int y, int x, int n) {
     actor *a;
-    if(!(a = malloc(sizeof(a)))) {
+    if(!(a = malloc(sizeof(actor)))) {
         printf("Failed to allocate storage for new actor");
     }
     struct npc *npc;
