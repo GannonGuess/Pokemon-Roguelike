@@ -1,4 +1,5 @@
 #include "trainer.h"
+#include "movement.h"
 
 
 // comparator for finding smallest moveTime
@@ -171,6 +172,7 @@ static void move_loop(int numTrainers, actorMap *cmap, distanceMap *hikerMap, di
         }
         
         if(a->display == '@') { // if Player is selected, increment its time and print the map
+            move_player();
             a->moveTime = currentTime + 10;
             room_print(r, cmap);
             usleep(250000); // 4fps
