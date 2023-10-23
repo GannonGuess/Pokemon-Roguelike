@@ -1,7 +1,47 @@
 # 327 Pokemon Game README - Gannon Guess
 
 ## Version 1.05
-
+This version adds the user interface, allowing for unbuffered command inputs using the ncurses library. Whenever it is tha player's turn, the game will halt and wait for a command to be input. Due to incompatability with the structure of version 1.04, the instructors code was brought in for the base of 1.05. Hopefully this will not happen again in the future.
+- Color added
+  - Makes screen flicker on refresh sometimes. Not an issue overall though.
+- PC movement commands added
+  - `y/7` - up left
+  - `k/8` - up
+  - `u/9` - up right
+  - `l/6` - right
+  - `n/3` - down right
+  - `j/2` - down
+  - `b/1` - down left
+  - `h/4` - left
+  - `5/./<space>` - wait
+  - `>` - attempt to enter building
+    - `<` - exit building
+  - `t` - display trainer list with relative positions
+    - `<down arrow>` - scroll down trainer list
+    - `<up arrow>` - scroll up trainer list
+    - `esc` - return to character controls
+  - `Q` - quit the game
+    - NOTE lowercase `q` WILL NOT WORK. This was done to prevent accidental exit of game.
+- Error messages should be displayed if attempting to move into impassable terrain, a gate, or attempting to enter a building where there isn't one.
+- If the PC attempts to move into a cell that an npc is currently in, a battle will begin
+  - Due to how the time system works in this game and how the map is only updated after the PC moves, the NPC may seem to be two squares away when the battle starts. Their move was just calculated at a different time. Player must be aware of how movement works to avoid unwanted battles, adding some forethought.
+  - Since neither the PC or NPC have pokemon, nothing can be done. Press `esc` to exit the battle and flag the NPC as defeated
+- A battle will also trigger if the NPC attempts to move into the PC's cell during their turn
+- Neither the NPC nor the PC will move if they triggered a battle on their turn. This is done so that the PC and NPC come out of battle with some space for the pokemon to have fought. Kind of hard to fit everyone on the same cell.
+- After a trainer is defeated, they are set to sentry movement (standing still), just like the classic pokemon games. Guess they took the loss a little too hard. They cannot be battled again as you crushed their spirits.
+- Defeated trainers can be walked over to prevent soft-locks in tunnels and prevent waiting for NPCs to move. Wouldn't be a very fun game otherwise.
+  - This also allows for strategic battle locations. Using a defeated npc to block of undefeated ones can allow you to escape if in danger
+  - The PC's display symbol `@` takes priority over the NPC's display symbol when on the same tile as an NPC
+  - Defeated trainers are given the path's color to indicate that they can be walked over.
+- Swimmers can leave water to walk on paths that are near water. (Part of instructor code that I kept because its neat)
+  - Swimmers can start battle with PC if PC is next to water. This was done so that Swimmers don't need paths to fight PC. Watch out, though -- they're fast.
+- FIXED BUG WITH PACERS
+  - Making note so I can come back to this for bug fixes, hopefully
+- Buildings, when entered, display a message about how they are not in use right now.
+- Trainer list `<t>` displays all trainer types on current map and their relative position to the PC.
+- Changed instructor code so that GATES do not extend out into the environment one tile and are now always flush with the map border. I want the PC to be able to access those tiles like my previous versions.
+  - Attempting to enter a gate displays a message that the path is blocked off.
+- Added easter eggs
 
 ## Version 1.04
 This version adds Trainer movement. A number of trainers (or actors) chosen by the user or by default (10) are generated and placed into a trainer map. The map is then used to calculate where the trainers will move. The screen is updated every time the player takes its turn. Hikers and Rivals are the actors added in this version.
