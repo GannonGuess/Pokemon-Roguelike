@@ -22,6 +22,7 @@ This version adds the user interface, allowing for unbuffered command inputs usi
     - `esc` - return to character controls
   - `Q` - quit the game
     - NOTE lowercase `q` WILL NOT WORK. This was done to prevent accidental exit of game.
+    - QUIT command does not work when in trainer list, when inside building, or when engaged in battle
 - Error messages should be displayed if attempting to move into impassable terrain, a gate, or attempting to enter a building where there isn't one.
 - If the PC attempts to move into a cell that an npc is currently in, a battle will begin
   - Due to how the time system works in this game and how the map is only updated after the PC moves, the NPC may seem to be two squares away when the battle starts. Their move was just calculated at a different time. Player must be aware of how movement works to avoid unwanted battles, adding some forethought.
@@ -39,9 +40,11 @@ This version adds the user interface, allowing for unbuffered command inputs usi
   - Making note so I can come back to this for bug fixes, hopefully
 - Buildings, when entered, display a message about how they are not in use right now.
 - Trainer list `<t>` displays all trainer types on current map and their relative position to the PC.
+  - Trainer list cannot scroll if there are fewer NPCs than display lines (24)
 - Changed instructor code so that GATES do not extend out into the environment one tile and are now always flush with the map border. I want the PC to be able to access those tiles like my previous versions.
   - Attempting to enter a gate displays a message that the path is blocked off.
 - Added easter eggs
+- May have segmentation fault at very high NPC counts
 
 ## Version 1.04
 This version adds Trainer movement. A number of trainers (or actors) chosen by the user or by default (10) are generated and placed into a trainer map. The map is then used to calculate where the trainers will move. The screen is updated every time the player takes its turn. Hikers and Rivals are the actors added in this version.
