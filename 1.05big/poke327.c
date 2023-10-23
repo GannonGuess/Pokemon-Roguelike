@@ -65,7 +65,7 @@ typedef int16_t pair_t[num_dims];
 #define SWIMMER_SYMBOL  'm'
 #define WANDERER_SYMBOL 'w'
 
-#define PATH_PAIR     0
+
 #define GRASS_PAIR    1
 #define WATER_PAIR    2
 #define ROCK_PAIR     3
@@ -74,6 +74,7 @@ typedef int16_t pair_t[num_dims];
 #define DEFEATED_PAIR 6
 #define CENTER_PAIR   7
 #define MART_PAIR     8
+#define PATH_PAIR     10
 
 
 #define mappair(pair) (m->map[pair[dim_y]][pair[dim_x]])
@@ -185,10 +186,10 @@ static pair_t all_dirs[8] = {
  * movement cost, or it throws a wrench into the turn queue.        */
 int32_t move_cost[num_character_types][num_terrain_types] = {
 //  boulder,tree,path,mart,center,grass,clearing,mountain,forest,water,gate
-  { IM, IM, 10, 10, 10, 20, 10, IM, IM, IM, 10 },
+  { IM, IM, 10, 10, 10, 20, 10, IM, IM, IM, 10 }, //PLAYER
   { IM, IM, 10, 50, 50, 15, 10, 15, 15, IM, IM },
   { IM, IM, 10, 50, 50, 20, 10, IM, IM, IM, IM },
-  { IM, IM,  7, IM, IM, IM, IM, IM, IM,  7, IM },
+  { IM, IM,  7, IM, IM, IM, IM, IM, IM,  7, IM }, //SWIMMER
   { IM, IM, 10, 50, 50, 20, 10, IM, IM, IM, IM },
 };
 #undef IM
@@ -329,7 +330,7 @@ static void move_hiker_func(character_t *c, pair_t dest)
         min = world.rival_dist[dest[dim_y]][dest[dim_x]];
       }
     }
-    if(dest[dim_x] == world.pc.pos[dim_x] && dest[dim_y] == world.pc.pos[dim_y]) {
+    if(dest[dim_x] == world.pc.pos[dim_x] && dest[dim_y] == world.pc.pos[dim_y]) { // if not defeated and walking into pc
       battle_init(c->npc);
       c->npc->mtype = move_sentry;
       dest[dim_x] = c->pos[dim_x];
@@ -374,7 +375,7 @@ static void move_rival_func(character_t *c, pair_t dest)
         min = world.rival_dist[dest[dim_y]][dest[dim_x]];
       }
     }
-    if(dest[dim_x] == world.pc.pos[dim_x] && dest[dim_y] == world.pc.pos[dim_y]) {
+    if(dest[dim_x] == world.pc.pos[dim_x] && dest[dim_y] == world.pc.pos[dim_y]) { // if not defeated and walking into pc
       battle_init(c->npc);
       c->npc->mtype = move_sentry;
       dest[dim_x] = c->pos[dim_x];
@@ -415,7 +416,7 @@ static void move_pacer_func(character_t *c, pair_t dest) /// SOMETIMES WALKS INT
     dest[dim_y] = c->pos[dim_y] + c->npc->dir[dim_y];
   }
   if(!c->npc->isDefeated && world.cur_map->cmap[c->pos[dim_y] + c->npc->dir[dim_y]]
-                         [c->pos[dim_x] + c->npc->dir[dim_x]]) {
+                         [c->pos[dim_x] + c->npc->dir[dim_x]]) { // if not defeated and walking into pc
       battle_init(c->npc);
       c->npc->mtype = move_sentry;
       dest[dim_x] = c->pos[dim_x];
@@ -455,7 +456,7 @@ static void move_wanderer_func(character_t *c, pair_t dest)
     dest[dim_y] = c->pos[dim_y] + c->npc->dir[dim_y];
   }
   if(!c->npc->isDefeated && world.cur_map->cmap[c->pos[dim_y] + c->npc->dir[dim_y]]
-                         [c->pos[dim_x] + c->npc->dir[dim_x]]) {
+                         [c->pos[dim_x] + c->npc->dir[dim_x]]) { // if not defeated and moving into pc
       battle_init(c->npc);
       c->npc->mtype = move_sentry;
       dest[dim_x] = c->pos[dim_x];
@@ -497,7 +498,7 @@ static void move_explorer_func(character_t *c, pair_t dest)
     dest[dim_y] = c->pos[dim_y] + c->npc->dir[dim_y];
   }
   if(!c->npc->isDefeated && world.cur_map->cmap[c->pos[dim_y] + c->npc->dir[dim_y]]
-                          [c->pos[dim_x] + c->npc->dir[dim_x]]) {
+                          [c->pos[dim_x] + c->npc->dir[dim_x]]) { // if not defeated and moving into PC
     battle_init(c->npc);
     c->npc->mtype = move_sentry;
     dest[dim_x] = c->pos[dim_x];
@@ -527,9 +528,9 @@ static void move_swimmer_func(character_t *c, pair_t dest) // SOMETIMES GO ON LA
     }
     
     if(!c->npc->isDefeated && m->cmap[dest[dim_y] + dir[dim_y]]
-                          [dest[dim_x] + dir[dim_x]]) {
+                          [dest[dim_x] + dir[dim_x]]) { // if this trainer is not defeated
       if(m->cmap[dest[dim_y] + dir[dim_y]]
-                          [dest[dim_x] + dir[dim_x]]->pc) {
+                          [dest[dim_x] + dir[dim_x]]->pc) { // start battle if would move to pc
         battle_init(c->npc);
         c->npc->mtype = move_sentry;
         dest[dim_x] = c->pos[dim_x];
@@ -582,7 +583,7 @@ static void move_swimmer_func(character_t *c, pair_t dest) // SOMETIMES GO ON LA
     }
   }
 
-  if (m->cmap[dest[dim_y]][dest[dim_x]]) {
+  if (m->cmap[dest[dim_y]][dest[dim_x]]) { // second simmer battle handler
     if(m->cmap[dest[dim_y]][dest[dim_x]]->npc) {
       /* Occupied.  Just be patient. */
       dest[dim_x] = c->pos[dim_x];
@@ -762,7 +763,7 @@ void place_characters(int total_trainers)
       new_char_other();
       break;
     }
-  } while (++num_trainers < total_trainers);
+  } while (++num_trainers < total_trainers); // print specific number of trainers given by user
 }
 
 int32_t cmp_char_turns(const void *key, const void *with)
@@ -1442,19 +1443,19 @@ static int map_terrain(map_t *m, int8_t n, int8_t s, int8_t e, int8_t w)
 
   if (n != -1) {
     mapxy(n,         0        ) = ter_gate;
-    mapxy(n,         1        ) = ter_gate;
+    mapxy(n,         1        ) = ter_path; // updated to have gates flush with wall
   }
   if (s != -1) {
     mapxy(s,         MAP_Y - 1) = ter_gate;
-    mapxy(s,         MAP_Y - 2) = ter_gate;
+    mapxy(s,         MAP_Y - 2) = ter_path;
   }
   if (w != -1) {
     mapxy(0,         w        ) = ter_gate;
-    mapxy(1,         w        ) = ter_gate;
+    mapxy(1,         w        ) = ter_path;
   }
   if (e != -1) {
     mapxy(MAP_X - 1, e        ) = ter_gate;
-    mapxy(MAP_X - 2, e        ) = ter_gate;
+    mapxy(MAP_X - 2, e        ) = ter_path;
   }
 
   return 0;
@@ -1577,34 +1578,44 @@ static int new_map(int num_trainers)
   return 0;
 }
 
-static void print_map()
-{
+static void print_map() {
+  clear();
+  int shiny = rand() % 8192; // easter eggs
+  int rus = rand() % 21845;
+  if(shiny == 256) {
+    mvprintw(22, 0, "Congratulations! This message has the appearance rate of a Shiny Pokemon.");
+    mvprintw(23, 0, "Too bad there aren't any in the game...");
+  }
+  if(rus == 512) {
+    mvprintw(22, 0, "Holy Moly! This message has the appearance rate of a PokeRus.");
+    mvprintw(23, 0, "Thats 1 in 21845. You wish your luck hadn't been wasted here");
+  }
+
   int x, y;
   int default_reached = 0;
-  clear();
   for (y = 0; y < MAP_Y; y++) {
     for (x = 0; x < MAP_X; x++) {
 
-      if (world.cur_map->cmap[y][x]) {
-        if((world.cur_map->cmap[y][x]->npc &&  world.pc.pos[dim_y] == y && world.pc.pos[dim_x] == x) || world.cur_map->cmap[y][x]->pc) {
+      if (world.cur_map->cmap[y][x]) { // if entity
+        if((world.cur_map->cmap[y][x]->npc &&  world.pc.pos[dim_y] == y && world.pc.pos[dim_x] == x) ||
+            world.cur_map->cmap[y][x]->pc) { // if npc and player are on same tile, print player
           attron(COLOR_PAIR(PLAYER_PAIR));
           mvaddch(y + 1, x, '@');
           attroff(COLOR_PAIR(PLAYER_PAIR));
         } 
         else {
-          if(world.cur_map->cmap[y][x]->npc->isDefeated) {
+          if(world.cur_map->cmap[y][x]->npc->isDefeated) { // otherwise if npc and defeated
             attron(COLOR_PAIR(DEFEATED_PAIR));
             mvaddch(y + 1, x, world.cur_map->cmap[y][x]->symbol);
             attroff(COLOR_PAIR(DEFEATED_PAIR));
           }
-          else {
+          else { // otherwise if npc
             attron(COLOR_PAIR(NPC_PAIR));
             mvaddch(y + 1, x, world.cur_map->cmap[y][x]->symbol);
             attroff(COLOR_PAIR(NPC_PAIR));
           }
-          
         }
-      } else {
+      } else { // print terrains
         switch (world.cur_map->map[y][x]) {
         case ter_boulder:
           attron(COLOR_PAIR(ROCK_PAIR));
@@ -1665,6 +1676,7 @@ static void print_map()
   }
   refresh();
   if (default_reached) {
+    endwin(); // exit ncurses
     fprintf(stderr, "Default reached in %s\n", __FUNCTION__);
   }
 }
@@ -1965,7 +1977,7 @@ void print_character(character_t *c)
          c->pos[dim_y], c->next_turn, c->seq_num);
 }
 
-void start_mart() {
+void start_mart() { // pokemart screen
   clear();
   mvprintw(0, 0, "Welcome to the Pokemart!");
   mvprintw(1, 0, "Seems like they're out of stock...");
@@ -1976,20 +1988,17 @@ void start_mart() {
   }
 }
 
-void start_center() {
+void start_center() { // pokemon center screen
   clear();
   mvprintw(0, 0, "Welcome to the Pokemon Center!");
   mvprintw(1, 0, "Seems that Nurse Joy isn't here right now...");
   mvprintw(2, 0, "You should come back later");
   mvprintw(4, 0, "Press \'<\' to leave");
   while(getch() != KEY_LEFT) {
-    
   }
 }
 
-
-void list_trainers(int command) {
-  scrollok(stdscr, TRUE);
+void list_trainers(int command) { // lists all trainers, types, and relative positions
   int y, x, i = 0;
   pair_t player_pos;
   player_pos[dim_y] = world.pc.pos[dim_y];
@@ -1997,12 +2006,12 @@ void list_trainers(int command) {
   char buffer[MAX_TRAINERS][21];
   int buffer_size =  0;
   
-  clear();
-  for(y = 0; y < MAP_Y; y++) {
+  for(y = 0; y < MAP_Y; y++) { // iterate through cmap to look for trainers
     for(x = 0; x < MAP_X; x++) {
-      if(world.cur_map->cmap[y][x] && !world.cur_map->cmap[y][x]->pc) {
+      if(world.cur_map->cmap[y][x] && !world.cur_map->cmap[y][x]->pc) { // if trainer and not pc
         char result[21];
         char second[9];
+        // find relative position to pc
         if(player_pos[dim_y] - y >= 0) {
           snprintf(result, 21, "%c, %d north,", world.cur_map->cmap[y][x]->symbol, player_pos[dim_y] - y);
         }
@@ -2015,8 +2024,9 @@ void list_trainers(int command) {
         if(player_pos[dim_x] - x < 0) {
           snprintf(second, 9, " %d east", x - player_pos[dim_x]);
         }
+        // combine positions
         strcat(result, second);
-        if(buffer_size < MAX_TRAINERS) {
+        if(buffer_size < MAX_TRAINERS) { // add positions to list
           strcpy(buffer[buffer_size], result);
           buffer_size++;
         }
@@ -2025,160 +2035,156 @@ void list_trainers(int command) {
     }
 
   }
-  refresh();
 
-  int MAX_LINES = 24;
-
+  int MAX_LINES = 24; // max display lines in terminal
   int current_line = 0;
 
-  while(command != 27) {
+  while(command != 27) { // while ! esc
     
-    if(command == KEY_DOWN) {
+    if(command == KEY_DOWN) { // move down list
       if(current_line < buffer_size - 1) {
         current_line++;
       } 
     } 
-    else if(command == KEY_UP) {
+    else if(command == KEY_UP) { // move up list
       if(current_line > 0) {
         current_line--;
        }
     }
     clear();
-    for(i = 0; i < MAX_LINES && current_line + i < buffer_size; i++) {
+    for(i = 0; i < MAX_LINES && current_line + i < buffer_size; i++) { // print from index
       mvprintw(i, 0, buffer[current_line + i]);
     }
     refresh();
     command = getch();
   }
   
-  scrollok(stdscr, FALSE);
   
 }
 
-int is_valid_command(char command) {
-  if(command == 'q' || command == '5' || command == ' ' || command == '.' ||
+int is_valid_command(char command) { // checks if command is a part of the command list
+  if(command == 'Q' || command == '5' || command == ' ' || command == '.' ||
      command == '7' || command == 'y' || command == '8' || command == 'k' ||
      command == '9' || command == 'u' || command == '6' || command == 'l' ||
      command == '3' || command == 'n' || command == '2' || command == 'j' ||
      command == '1' || command == 'b' || command == '4' || command == 'h' ||
-     command == (char) KEY_RIGHT || command == 't' || command == 27) {
+     command == (char) KEY_RIGHT || command == 't') {
       return 1;
   }
 
   return 0;
 }
 
-int perform_action(char command) {
-    char current_tile = world.cur_map->map[world.pc.pos[dim_y]][world.pc.pos[dim_x]];
-    pair_t dest;
+int perform_action(char command) { // perform action based off of input command
+    pair_t dest; // initilize destination tile
     dest[dim_x] = world.pc.pos[dim_x];
     dest[dim_y] = world.pc.pos[dim_y];
-    int moved = 0;
-    if(command == 'q') {
+    int moved = 0; // boolean for if player moved
+    if(command == 'Q') { // return if quit
       return 1;
     }
-    if(command == '5' || command == '.' || command == ' ') {
-      mvprintw(0, 0, "Resting");
+    if(command == '5' || command == '.' || command == ' ') { // wait
+      return 1;
     }
-    else if(command == '7' || command =='y') {
-        mvprintw(0, 0, "Up-left");
-        if(world.pc.pos[dim_y] > 1 && world.pc.pos[dim_x] > 1) {
+    else if(command == '7' || command =='y') { // move up left
+        if(world.pc.pos[dim_y] > 0 && world.pc.pos[dim_x] > 0) {
           dest[dim_y] = world.pc.pos[dim_y] - 1;
           dest[dim_x] = world.pc.pos[dim_x] - 1;
           moved = 1;
         }
     }
-    else if(command == '8' || command =='k') {
-        mvprintw(0, 0, "Up");
-        if(world.pc.pos[dim_y] > 1) {
+    else if(command == '8' || command =='k') { // move up
+        if(world.pc.pos[dim_y] > 0) {
           dest[dim_y] = world.pc.pos[dim_y] - 1;
           moved = 1;
         }
     }
-    else if(command == '9' || command =='u') {
-        mvprintw(0, 0, "Up-right");
-        if(world.pc.pos[dim_y] > 1 && world.pc.pos[dim_x] < 78) {
+    else if(command == '9' || command =='u') { // move up right
+        if(world.pc.pos[dim_y] > 0 && world.pc.pos[dim_x] < 79) {
           dest[dim_y] = world.pc.pos[dim_y] - 1;
           dest[dim_x] = world.pc.pos[dim_x] + 1;
           moved = 1;
         }
     }
-    else if(command == '6' || command =='l') {
-        mvprintw(0, 0, "Right");
-        if(world.pc.pos[dim_x] < 78) {
+    else if(command == '6' || command =='l') { // move right
+        if(world.pc.pos[dim_x] < 79) {
           dest[dim_x] = world.pc.pos[dim_x] + 1;
           moved = 1;
         }
     }
-    else if(command == '3' || command =='n') {
-        mvprintw(0, 0, "Down-right");
-        if(world.pc.pos[dim_y] < 19 && world.pc.pos[dim_x] < 78) {
+    else if(command == '3' || command =='n') { // move down right
+        if(world.pc.pos[dim_y] < 20 && world.pc.pos[dim_x] < 79) {
           dest[dim_y] = world.pc.pos[dim_y] + 1;
           dest[dim_x] = world.pc.pos[dim_x] + 1;
           moved = 1;
         }
     }
-    else if(command == '2' || command =='j') {
-        mvprintw(0, 0, "Down");
-        if(world.pc.pos[dim_y] < 19) {
+    else if(command == '2' || command =='j') { // move down
+        if(world.pc.pos[dim_y] < 20) {
           dest[dim_y] = world.pc.pos[dim_y] + 1;
           moved = 1;
         }
     }
-    else if(command == '1' || command =='b') {
-        mvprintw(0, 0, "Down-left");
-        if(world.pc.pos[dim_y] < 19 && world.pc.pos[dim_x] > 1) {
+    else if(command == '1' || command =='b') { // move down left
+        if(world.pc.pos[dim_y] < 20 && world.pc.pos[dim_x] > 0) {
           dest[dim_y] = world.pc.pos[dim_y] + 1;
           dest[dim_x] = world.pc.pos[dim_x] - 1;
           moved = 1;
         }
     }
-    else if(command == '4' || command =='h') {
-        mvprintw(0, 0, "Left");
-        if(world.pc.pos[dim_x] > 1) {
+    else if(command == '4' || command =='h') { // move left
+        if(world.pc.pos[dim_x] > 0) {
           dest[dim_x] = world.pc.pos[dim_x] - 1;
           moved = 1;
         }
     }
-    else if(command == (char) KEY_RIGHT) {
-      if(current_tile == ter_mart) {
+    else if(command == (char) KEY_RIGHT) { // attempt to enter building if standing on one
+      char current_tile = world.cur_map->map[world.pc.pos[dim_y]][world.pc.pos[dim_x]];
+      if(current_tile == ter_mart) { // enter mart if on mart
         start_mart();
+        print_map();
       }
-      else if(current_tile == ter_center) {
+      else if(current_tile == ter_center) { // enter center if on center
         start_center();
         print_map();
       }
-      print_map();
+      else {
+        mvprintw(0, 0, "There is no building here...");
+        refresh();
+      }
       return 0;
     }
-    else if(command == 't') {
+    else if(command == 't') { // display trainer list
       list_trainers((int) command);
       print_map();
       return 0;
     }
+    
 
-
-    char destTile = world.cur_map->map[dest[dim_y]][dest[dim_x]];
+    char destTile = world.cur_map->map[dest[dim_y]][dest[dim_x]]; // tile being moved into
     if(moved && (destTile == ter_boulder || destTile == ter_tree || destTile == ter_water || destTile == ter_mountain || 
-                 destTile == ter_forest || destTile == ter_gate)) {
-      dest[dim_x] = world.pc.pos[dim_x];
-      dest[dim_y] = world.pc.pos[dim_y]; 
-      moved = 0;
+                 destTile == ter_forest)) { // if destination tile is impasse
+      mvprintw(0, 0, "There is something in your way");
+      refresh();
+      return 0;
     }
-    if(moved && (world.cur_map->cmap[dest[dim_y]][dest[dim_x]])) {
-      if(!world.cur_map->cmap[dest[dim_y]][dest[dim_x]]->npc->isDefeated) {
-        if(battle_init(world.cur_map->cmap[dest[dim_y]][dest[dim_x]]->npc)) {
-          world.cur_map->cmap[dest[dim_y]][dest[dim_x]]->npc->isDefeated = 1;
-          if(world.cur_map->cmap[dest[dim_y]][dest[dim_x]]->npc->ctype != char_swimmer) {
-            world.cur_map->cmap[dest[dim_y]][dest[dim_x]]->npc->mtype = move_sentry;
-          }
+    if(moved && destTile == ter_gate) { // if destination tile is gate
+      mvprintw(23, 0, "It looks like the way forward is blocked off...");
+      refresh();
+      clrtoeol();
+      return 0;
+    }
+    if(moved && (world.cur_map->cmap[dest[dim_y]][dest[dim_x]])) { // if destination has an npc
+      if(!world.cur_map->cmap[dest[dim_y]][dest[dim_x]]->npc->isDefeated) { // if npc is not defeated, start a battle
+        if(battle_init(world.cur_map->cmap[dest[dim_y]][dest[dim_x]]->npc)) { // if player wins battle, update npc to sentry
+          world.cur_map->cmap[dest[dim_y]][dest[dim_x]]->npc->mtype = move_sentry;
         }
-        dest[dim_x] = world.pc.pos[dim_x];
+        dest[dim_x] = world.pc.pos[dim_x]; // do not move player after a battle
         dest[dim_y] = world.pc.pos[dim_y]; 
         moved = 0; 
       }
     }
-    if(moved) {
+    if(moved) { // if player moved, update their position
       world.cur_map->cmap[dest[dim_y]][dest[dim_x]] = &world.pc;
       if(!world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]]->npc) {
         world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
@@ -2191,19 +2197,18 @@ int perform_action(char command) {
    return 1;
 }
 
-int battle_init(npc_t *n) {
+int battle_init(npc_t *n) { // handles trainer battles
   clear();
   mvprintw(0, 0, "A trainer wants to battle!");
   mvprintw(1, 0, "But neither of you have pokemon...");
   mvprintw(2, 0, "You should come back later");
   mvprintw(4, 0, "Press \'esc\' to leave");
   while(getch() != 27) {
-    
   }
 
-  n->isDefeated = 1;
-  clear();
-  print_map();
+  n->isDefeated = 1; // set npc to defeated if player wins
+  clear(); 
+  print_map(); // exit back to map
 
   return 1;
 }
@@ -2212,27 +2217,24 @@ int battle_init(npc_t *n) {
 void game_loop()
 {
 
-  print_map();
+  print_map(); // print first map
   character_t *c;
   pair_t d;
-  char command = ' ';
-  while (command != 'q') {
+  char command = 's'; // set command to something random
+  while (command != 'Q') {
     c = heap_remove_min(&world.cur_map->turn);
     //    print_character(c);
-    if (c == &world.pc) {
-      command = getch(); //t
-      while(!is_valid_command(command)) { // TRUE
+    if (c == &world.pc) { // if pc's turn, get user command
+      command = getch();
+      while(!is_valid_command(command)) { // check that command is valid
         mvprintw(22, 0, "Invalid Command");
         command = getch();
       }
       clrtoeol();
-      while(perform_action(command) == 0) {
+      while(perform_action(command) == 0) { // only move on to updating npcs if command was a movement
         command = getch();
       }
-      clear();
-      print_map();
-      refresh();
-      usleep(250000);
+      print_map(); // print the map after player moves
       c->next_turn += move_cost[char_pc][world.cur_map->map[c->pos[dim_y]]
                                                            [c->pos[dim_x]]];
       pathfind(world.cur_map);
@@ -2250,31 +2252,30 @@ void game_loop()
   endwin();
 }
 
-void io_init_terminal() {
+void io_init_terminal() { //initilize terminal for ncurses
     initscr();
-    cbreak();
-    noecho();
-    curs_set(0);
-    keypad(stdscr, TRUE);
+    cbreak(); // can use ctrl c to quit if issue
+    noecho(); // doesnt print pressed key
+    curs_set(0); // no flashing cursor
+    keypad(stdscr, TRUE); // allows special keys
     nodelay(stdscr, TRUE);
-    set_escdelay(0);
-    timeout(-1);
-    start_color();
-    init_pair(PATH_PAIR, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(GRASS_PAIR, COLOR_GREEN, COLOR_BLACK);
-    init_pair(PLAYER_PAIR, COLOR_RED, COLOR_BLACK);
-    init_pair(WATER_PAIR, COLOR_CYAN, COLOR_BLACK);
-    init_pair(ROCK_PAIR, COLOR_WHITE, COLOR_BLACK);
-    init_pair(CENTER_PAIR, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(MART_PAIR, COLOR_BLUE, COLOR_BLACK);
-    init_pair(NPC_PAIR, COLOR_RED, COLOR_BLACK);
-    init_pair(DEFEATED_PAIR, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(PATH_PAIR, COLOR_YELLOW, COLOR_BLACK);
+    set_escdelay(0); // escape does not take 1 second to confirm
+    timeout(-1); // halts at getch()
+    start_color(); // begin terminal colorizing
+    init_pair(PATH_PAIR, COLOR_YELLOW, COLOR_BLACK); // path color
+    init_pair(GRASS_PAIR, COLOR_GREEN, COLOR_BLACK); // grass
+    init_pair(PLAYER_PAIR, COLOR_RED, COLOR_BLUE);   // player
+    init_pair(WATER_PAIR, COLOR_CYAN, COLOR_BLACK);  // water
+    init_pair(ROCK_PAIR, COLOR_WHITE, COLOR_BLACK);  // rocks
+    init_pair(CENTER_PAIR, COLOR_MAGENTA, COLOR_BLACK);  // pokecenter
+    init_pair(MART_PAIR, COLOR_BLUE, COLOR_BLACK);   // pokemart
+    init_pair(NPC_PAIR, COLOR_RED, COLOR_BLACK);     // npc
+    init_pair(DEFEATED_PAIR, COLOR_YELLOW, COLOR_BLACK);  // defeated npc
 }
 
 int main(int argc, char *argv[])
 {
-  io_init_terminal();
+  io_init_terminal(); // start terminal for game
   struct timeval tv;
   uint32_t seed;
   int num_trainers = MIN_TRAINERS;
@@ -2285,9 +2286,9 @@ int main(int argc, char *argv[])
     gettimeofday(&tv, NULL);
     seed = (tv.tv_usec ^ (tv.tv_sec << 20)) & 0xffffffff;
   }
-  if(argc == 3) {
-    if(atoi(argv[2]) < 0) {
-      fprintf(stderr, "Number of trainser must be >= 0");
+  if(argc == 3) { // get --numtrainers switch info
+    if(atoi(argv[2]) < 3) {
+      fprintf(stderr, "Number of trainser must be >= 3");
       return -1;
     }
     if(!strcmp(argv[1], "--numtrainers")) {
