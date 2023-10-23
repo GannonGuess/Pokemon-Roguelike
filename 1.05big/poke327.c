@@ -417,10 +417,13 @@ static void move_pacer_func(character_t *c, pair_t dest) /// SOMETIMES WALKS INT
   }
   if(!c->npc->isDefeated && world.cur_map->cmap[c->pos[dim_y] + c->npc->dir[dim_y]]
                          [c->pos[dim_x] + c->npc->dir[dim_x]]) { // if not defeated and walking into pc
+    if( world.cur_map->cmap[c->pos[dim_y] + c->npc->dir[dim_y]]
+                           [c->pos[dim_x] + c->npc->dir[dim_x]]->pc) {
       battle_init(c->npc);
       c->npc->mtype = move_sentry;
       dest[dim_x] = c->pos[dim_x];
       dest[dim_y] = c->pos[dim_y];
+    }
   }
   char destTile = world.cur_map->map[dest[dim_y]][dest[dim_x]];
   if(destTile != ter_path && destTile != ter_grass && destTile != ter_clearing) { // should fix walking into walls
@@ -457,10 +460,13 @@ static void move_wanderer_func(character_t *c, pair_t dest)
   }
   if(!c->npc->isDefeated && world.cur_map->cmap[c->pos[dim_y] + c->npc->dir[dim_y]]
                          [c->pos[dim_x] + c->npc->dir[dim_x]]) { // if not defeated and moving into pc
+    if(world.cur_map->cmap[c->pos[dim_y] + c->npc->dir[dim_y]]
+                         [c->pos[dim_x] + c->npc->dir[dim_x]]->pc) {
       battle_init(c->npc);
       c->npc->mtype = move_sentry;
       dest[dim_x] = c->pos[dim_x];
       dest[dim_y] = c->pos[dim_y];
+    }
   }
 }
 
@@ -499,10 +505,13 @@ static void move_explorer_func(character_t *c, pair_t dest)
   }
   if(!c->npc->isDefeated && world.cur_map->cmap[c->pos[dim_y] + c->npc->dir[dim_y]]
                           [c->pos[dim_x] + c->npc->dir[dim_x]]) { // if not defeated and moving into PC
-    battle_init(c->npc);
-    c->npc->mtype = move_sentry;
-    dest[dim_x] = c->pos[dim_x];
-    dest[dim_y] = c->pos[dim_y];
+    if(world.cur_map->cmap[c->pos[dim_y] + c->npc->dir[dim_y]]
+                          [c->pos[dim_x] + c->npc->dir[dim_x]]->pc) {
+      battle_init(c->npc);
+      c->npc->mtype = move_sentry;
+      dest[dim_x] = c->pos[dim_x];
+      dest[dim_y] = c->pos[dim_y];
+    }
   }
 }
 
@@ -2038,9 +2047,9 @@ void list_trainers(int command) { // lists all trainers, types, and relative pos
 
   int MAX_LINES = 24; // max display lines in terminal
   int current_line = 0;
-
+  int num_trainers = i;
   while(command != 27) { // while ! esc
-    
+    if(num_trainers > MAX_LINES) {
     if(command == KEY_DOWN) { // move down list
       if(current_line < buffer_size - 1) {
         current_line++;
@@ -2055,8 +2064,16 @@ void list_trainers(int command) { // lists all trainers, types, and relative pos
     for(i = 0; i < MAX_LINES && current_line + i < buffer_size; i++) { // print from index
       mvprintw(i, 0, buffer[current_line + i]);
     }
-    refresh();
-    command = getch();
+    
+  }
+  else {
+    clear();
+    for(i = 0; i < MAX_LINES && current_line + i < buffer_size; i++) { // print from index
+      mvprintw(i, 0, buffer[current_line + i]);
+    }
+  }
+  refresh();
+  command = getch();
   }
   
   
