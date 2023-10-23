@@ -1,7 +1,56 @@
 ## Version 1.05
 
+10/21 21:35 - Packaged 1.05 for submission
 
-10/19 22:09 - after failed testing for hours, copied over instructor code
+10/22 21:32 - Updated README and CHANGELOG
+            - commented code
+            - deleted unneeded code
+            - Trainer list now only scrolls if not all trainers listed
+            - NPCs should no longer trigger battles off each other
+
+10/22 15:34 - Added error messages based off certain actions
+            - updated `q` to `Q` for quitting game
+            - Added --numtrainers switch to instructor code
+            - Changed PC color to make it stand out more
+
+10/22 07:31 - Trainer list now works
+                - lists trainer types and relative positions
+                - scrolling works
+
+10/22 06:22 - Added easter egg to game and removed some experiments
+            - PC can now walk on defeated NPCs and PC dispaly takes priority
+
+10/22 04:12 - Fixed bug with pacer
+            - All NPCs should now be able to tigger battle by moving into PC
+            - Fixed segmentation fault near border by keeping gate flush with map border.
+
+10/22 01:30 - Certain NPCs can now trigger battle by moving into PC
+
+10/22 00:25 - Added color to game using ncurses
+
+10/21 01:30 - PC can now start battles by moving into a tile with an NPC
+            - Upon leaving battle, NPC is flagged as defeated
+
+10/20 20:55 - Added NPC defeat flag and basic battle screen
+            - Fixed bugged pacer movement
+
+10/20 19:37 - Added checks for standing on buildings
+            - Added screen pop-ups for buildings
+            - Added trainer list popup
+                - still need to populate
+            - `q` no longer exits program with exit() but now just leaves loop and activates delete_world();
+
+10/20 17:22 - Finished mapping movemnet commands to actully moving the PC
+            - PC time updates accordingly
+            - PC cannot move into NPCs or impassable terrain
+
+10/20 16:23 - Added ncurses and command checking to ensure valid command inputs
+            - Ncurses terminal initilization
+            - Removed sleep command
+            - Print map after every valid movement command
+                - If command is not a movement, dont update map
+
+10/19 22:09 - After failing to integrate new code with old, copied over instructor code
 
 10/17 17:30 - Copied files for 1.05
 
