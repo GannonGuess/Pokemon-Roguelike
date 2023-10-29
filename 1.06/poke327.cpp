@@ -1661,16 +1661,6 @@ static int new_map(int flew)
 
 static void print_map() {
   clear();
-  int shiny = rand() % 8192; // easter eggs
-  int rus = rand() % 21845;
-  if(shiny == 256) {
-    mvprintw(22, 0, "Congratulations! This message has the appearance rate of a Shiny Pokemon.");
-    mvprintw(23, 0, "Too bad there aren't any in the game...");
-  }
-  if(rus == 512) {
-    mvprintw(22, 0, "Holy Moly! This message has the appearance rate of a PokeRus.");
-    mvprintw(23, 0, "Thats 1 in 21845. You wish your luck hadn't been wasted here");
-  }
 
   int x, y;
   int default_reached = 0;
@@ -2420,7 +2410,7 @@ void game_loop()
       print_map(); // print the map after player moves
       c->next_turn += move_cost[char_pc][world.cur_map->map[c->pos[dim_y]]
                                                            [c->pos[dim_x]]];
-      pathfind(world.cur_map);
+      
     } else {
       move_func[c->npc->mtype](c, d);
       world.cur_map->cmap[c->pos[dim_y]][c->pos[dim_x]] = NULL;
@@ -2431,6 +2421,7 @@ void game_loop()
       c->pos[dim_x] = d[dim_x];
     }
     heap_insert(&world.cur_map->turn, c);
+    pathfind(world.cur_map);
     print_map();
   }
   endwin();
