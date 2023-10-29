@@ -240,8 +240,8 @@ void io_init_terminal() { //initilize terminal for ncurses
     init_pair(PLAYER_PAIR, COLOR_RED, COLOR_BLUE);   // player
     init_pair(WATER_PAIR, COLOR_CYAN, COLOR_BLACK);  // water
     init_pair(ROCK_PAIR, COLOR_WHITE, COLOR_BLACK);  // rocks
-    init_pair(CENTER_PAIR, COLOR_MAGENTA, COLOR_BLACK);  // pokecenter
-    init_pair(MART_PAIR, COLOR_BLUE, COLOR_BLACK);   // pokemart
+    init_pair(CENTER_PAIR, COLOR_RED, COLOR_WHITE);  // pokecenter
+    init_pair(MART_PAIR, COLOR_BLUE, COLOR_WHITE);   // pokemart
     init_pair(NPC_PAIR, COLOR_RED, COLOR_BLACK);     // npc
 }
 
@@ -2154,7 +2154,7 @@ int is_valid_command(char command) { // checks if command is a part of the comma
      command == '9' || command == 'u' || command == '6' || command == 'l' ||
      command == '3' || command == 'n' || command == '2' || command == 'j' ||
      command == '1' || command == 'b' || command == '4' || command == 'h' ||
-     command == (char) KEY_RIGHT || command == 't' || command == '>' || command == 'f') {
+     command == 't' || command == '>' || command == 'f') {
       return 1;
   }
 
@@ -2194,9 +2194,10 @@ void fly() {
   clrtoeol();
   refresh();
   echo();
-  getstr(buffer);
-  if(sscanf(buffer, "%d %d", &x, &y) == 2) {
-    if(x + (WORLD_SIZE / 2) == world.cur_idx[dim_x] && y + (WORLD_SIZE / 2) == world.cur_idx[dim_y]) {
+  getstr(buffer); // get input
+  if(sscanf(buffer, "%d %d", &x, &y) == 2) { // parse input for flight values
+    if(x + (WORLD_SIZE / 2) == world.cur_idx[dim_x] && 
+       y + (WORLD_SIZE / 2) == world.cur_idx[dim_y]) { // flying to current room
       noecho();
       mvprintw(23, 0, "You cannot fly to a room you are currently in. Press any key to continue");
       refresh();
@@ -2204,12 +2205,12 @@ void fly() {
       return;
     }
     else if(x >= -(WORLD_SIZE / 2) && x <= WORLD_SIZE / 2 &&
-          y >= -(WORLD_SIZE / 2) && y <= WORLD_SIZE / 2) {
+            y >= -(WORLD_SIZE / 2) && y <= WORLD_SIZE / 2) { // valid flight
       world.cur_map->time_on_leave = world.pc.next_turn; // update leave time
       world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL; // remove player from this map
       mvprintw(23, 0, "Flying to %d %d", x, y);
     }
-    else {
+    else { // invalid coordinates
       noecho();
       mvprintw(23, 0, "Invalid input. Flight values must be in range [-200 : 200]. Press any key to continue");
       refresh();
@@ -2217,7 +2218,7 @@ void fly() {
       return; 
     }
   }
-  else {
+  else { // invalid number of arguments
     noecho();
     mvprintw(23, 0, "Invalid input. Flight takes one x and one y coordinate pair. Press any key to continue"); 
     refresh();
@@ -2229,15 +2230,7 @@ void fly() {
   world.cur_idx[dim_x] = x + (WORLD_SIZE / 2);
   world.cur_idx[dim_y] = y + (WORLD_SIZE / 2);
 
-  new_map(1);
-  // world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
-  // world.pc.pos[dim_x] = (rand() % 78) + 1;
-  // world.pc.pos[dim_y] = (rand() % 18) + 1;
-  // while(world.cur_map->map[world.pc.pos[dim_y]][world.pc.pos[dim_x]] != ter_path) {
-  //   world.pc.pos[dim_x] = (rand() % 78) + 1;
-  //   world.pc.pos[dim_y] = (rand() % 18) + 1;
-  // }
-  // world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+  new_map(1); // flew
 
 }
 
@@ -2304,7 +2297,7 @@ int perform_action(char command) { // perform action based off of input command
           moved = 1;
         }
     }
-    else if(command == (char) KEY_RIGHT || command == '>') { // attempt to enter building if standing on one
+    else if(command == '>') { // attempt to enter building if standing on one
       char current_tile = world.cur_map->map[world.pc.pos[dim_y]][world.pc.pos[dim_x]];
       if(current_tile == ter_mart) { // enter mart if on mart
         start_mart();
@@ -2326,11 +2319,9 @@ int perform_action(char command) { // perform action based off of input command
       return 0;
     }
     else if(command == 'f') { // flight
-      
-      
-      fly();
-      print_map();
-      return 0;
+      fly(); // fly to new map
+      print_map(); // print new room
+      return 0; // flight doesnt update map
     }
     
 
@@ -2400,7 +2391,6 @@ void game_loop()
     if (c == &world.pc) { // if pc's turn, get user command
       command = getch();
       while(!is_valid_command(command)) { // check that command is valid
-        mvprintw(22, 0, "Invalid Command");
         command = getch();
       }
       clrtoeol();

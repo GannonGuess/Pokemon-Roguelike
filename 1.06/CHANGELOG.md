@@ -1,20 +1,39 @@
 ## Version 1.06
 
-10/29 03:24 - Finished flight movement
-            - Error messages pop up with invalid input
+10/29 15:24 - Packaged 1.06 for submission
+
+10/29 15:09 - Added some comments and removed unneeded testing code
+            - Invalid commands no longer print error to avoid weird outputs.
+            - Buildings now have white background to make them pop more
+
+10/29 14:00 - Map prints every time NPCs finish moving to make it more sclear where they are
+
+10/29 13:38 - changed location of pathfinding call
+            - fixed pathfinding bug (I think)
+            - removed easter eggs
+
+10/29 03:24 - Finished implementing flight movement
+            - Error messages pop up when invalid flight input
             - Cannot fly to map you are currently in
+            - PC is placed on a random path tile in the room it flies to
 
 10/29 02:12 - Reimplemented movement between rooms
+            - all rooms given their own heap queue
             - PC next move time is preserved based on room
             - PC no longer duplicates if entering room from a different enterance than it was exited from
+            - Room location and player time are now printed below the map
 
 10/28 23:21 - Changed all calls to malloc to new and all free to delete
+                - Get experience with new options
             - Changed makefile to link C++ compiler
-            - Code appears to be working
+                - Code appears to be working
 
-10/28 21:37 - Changed all `structs` to `classes`
-            - Moved around pc, npc, and character classes to allow for this
+10/28 21:37 - Converted from .c to .cpp files
+            - Changed all `structs` to `classes`
+                - Moved around pc, npc, and character classes to allow for this
+                - PC and NPC now inherit from character
             - made all variables public for now
+            - Added greater than `>` and less than `<` for entering and exiting buildings
 
 10/28 21:20 - Copied over files from 1.05
 

@@ -1,5 +1,30 @@
 # 327 Pokemon Game README - Gannon Guess
 
+## Version 1.06
+In this version, I ported the game from C to C++. Classes and inheritance replace the old struct format, and the compiler was changed to compensate. Room/map traversal and the flight command were reimplemented with this version to allow world traversal.
+- All .c files changed to .cpp
+  - Compiler now links in C++ compiler
+- Classes are now used in place of structs
+  - PC and NPC inherit from Character class
+- Calls to `malloc` are now calls to `new`
+  - `free` is now `delete` to compensate
+- `>` is now used to enter a building, making up for me mistaking it for `<right arrow>` in the last version
+  - Similarly, `<` is now used to exit a building
+- Map is now printed after each NPC moves, giving the Player a better idea of, and reaction to, NPC movement.
+- Each room/map has its own PC/NPC movement queue to preserve movement order and times
+  - Each room preserves the PC's movement time upon exit from the room
+  - Upon reentering a room, PC's movement time is set to value it left with. This allows the PC and NPCs to move at the correct times since time does not pass when PC is not in a room.
+    - This information is printed below the map for visualization
+- Movement between rooms via gate places PC on tile abeam of the previous rooms exit gate.
+- Movement between rooms via flight places PC on random path tile in destination room.
+  - Landing on an NPC will rightfully start a battle
+- Flight is started with `f` command and takes two integer values, separated by a space, in range of [-200 : 200]
+  - Echo is turned on so that player can see the coordinates they are entering. It is turned off after flight or upon input error
+  - First integer is X coordinate, second is Y coordinate.
+  - Cannot fly to a room you are currently in. This prevents the PC from avoiding battles easily
+  - Invalid input displays an error message and flight is canceled.
+!!!PLEASE NOTE: Instructor mentioned fixing a pathfinding bug that causes an error. I had this issue at the start of the 1.06 assignment, since this version is built off of Instructor Version 1.04 as a base. I believe that I found and added his fix from 1.05 to my own code and have not encountered any errors in my testing since, but BE AWARE that pathfinding may very rarely cause a segmentation fault that I don't have time to test for right now, but I haven't encountered it recently when I ran around the map for maybe 5 minutes. This error was stated to be "not even your (the students) fault!". Going forward in 1.07 I will use the Instructor's 1.06 code to be even more sure that this error does not persist. Feel free to run this version with the debugger to be sure that if a segmentation fault occurs, it is due to pathfinding.
+
 ## Version 1.05
 This version adds the user interface, allowing for unbuffered command inputs using the ncurses library. Whenever it is tha player's turn, the game will halt and wait for a command to be input. Due to incompatability with the structure of version 1.04, the instructors code was brought in for the base of 1.05. Hopefully this will not happen again in the future.
 - Color added
