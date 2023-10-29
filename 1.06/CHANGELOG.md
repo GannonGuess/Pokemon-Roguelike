@@ -1,5 +1,13 @@
 ## Version 1.06
 
+10/29 03:24 - Finished flight movement
+            - Error messages pop up with invalid input
+            - Cannot fly to map you are currently in
+
+10/29 02:12 - Reimplemented movement between rooms
+            - PC next move time is preserved based on room
+            - PC no longer duplicates if entering room from a different enterance than it was exited from
+
 10/28 23:21 - Changed all calls to malloc to new and all free to delete
             - Changed makefile to link C++ compiler
             - Code appears to be working

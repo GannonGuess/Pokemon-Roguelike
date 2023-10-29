@@ -72,10 +72,9 @@ typedef int16_t pair_t[num_dims];
 #define ROCK_PAIR     3
 #define PLAYER_PAIR   4
 #define NPC_PAIR      5
-#define DEFEATED_PAIR 6
-#define CENTER_PAIR   7
-#define MART_PAIR     8
-#define PATH_PAIR     10
+#define CENTER_PAIR   6
+#define MART_PAIR     7
+#define PATH_PAIR     8
 
 
 #define mappair(pair) (m->map[pair[dim_y]][pair[dim_x]])
@@ -225,6 +224,26 @@ int32_t move_cost[num_character_types][num_terrain_types] = {
 void pathfind(map_t *m);
 
 int battle_init(npc_t *n);
+
+void io_init_terminal() { //initilize terminal for ncurses
+    initscr();
+    cbreak(); // can use ctrl c to quit if issue
+    noecho(); // doesnt print pressed key
+    curs_set(0); // no flashing cursor
+    keypad(stdscr, TRUE); // allows special keys
+    nodelay(stdscr, TRUE);
+    set_escdelay(0); // escape does not take 1 second to confirm
+    timeout(-1); // halts at getch()
+    start_color(); // begin terminal colorizing
+    init_pair(PATH_PAIR, COLOR_YELLOW, COLOR_BLACK); // path color
+    init_pair(GRASS_PAIR, COLOR_GREEN, COLOR_BLACK); // grass
+    init_pair(PLAYER_PAIR, COLOR_RED, COLOR_BLUE);   // player
+    init_pair(WATER_PAIR, COLOR_CYAN, COLOR_BLACK);  // water
+    init_pair(ROCK_PAIR, COLOR_WHITE, COLOR_BLACK);  // rocks
+    init_pair(CENTER_PAIR, COLOR_MAGENTA, COLOR_BLACK);  // pokecenter
+    init_pair(MART_PAIR, COLOR_BLUE, COLOR_BLACK);   // pokemart
+    init_pair(NPC_PAIR, COLOR_RED, COLOR_BLACK);     // npc
+}
 
 uint32_t can_see(map_t *m, character_t *voyeur, character_t *exhibitionist)
 {
@@ -1530,15 +1549,29 @@ static int place_trees(map_t *m)
 // New map expects cur_idx to refer to the index to be generated.  If that
 // map has already been generated then the only thing this does is set
 // cur_map.
-static int new_map()
+static int new_map(int flew)
 {
   int d, p;
   int e, w, n, s;
   int x, y;
-  if (world.world[world.cur_idx[dim_y]][world.cur_idx[dim_x]]) {
+  if (world.world[world.cur_idx[dim_y]][world.cur_idx[dim_x]] && !flew) {
     world.cur_map = world.world[world.cur_idx[dim_y]][world.cur_idx[dim_x]];
     world.cur_map->turn = world.world[world.cur_idx[dim_y]][world.cur_idx[dim_x]]->turn;
     world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+    world.pc.next_turn = world.cur_map->time_on_leave;
+    return 0;
+  }
+  else if (world.world[world.cur_idx[dim_y]][world.cur_idx[dim_x]] && flew) {
+    world.cur_map = world.world[world.cur_idx[dim_y]][world.cur_idx[dim_x]];
+    world.cur_map->turn = world.world[world.cur_idx[dim_y]][world.cur_idx[dim_x]]->turn;
+
+    world.pc.pos[dim_x] = (rand() % 78) + 1;
+    world.pc.pos[dim_y] = (rand() % 18) + 1;
+    while(world.cur_map->map[world.pc.pos[dim_y]][world.pc.pos[dim_x]] != ter_path) {
+      world.pc.pos[dim_x] = (rand() % 78) + 1;
+      world.pc.pos[dim_y] = (rand() % 18) + 1;
+    }
+    world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc; 
     world.pc.next_turn = world.cur_map->time_on_leave;
     return 0;
   }
@@ -1605,9 +1638,19 @@ static int new_map()
   if(!world.pc.pc) {
     init_pc();
   }
-  else {
+  else if(!flew){
     world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
     world.pc.next_turn = 0;
+  }
+  else if(flew) {
+    world.pc.next_turn = 0;
+    world.pc.pos[dim_x] = (rand() % 78) + 1;
+    world.pc.pos[dim_y] = (rand() % 18) + 1;
+    while(world.cur_map->map[world.pc.pos[dim_y]][world.pc.pos[dim_x]] != ter_path) {
+      world.pc.pos[dim_x] = (rand() % 78) + 1;
+      world.pc.pos[dim_y] = (rand() % 18) + 1;
+    }
+    world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
   }
   
   pathfind(world.cur_map);
@@ -1643,9 +1686,9 @@ static void print_map() {
         } 
         else {
           if(world.cur_map->cmap[y][x]->npc->isDefeated) { // otherwise if npc and defeated
-            attron(COLOR_PAIR(DEFEATED_PAIR));
+            attron(COLOR_PAIR(PATH_PAIR));
             mvaddch(y + 1, x, world.cur_map->cmap[y][x]->symbol);
-            attroff(COLOR_PAIR(DEFEATED_PAIR));
+            attroff(COLOR_PAIR(PATH_PAIR));
           }
           else { // otherwise if npc
             attron(COLOR_PAIR(NPC_PAIR));
@@ -1677,7 +1720,9 @@ static void print_map() {
           attroff(COLOR_PAIR(PATH_PAIR));
           break;
         case ter_gate:
+          attron(COLOR_PAIR(PATH_PAIR));
           mvaddch(y + 1, x, GATE_SYMBOL);
+          attroff(COLOR_PAIR(PATH_PAIR));
           break;
         case ter_mart:
           attron(COLOR_PAIR(MART_PAIR));
@@ -1712,7 +1757,7 @@ static void print_map() {
       }
     }
   }
-  mvprintw(22, 0, "Current room: x:%d y:%d", world.cur_idx[dim_x], world.cur_idx[dim_y]);
+  mvprintw(22, 0, "Current room: x:%d y:%d", world.cur_idx[dim_x] - 200, world.cur_idx[dim_y] - 200);
   mvprintw(23, 0, "PC Time: %d Time of room on last exit: %d", world.pc.next_turn, world.cur_map->time_on_leave);
   refresh();
   if (default_reached) {
@@ -1726,7 +1771,7 @@ void init_world(int num_trainers)
 {
   world.cur_idx[dim_x] = world.cur_idx[dim_y] = WORLD_SIZE / 2;
   world.char_seq_num = 0;
-  new_map();
+  new_map(0);
 }
 
 void delete_world()
@@ -2119,7 +2164,7 @@ int is_valid_command(char command) { // checks if command is a part of the comma
      command == '9' || command == 'u' || command == '6' || command == 'l' ||
      command == '3' || command == 'n' || command == '2' || command == 'j' ||
      command == '1' || command == 'b' || command == '4' || command == 'h' ||
-     command == (char) KEY_RIGHT || command == 't' || command == '>') {
+     command == (char) KEY_RIGHT || command == 't' || command == '>' || command == 'f') {
       return 1;
   }
 
@@ -2130,22 +2175,80 @@ void move_room(pair_t dest) {
   if(dest[dim_y] == 0) {
     world.cur_idx[dim_y]--;
     world.pc.pos[dim_y] = 19;
+    world.pc.pos[dim_x] = dest[dim_x];
   }
   else if(dest[dim_y] == 20) {
     world.cur_idx[dim_y]++;
     world.pc.pos[dim_y] = 1;
+    world.pc.pos[dim_x] = dest[dim_x];
   }
   else if(dest[dim_x] == 0) {
     world.cur_idx[dim_x]--;
     world.pc.pos[dim_x] = 78;
+    world.pc.pos[dim_y] = dest[dim_y];
   }
   else if(dest[dim_x] == 79) {
     world.cur_idx[dim_x]++;
     world.pc.pos[dim_x] = 1;
+    world.pc.pos[dim_y] = dest[dim_y];
   }
 
-  new_map();
+  new_map(0);
   print_map();
+}
+
+void fly() {
+  int x, y;
+  char buffer[256];
+  mvprintw(23, 0, "Fly: ");
+  clrtoeol();
+  refresh();
+  echo();
+  getstr(buffer);
+  if(sscanf(buffer, "%d %d", &x, &y) == 2) {
+    if(x + (WORLD_SIZE / 2) == world.cur_idx[dim_x] && y + (WORLD_SIZE / 2) == world.cur_idx[dim_y]) {
+      noecho();
+      mvprintw(23, 0, "You cannot fly to a room you are currently in. Press any key to continue");
+      refresh();
+      getch();
+      return;
+    }
+    else if(x >= -(WORLD_SIZE / 2) && x <= WORLD_SIZE / 2 &&
+          y >= -(WORLD_SIZE / 2) && y <= WORLD_SIZE / 2) {
+      world.cur_map->time_on_leave = world.pc.next_turn; // update leave time
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL; // remove player from this map
+      mvprintw(23, 0, "Flying to %d %d", x, y);
+    }
+    else {
+      noecho();
+      mvprintw(23, 0, "Invalid input. Flight values must be in range [-200 : 200]. Press any key to continue");
+      refresh();
+      getch();
+      return; 
+    }
+  }
+  else {
+    noecho();
+    mvprintw(23, 0, "Invalid input. Flight takes one x and one y coordinate pair. Press any key to continue"); 
+    refresh();
+    getch();
+    return;
+  }
+  refresh();
+  noecho();
+  world.cur_idx[dim_x] = x + (WORLD_SIZE / 2);
+  world.cur_idx[dim_y] = y + (WORLD_SIZE / 2);
+
+  new_map(1);
+  // world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+  // world.pc.pos[dim_x] = (rand() % 78) + 1;
+  // world.pc.pos[dim_y] = (rand() % 18) + 1;
+  // while(world.cur_map->map[world.pc.pos[dim_y]][world.pc.pos[dim_x]] != ter_path) {
+  //   world.pc.pos[dim_x] = (rand() % 78) + 1;
+  //   world.pc.pos[dim_y] = (rand() % 18) + 1;
+  // }
+  // world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = &world.pc;
+
 }
 
 int perform_action(char command) { // perform action based off of input command
@@ -2232,6 +2335,13 @@ int perform_action(char command) { // perform action based off of input command
       print_map();
       return 0;
     }
+    else if(command == 'f') { // flight
+      
+      
+      fly();
+      print_map();
+      return 0;
+    }
     
 
     char destTile = world.cur_map->map[dest[dim_y]][dest[dim_x]]; // tile being moved into
@@ -2243,7 +2353,7 @@ int perform_action(char command) { // perform action based off of input command
     }
     if(moved && destTile == ter_gate) { // if destination tile is gate
       world.cur_map->time_on_leave = world.pc.next_turn; // set time of room when pc leaves it
-      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+      world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL; //remove pc from room when it leaves
       move_room(dest);
       return 0;
     }
@@ -2326,26 +2436,7 @@ void game_loop()
   endwin();
 }
 
-void io_init_terminal() { //initilize terminal for ncurses
-    initscr();
-    cbreak(); // can use ctrl c to quit if issue
-    noecho(); // doesnt print pressed key
-    curs_set(0); // no flashing cursor
-    keypad(stdscr, TRUE); // allows special keys
-    nodelay(stdscr, TRUE);
-    set_escdelay(0); // escape does not take 1 second to confirm
-    timeout(-1); // halts at getch()
-    start_color(); // begin terminal colorizing
-    init_pair(PATH_PAIR, COLOR_YELLOW, COLOR_BLACK); // path color
-    init_pair(GRASS_PAIR, COLOR_GREEN, COLOR_BLACK); // grass
-    init_pair(PLAYER_PAIR, COLOR_RED, COLOR_BLUE);   // player
-    init_pair(WATER_PAIR, COLOR_CYAN, COLOR_BLACK);  // water
-    init_pair(ROCK_PAIR, COLOR_WHITE, COLOR_BLACK);  // rocks
-    init_pair(CENTER_PAIR, COLOR_MAGENTA, COLOR_BLACK);  // pokecenter
-    init_pair(MART_PAIR, COLOR_BLUE, COLOR_BLACK);   // pokemart
-    init_pair(NPC_PAIR, COLOR_RED, COLOR_BLACK);     // npc
-    init_pair(DEFEATED_PAIR, COLOR_YELLOW, COLOR_BLACK);  // defeated npc
-}
+
 
 int main(int argc, char *argv[])
 {
