@@ -14,8 +14,8 @@ This version adds the user interface, allowing for unbuffered command inputs usi
   - `b/1` - down left
   - `h/4` - left
   - `5/./<space>` - wait
-  - `>` - attempt to enter building
-    - `<` - exit building
+  - `<right arrow>` - attempt to enter building
+    - `<left arrow>` - exit building
   - `t` - display trainer list with relative positions
     - `<down arrow>` - scroll down trainer list
     - `<up arrow>` - scroll up trainer list

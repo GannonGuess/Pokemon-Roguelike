@@ -1,0 +1,8 @@
+calass npc : public character {
+    character _type_t ctype;
+
+}
+
+class character {
+    npc_t *npc;
+}
