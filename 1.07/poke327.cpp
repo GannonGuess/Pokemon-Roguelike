@@ -24,6 +24,7 @@
 #include "type_names.h"
 #include "pokemon_stats.h"
 #include "stats.h"
+#include "pokemon_types.h"
 
 typedef struct queue_node {
   int x, y;
@@ -1216,7 +1217,7 @@ void load_database(std::string file_to_parse) {
     parse_stats(checkDir);
   }
   else if(file_to_parse == "pokemon_types.csv") {
-
+    parse_pokemon_types(checkDir);
   }
 
   

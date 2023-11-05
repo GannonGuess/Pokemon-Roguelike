@@ -1,5 +1,7 @@
 ## Version 1.07
 
+11/05 05:25 - Added pokemon_types class
+
 11/05 05:17 - Added stats class
 
 11/05 05:09 - Added pokemon_stats class
