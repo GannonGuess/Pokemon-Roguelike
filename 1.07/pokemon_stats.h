@@ -16,6 +16,6 @@ class PokemonStats {
         int effort;
 };
 
-void parse_pokemon_stats(std::filesystem::path pokemon_data);
+std::vector<PokemonStats> parse_pokemon_stats(std::filesystem::path pokemon_data);
 
 #endif

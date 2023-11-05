@@ -1,10 +1,10 @@
 #include "type_names.h"
+#include <cstdio>
 
-void parse_type_names(std::filesystem::path type_names_data) {
+std::vector<TypeName> parse_type_names(std::filesystem::path type_names_data) {
     std::ifstream file(type_names_data);
     if(!file.is_open()) {
-        std::cerr << "Failed to open type_name.csv" << std::endl;
-        return;
+        throw std::runtime_error("Failed to open type_name.csv");
     }
 
     std::string header;
@@ -53,5 +53,5 @@ void parse_type_names(std::filesystem::path type_names_data) {
         info += tn.name;
         std::cout << info << std::endl;
     }
-    return;
+    return type_names_list;
 }

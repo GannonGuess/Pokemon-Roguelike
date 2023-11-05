@@ -1,11 +1,10 @@
 #include "moves.h"
 
 
-void parse_moves(std::filesystem::path moves_data) {
+std::vector<Move> parse_moves(std::filesystem::path moves_data) {
     std::ifstream file(moves_data);
     if(!file.is_open()) {
-        std::cerr << "Failed to open moves.csv" << std::endl;
-        return;
+        throw std::runtime_error("Failed to open moves.csv");
     }
 
     std::string header;
@@ -186,5 +185,5 @@ void parse_moves(std::filesystem::path moves_data) {
         info += (m.super_contest_effect_id == INT_MAX ? "" : std::to_string(m.super_contest_effect_id));
         std::cout << info << std::endl;
     }
-    return;
+    return moves_list;
 }

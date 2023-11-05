@@ -1,5 +1,7 @@
 ## Version 1.07
 
+11/05 05:50 - All parse functions now return vectors
+
 11/05 05:25 - Added pokemon_types class
 
 11/05 05:17 - Added stats class

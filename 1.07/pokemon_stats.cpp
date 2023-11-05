@@ -1,10 +1,9 @@
 #include "pokemon_stats.h"
 
-void parse_pokemon_stats(std::filesystem::path pk_stats_data) {
+std::vector<PokemonStats> parse_pokemon_stats(std::filesystem::path pk_stats_data) {
     std::ifstream file(pk_stats_data);
     if(!file.is_open()) {
-        std::cerr << "Failed to open pk_stat.csv" << std::endl;
-        return;
+        throw std::runtime_error("Failed to open pokemon_stats.csv");
     }
 
     std::string header;
@@ -70,5 +69,5 @@ void parse_pokemon_stats(std::filesystem::path pk_stats_data) {
         info += (ps.effort == INT_MAX ? "" : std::to_string(ps.effort));
         std::cout << info << std::endl;
     }
-    return;
+    return pk_stats_list;
 }

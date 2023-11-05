@@ -1,11 +1,10 @@
 #include "pokemon.h"
 
 
-void parse_pokemon(std::filesystem::path pokemon_data) {
+std::vector<Pokemon> parse_pokemon(std::filesystem::path pokemon_data) {
     std::ifstream file(pokemon_data);
     if(!file.is_open()) {
-        std::cerr << "Failed to open pokemon.csv" << std::endl;
-        return;
+        throw std::runtime_error("Failed to open pokemon.csv");
     }
 
     std::string header;
@@ -109,5 +108,5 @@ void parse_pokemon(std::filesystem::path pokemon_data) {
         info += (p.is_default == INT_MAX ? "" : std::to_string(p.is_default));
         std::cout << info << std::endl;
     }
-    return;
+    return pokemon_list;
 }

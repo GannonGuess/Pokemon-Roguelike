@@ -1,10 +1,9 @@
 #include "experience.h"
 
-void parse_experience(std::filesystem::path experience_data) {
+std::vector<Experience> parse_experience(std::filesystem::path experience_data) {
     std::ifstream file(experience_data);
     if(!file.is_open()) {
-        std::cerr << "Failed to open exp.csv" << std::endl;
-        return;
+        throw std::runtime_error("Failed to open experience.csv");
     }
 
     std::string header;
@@ -59,5 +58,5 @@ void parse_experience(std::filesystem::path experience_data) {
         info += (e.experience == INT_MAX ? "" : std::to_string(e.experience));
         std::cout << info << std::endl;
     }
-    return;
+    return experience_list;
 }

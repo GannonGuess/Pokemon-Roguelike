@@ -1,11 +1,10 @@
 #include "pokemon_species.h"
 
 
-void parse_pokemon_species(std::filesystem::path pk_species_data) {
+std::vector<PokemonSpecies> parse_pokemon_species(std::filesystem::path pk_species_data) {
     std::ifstream file(pk_species_data);
     if(!file.is_open()) {
-        std::cerr << "Failed to open moves.csv" << std::endl;
-        return;
+        throw std::runtime_error("Failed to open pokemon_species.csv");
     }
 
     std::string header;
@@ -242,5 +241,5 @@ void parse_pokemon_species(std::filesystem::path pk_species_data) {
         info += (m.conquest_order == INT_MAX ? "" : std::to_string(m.conquest_order)) + ",";
         std::cout << info << std::endl;
     }
-    return;
+    return pk_species_list;
 }

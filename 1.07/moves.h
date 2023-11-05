@@ -27,6 +27,6 @@ class Move {
         int super_contest_effect_id;
 };
 
-void parse_moves(std::filesystem::path moves_data);
+std::vector<Move> parse_moves(std::filesystem::path moves_data);
 
 #endif

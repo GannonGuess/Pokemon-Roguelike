@@ -20,6 +20,6 @@ class Pokemon {
         int is_default; 
 };
 
-void parse_pokemon(std::filesystem::path pokemon_data);
+std::vector<Pokemon> parse_pokemon(std::filesystem::path pokemon_data);
 
 #endif

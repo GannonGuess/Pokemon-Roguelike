@@ -1,6 +1,20 @@
 # 327 Pokemon Game README - Gannon Guess
 
 ## Version 1.07
+This version adds the pokedex database. The user cannot play the game, but instead chooses an option of what information from the database to print to the terminal.
+- The command given by the user is passed in with the call to the file.
+  - ex. `./poke327 pokemon` will print all of the pokemon in the pokedex and their associated information
+Commands include:
+  - `pokemon`: gives all pokemon in pokedex and info such as weight, height, base exp, and id
+  - `moves`: gives all moves that can be learned by a pokemon and associated info
+  - `pokemon_moves`: information relating pokemon to the moves they can have
+  - `pokemon_species`: information on the species of pokemon including evolution and biome data
+  - `experience`: information on experience required for leve-ups
+  - `type_names`: lists all type names in different languages
+  - `pokemon_stats`: defines stat values for each pokemon
+  - `stats`: defines stat names and where they are used
+  - `pokemon_types`:defines the types that each pokemon is
+- When a command is called, the associated file is located and opened. It is then parsed into a vector<> containing instances of the associated class. The instances stored in the vector are then printed out for the user to view. The vector is returned.
 
 ## Version 1.06
 In this version, I ported the game from C to C++. Classes and inheritance replace the old struct format, and the compiler was changed to compensate. Room/map traversal and the flight command were reimplemented with this version to allow world traversal.

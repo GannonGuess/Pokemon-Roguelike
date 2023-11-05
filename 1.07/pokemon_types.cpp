@@ -1,10 +1,9 @@
 #include "pokemon_types.h"
 
-void parse_pokemon_types(std::filesystem::path pk_types_data) {
+std::vector<PokemonType> parse_pokemon_types(std::filesystem::path pk_types_data) {
     std::ifstream file(pk_types_data);
     if(!file.is_open()) {
-        std::cerr << "Failed to open pk_type.csv" << std::endl;
-        return;
+        throw std::runtime_error("Failed to open pokemon_types.csv");
     }
 
     std::string header;
@@ -59,5 +58,5 @@ void parse_pokemon_types(std::filesystem::path pk_types_data) {
         info += (pt.slot == INT_MAX ? "" : std::to_string(pt.slot));
         std::cout << info << std::endl;
     }
-    return;
+    return pk_types_list;
 }

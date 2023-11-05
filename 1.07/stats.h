@@ -17,6 +17,6 @@ class Stats {
         int game_index;
 };
 
-void parse_stats(std::filesystem::path pokemon_data);
+std::vector<Stats> parse_stats(std::filesystem::path pokemon_data);
 
 #endif

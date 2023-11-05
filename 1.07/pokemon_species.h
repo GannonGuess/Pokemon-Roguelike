@@ -32,6 +32,6 @@ class PokemonSpecies {
         int conquest_order;
 };
 
-void parse_pokemon_species(std::filesystem::path moves_data);
+std::vector<PokemonSpecies> parse_pokemon_species(std::filesystem::path moves_data);
 
 #endif

@@ -15,6 +15,6 @@ class TypeName {
         std::string name;
 };
 
-void parse_type_names(std::filesystem::path pokemon_data);
+std::vector<TypeName> parse_type_names(std::filesystem::path pokemon_data);
 
 #endif

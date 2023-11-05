@@ -1,17 +1,16 @@
 #include "pokemon_moves.h"
 
-void parse_pokemon_moves(std::filesystem::path pokemon_moves_data) {
+std::vector<PokemonMove> parse_pokemon_moves(std::filesystem::path pokemon_moves_data) {
     std::ifstream file(pokemon_moves_data);
     if(!file.is_open()) {
-        std::cerr << "Failed to open poke_move.csv" << std::endl;
-        return;
+        throw std::runtime_error("Failed to open pokemon_moves.csv");
     }
 
     std::string header;
     std::getline(file, header);
 
     std::string line;
-    std::vector<PokemonMove> pokemon_move_list;
+    std::vector<PokemonMove> pk_move_list;
 
     while(std::getline(file, line)) {
         std::istringstream lineStream(line);
@@ -80,11 +79,11 @@ void parse_pokemon_moves(std::filesystem::path pokemon_moves_data) {
         }
 
         
-        pokemon_move_list.push_back(poke_move);
+        pk_move_list.push_back(poke_move);
     }
 
     std::cout << header << std::endl;
-    for(const PokemonMove& pm : pokemon_move_list) {
+    for(const PokemonMove& pm : pk_move_list) {
         std::string info = (pm.pokemon_id == INT_MAX ? "" : std::to_string(pm.pokemon_id)) + ","; 
         info += (pm.version_group_id == INT_MAX ? "" : std::to_string(pm.version_group_id)) + ",";
         info += (pm.move_id == INT_MAX ? "" : std::to_string(pm.move_id)) + ",";
@@ -93,5 +92,5 @@ void parse_pokemon_moves(std::filesystem::path pokemon_moves_data) {
         info += (pm.order == INT_MAX ? "" : std::to_string(pm.order));
         std::cout << info << std::endl;
     }
-    return;
+    return pk_move_list;
 }

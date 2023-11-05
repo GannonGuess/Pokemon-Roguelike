@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <filesystem>
 #include <iostream>
+#include <vector>
 
 #include "heap.h"
 #include "poke327.h"
@@ -25,6 +26,16 @@
 #include "pokemon_stats.h"
 #include "stats.h"
 #include "pokemon_types.h"
+
+std::vector<Pokemon> pokemon_data;
+std::vector<Move> move_data;
+std::vector<PokemonMove> pk_move_data;
+std::vector<PokemonSpecies> pk_species_data;
+std::vector<Experience> exp_data;
+std::vector<TypeName> type_name_data;
+std::vector<PokemonStats> pk_stats_data;
+std::vector<Stats> stats_data;
+std::vector<PokemonType> pk_types_data;
 
 typedef struct queue_node {
   int x, y;
@@ -1193,31 +1204,34 @@ void load_database(std::string file_to_parse) {
   }
 
   if(file_to_parse == "pokemon.csv") {
-    parse_pokemon(checkDir);
+    pokemon_data = parse_pokemon(checkDir);
   }
   else if (file_to_parse == "moves.csv") {
-    parse_moves(checkDir);
+    move_data = parse_moves(checkDir);
   }
   else if(file_to_parse == "pokemon_moves.csv") {
-    parse_pokemon_moves(checkDir);
+    pk_move_data = parse_pokemon_moves(checkDir);
   }
   else if(file_to_parse == "pokemon_species.csv") {
-    parse_pokemon_species(checkDir);
+    pk_species_data = parse_pokemon_species(checkDir);
   }
   else if(file_to_parse == "experience.csv") {
-    parse_experience(checkDir);
+    exp_data = parse_experience(checkDir);
   }
   else if(file_to_parse == "type_names.csv") {
-    parse_type_names(checkDir);
+    type_name_data = parse_type_names(checkDir);
   }
   else if(file_to_parse == "pokemon_stats.csv") {
-    parse_pokemon_stats(checkDir);
+    pk_stats_data = parse_pokemon_stats(checkDir);
   }
   else if(file_to_parse == "stats.csv") {
-    parse_stats(checkDir);
+    stats_data = parse_stats(checkDir);
   }
   else if(file_to_parse == "pokemon_types.csv") {
-    parse_pokemon_types(checkDir);
+    pk_types_data = parse_pokemon_types(checkDir);
+  }
+  else {
+    cout << "Invalid file input" << endl;
   }
 
   

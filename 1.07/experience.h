@@ -15,6 +15,6 @@ class Experience {
         int experience;
 };
 
-void parse_experience(std::filesystem::path pokemon_data);
+std::vector<Experience> parse_experience(std::filesystem::path pokemon_data);
 
 #endif

@@ -1,10 +1,9 @@
 #include "stats.h"
 
-void parse_stats(std::filesystem::path stats_data) {
+std::vector<Stats> parse_stats(std::filesystem::path stats_data) {
     std::ifstream file(stats_data);
     if(!file.is_open()) {
-        std::cerr << "Failed to open stat.csv" << std::endl;
-        return;
+        throw std::runtime_error("Failed to open stats.csv");
     }
 
     std::string header;
@@ -75,5 +74,5 @@ void parse_stats(std::filesystem::path stats_data) {
         info += (s.game_index == INT_MAX ? "" : std::to_string(s.game_index));
         std::cout << info << std::endl;
     }
-    return;
+    return stats_list;
 }

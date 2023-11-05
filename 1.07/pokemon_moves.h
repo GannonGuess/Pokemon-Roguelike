@@ -18,6 +18,6 @@ class PokemonMove {
         int order;
 };
 
-void parse_pokemon_moves(std::filesystem::path pokemon_data);
+std::vector<PokemonMove> parse_pokemon_moves(std::filesystem::path pokemon_data);
 
 #endif

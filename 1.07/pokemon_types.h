@@ -15,6 +15,6 @@ class PokemonType {
         int slot;
 };
 
-void parse_pokemon_types(std::filesystem::path pokemon_data);
+std::vector<PokemonType> parse_pokemon_types(std::filesystem::path pokemon_data);
 
 #endif
