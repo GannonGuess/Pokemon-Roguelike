@@ -1,5 +1,9 @@
 ## Version 1.07
 
+11/05 
+
+11/05 04:48 - experience class added
+
 11/05 04:37 - pokemon_species class added
 
 11/05 04:19 - Added class and printing for pokemon_moves
