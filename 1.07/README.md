@@ -15,6 +15,7 @@ Commands include:
   - `stats`: defines stat names and where they are used
   - `pokemon_types`:defines the types that each pokemon is
 - When a command is called, the associated file is located and opened. It is then parsed into a vector<> containing instances of the associated class. The instances stored in the vector are then printed out for the user to view. The vector is returned.
+- Printing also includes header value definitions at the top of the print
 
 ## Version 1.06
 In this version, I ported the game from C to C++. Classes and inheritance replace the old struct format, and the compiler was changed to compensate. Room/map traversal and the flight command were reimplemented with this version to allow world traversal.
