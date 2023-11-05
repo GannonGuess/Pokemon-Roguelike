@@ -1,6 +1,7 @@
 ## Version 1.07
 
-11/05 05:50 - All parse functions now return vectors
+11/05 06:04 - All parse functions now return vectors
+            - Parse functions throw errors if file cannot be read
 
 11/05 05:25 - Added pokemon_types class
 
