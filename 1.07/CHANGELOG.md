@@ -1,6 +1,8 @@
 ## Version 1.07
 
-11/05 
+11/05 05:09 - add pokemon_stats class
+
+11/05 05:00 - added type_names class
 
 11/05 04:48 - experience class added
 

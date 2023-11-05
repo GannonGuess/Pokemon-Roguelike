@@ -15,12 +15,14 @@
 #include "poke327.h"
 #include "character.h"
 #include "io.h"
+
 #include "pokemon.h"
 #include "moves.h"
 #include "pokemon_moves.h"
 #include "pokemon_species.h"
 #include "experience.h"
 #include "type_names.h"
+#include "pokemon_stats.h"
 
 typedef struct queue_node {
   int x, y;
@@ -1207,7 +1209,7 @@ void load_database(std::string file_to_parse) {
     parse_type_names(checkDir);
   }
   else if(file_to_parse == "pokemon_stats.csv") {
-
+    parse_pokemon_stats(checkDir);
   }
   else if(file_to_parse == "stats.csv") {
 
