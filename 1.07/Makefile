@@ -11,7 +11,7 @@ CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
 LDFLAGS = -lncurses
 
 BIN = poke327
-OBJS = poke327.o heap.o io.o character.o pokemon.o moves.o pokemon_moves.o pokemon_species.o experience.o
+OBJS = poke327.o heap.o io.o character.o pokemon.o moves.o pokemon_moves.o pokemon_species.o experience.o type_names.o
 
 all: $(BIN) etags
 

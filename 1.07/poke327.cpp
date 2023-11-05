@@ -20,6 +20,7 @@
 #include "pokemon_moves.h"
 #include "pokemon_species.h"
 #include "experience.h"
+#include "type_names.h"
 
 typedef struct queue_node {
   int x, y;
@@ -1203,7 +1204,7 @@ void load_database(std::string file_to_parse) {
     parse_experience(checkDir);
   }
   else if(file_to_parse == "type_names.csv") {
-
+    parse_type_names(checkDir);
   }
   else if(file_to_parse == "pokemon_stats.csv") {
 
