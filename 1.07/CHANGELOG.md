@@ -1,5 +1,9 @@
 ## Version 1.07
 
+11/05 19:34 - Updated README and packaged for submission
+
+11/05 18:57 - Comments
+
 11/05 06:04 - All parse functions now return vectors
             - Parse functions throw errors if file cannot be read
 

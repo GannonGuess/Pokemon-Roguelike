@@ -96,6 +96,7 @@ std::vector<Pokemon> parse_pokemon(std::filesystem::path pokemon_data) {
         pokemon_list.push_back(pokemon);
     }
 
+    //print saved pkm to std out
     std::cout << header << std::endl;
     for(const Pokemon& p : pokemon_list) {
         std::string info = (p.id == INT_MAX ? "" : std::to_string(p.id)) + ","; 

@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+// class for storing pkm information
 class Pokemon {
     public:
         int id;

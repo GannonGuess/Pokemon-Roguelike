@@ -1166,43 +1166,38 @@ void usage(char *s)
 
 void load_database(std::string file_to_parse) {
   using namespace std;
-  std::filesystem::path homeDir = std::filesystem::path(getenv("HOME"));
-  std::string dirToCheck = ".poke327/pokedex/pokedex/data/csv/";
-  std::filesystem::path checkDir = homeDir / dirToCheck;
+  std::filesystem::path homeDir = std::filesystem::path(getenv("HOME")); // get home dir path
+  std::string dirToCheck = "/share/cs327/pokedex/pokedex/data/csv/"; // first directory to check. May or may not work 
+  std::filesystem::path checkDir = dirToCheck;
   int located = 0;
-  if(exists(checkDir) && is_directory(checkDir)) {
+  if(!exists(checkDir) && is_directory(checkDir)) { // if the csv folder is found, mark it found
     located = 1;
   }
-  if (!located) {
-    dirToCheck = "share/pokedex/pokedex/data/csv/";
+  if (!located) { // search second dir if not found
+    dirToCheck = ".poke327/pokedex/pokedex/data/csv/";
     checkDir = homeDir / dirToCheck;
     if(exists(checkDir) && is_directory(checkDir)) {
       located = 1;
     }
-    else {
-      cout << "Not located at " << checkDir.string() << endl;
-    }
   }
-  if(!located) {
-    dirToCheck = "dev/327/pokedex/pokedex/data/csv/";
+  if(!located) { // finally, check third dir if still not found
+    dirToCheck = "dev/pokedex/pokedex/data/csv/"; // a personal local dir
     checkDir = homeDir / dirToCheck;
     if(exists(checkDir) && is_directory(checkDir)) {
       located = 1;
     }
-    else {
-      cout << "Not located at " << checkDir.string() << endl;
-    }
   }
-  if (!located){
+  if (!located){ // if not found in any dir, print error
     cout << "Could not find database" << endl;
     return;
   }
-  checkDir = checkDir / file_to_parse;
-  if(!exists(checkDir) || !is_regular_file(checkDir)) {
+  checkDir = checkDir / file_to_parse; // append file to be parsed to database directory
+  if(!exists(checkDir) || !is_regular_file(checkDir)) { // check that the file that user wants to parse is in database
     cout << "File you are attempting to parse does not exist in database" << endl;
     return;
   }
 
+  // performs parsing base on user input file. Each file has its own associated class and parsing method
   if(file_to_parse == "pokemon.csv") {
     pokemon_data = parse_pokemon(checkDir);
   }
@@ -1230,11 +1225,11 @@ void load_database(std::string file_to_parse) {
   else if(file_to_parse == "pokemon_types.csv") {
     pk_types_data = parse_pokemon_types(checkDir);
   }
-  else {
-    cout << "Invalid file input" << endl;
+  else { // User input a file that was in the database, but not one we are looking to parse
+    cout << "Invalid file input. We are not looking to parse this file." << endl;
   }
 
-  
+
 }
 
 int main(int argc, char *argv[])

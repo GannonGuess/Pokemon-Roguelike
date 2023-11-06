@@ -238,7 +238,7 @@ std::vector<PokemonSpecies> parse_pokemon_species(std::filesystem::path pk_speci
         info += (m.is_legendary == INT_MAX ? "" : std::to_string(m.is_legendary)) + ",";
         info += (m.is_mythical == INT_MAX ? "" : std::to_string(m.is_mythical)) + ",";
         info += (m.order == INT_MAX ? "" : std::to_string(m.order)) + ",";
-        info += (m.conquest_order == INT_MAX ? "" : std::to_string(m.conquest_order)) + ",";
+        info += (m.conquest_order == INT_MAX ? "" : std::to_string(m.conquest_order));
         std::cout << info << std::endl;
     }
     return pk_species_list;

@@ -1,21 +1,27 @@
 # 327 Pokemon Game README - Gannon Guess
 
 ## Version 1.07
-This version adds the pokedex database. The user cannot play the game, but instead chooses an option of what information from the database to print to the terminal.
-- The command given by the user is passed in with the call to the file.
-  - ex. `./poke327 pokemon` will print all of the pokemon in the pokedex and their associated information
+This version adds the pokedex database. The user cannot play the game, but instead chooses an option of what information from the database to store in a vector. That vector's information is then stored printed to the terminal.
+- The command given by the user is passed in with the call to the game.
+  - ex. `./poke327 pokemon` will print all of the pokemon in the pokedex and their associated information found in `pokemon.csv`
 Commands include:
   - `pokemon`: gives all pokemon in pokedex and info such as weight, height, base exp, and id
   - `moves`: gives all moves that can be learned by a pokemon and associated info
   - `pokemon_moves`: information relating pokemon to the moves they can have
   - `pokemon_species`: information on the species of pokemon including evolution and biome data
   - `experience`: information on experience required for leve-ups
-  - `type_names`: lists all type names in different languages
+  - `type_names`: lists all type names in different languages - I opted to include non-english type names
   - `pokemon_stats`: defines stat values for each pokemon
   - `stats`: defines stat names and where they are used
   - `pokemon_types`:defines the types that each pokemon is
-- When a command is called, the associated file is located and opened. It is then parsed into a vector<> containing instances of the associated class. The instances stored in the vector are then printed out for the user to view. The vector is returned.
-- Printing also includes header value definitions at the top of the print
+- `.csv` is appended automatically
+- When a command is called, the associated file is located and opened. It is then parsed into a vector containing instances of the associated class. The instances stored in the vector are then printed out for the user to view. The vector is returned by the parse function.
+- INT_MAX is stored in place of empty fields when parsing. When printing, INT_MAX is converted to print "" denoting an empty field.
+- Printing also includes header field definitions at the top of the print
+- Three directories are checked for the database csv storage:
+  - `/share/cs327/pokedex/pokedex/data/csv/`: first checked, would need to be a part of this package which it cannot be due to submission rules
+  - `$HOME/.poke327/pokedex/pokedex/data/csv/`: Checked if first fails. Should be what works for submission checking. Works on my end.
+  - `$HOME/dev/pokedex/pokedex/data/csv/`: Final check if first two fail. A directory specific to my computer that works on my end.
 
 ## Version 1.06
 In this version, I ported the game from C to C++. Classes and inheritance replace the old struct format, and the compiler was changed to compensate. Room/map traversal and the flight command were reimplemented with this version to allow world traversal.
