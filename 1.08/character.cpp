@@ -3,6 +3,7 @@
 #include "character.h"
 #include "poke327.h"
 #include "io.h"
+#include "db_parse.h"
 
 /* Just to make the following table fit in 80 columns */
 #define PM DIJKSTRA_PATH_MAX
@@ -656,4 +657,8 @@ void pathfind(map *m)
     }
   }
   heap_delete(&h);
+}
+
+void generate_pokemon(monster &p) {
+  p.name = "OZOBOZO";  
 }

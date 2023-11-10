@@ -1,6 +1,8 @@
 #ifndef IO_H
 # define IO_H
 
+#define ENCOUNTER_RATE  15
+
 class character;
 typedef int16_t pair_t[2];
 

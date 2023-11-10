@@ -376,7 +376,9 @@ void io_pokemart()
 
 void io_pokemon_center()
 {
-  mvprintw(0, 0, "Welcome to the Pokemon Center.  How can Nurse Joy assist you?");
+  move(0,0);
+  clrtoeol();
+  printw("Welcome to the Pokemon Center.  How can Nurse Joy assist you?");
   refresh();
   getch();
 }
@@ -394,6 +396,25 @@ void io_battle(character *aggressor, character *defender)
   if (n->ctype == char_hiker || n->ctype == char_rival) {
     n->mtype = move_wander;
   }
+}
+
+void io_select_starter() {
+  monster *p1, *p2, *p3;
+
+}
+
+void io_pokemon_encounter() {
+  monster p;
+  generate_pokemon(p);
+
+
+  clear();
+  move(0,0);
+  clrtoeol();
+  printw("You encountered a wild %s!", p.name.c_str());
+  mvprintw(1, 0, "Press any key to leave");
+  refresh();
+  getch();
 }
 
 uint32_t move_pc_dir(uint32_t input, pair_t dest)
@@ -457,10 +478,17 @@ uint32_t move_pc_dir(uint32_t input, pair_t dest)
       dest[dim_y] = world.pc.pos[dim_y];
     }
   }
-  
+
   if (move_cost[char_pc][world.cur_map->map[dest[dim_y]][dest[dim_x]]] ==
       DIJKSTRA_PATH_MAX) {
     return 1;
+  }
+
+  int encounter_chance = rand() % 100;
+
+  if(world.cur_map->map[dest[dim_y]][dest[dim_x]] == ter_grass &&
+      encounter_chance < ENCOUNTER_RATE) {
+    io_pokemon_encounter();
   }
 
   if (world.cur_map->map[dest[dim_y]][dest[dim_x]] == ter_gate &&

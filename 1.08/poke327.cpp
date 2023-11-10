@@ -1153,7 +1153,6 @@ int main(int argc, char *argv[])
   int i;
 
   db_parse(false);
-  return 0;
 
   do_seed = 1;
   

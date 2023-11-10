@@ -2,6 +2,7 @@
 # define CHARACTER_H
 
 # include <cstdint>
+# include <string>
 
 # include "pair.h"
 
@@ -30,6 +31,21 @@ typedef enum __attribute__ ((__packed__)) character_type {
 
 extern const char *char_type_name[num_character_types];
 
+class monster {
+public:
+  std::string name;
+  std::string move1;
+  std::string move2;
+  int level;
+  int hp;
+  int atk;
+  int dfs;
+  int spd;
+  int sp_atk;
+  int sp_def;
+  int gender;
+};
+
 class character {
  public:
   virtual ~character() {}
@@ -37,6 +53,7 @@ class character {
   char symbol;
   int next_turn;
   int seq_num;
+  monster pkm[6];
 };
 
 class npc : public character {
@@ -45,6 +62,7 @@ class npc : public character {
   movement_type_t mtype;
   int defeated;
   pair_t dir;
+  monster pkm[6];
 };
 
 class pc : public character {
@@ -60,5 +78,6 @@ extern void (*move_func[num_movement_types])(character *, pair_t);
 
 int pc_move(char);
 bool is_pc(character *c);
+void generate_pokemon(monster &p);
 
 #endif
