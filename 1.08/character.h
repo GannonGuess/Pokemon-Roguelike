@@ -37,13 +37,6 @@ public:
   std::string move1;
   std::string move2;
   int level;
-  int hp;
-  int atk;
-  int dfs;
-  int spd;
-  int sp_atk;
-  int sp_def;
-  int gender;
 };
 
 class character {
@@ -62,7 +55,6 @@ class npc : public character {
   movement_type_t mtype;
   int defeated;
   pair_t dir;
-  monster pkm[6];
 };
 
 class pc : public character {

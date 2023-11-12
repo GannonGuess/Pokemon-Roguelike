@@ -4,6 +4,10 @@
 #include "poke327.h"
 #include "io.h"
 #include "db_parse.h"
+#include <vector>
+#include <algorithm>
+#include <random>
+#include <ctime>
 
 /* Just to make the following table fit in 80 columns */
 #define PM DIJKSTRA_PATH_MAX
@@ -660,5 +664,60 @@ void pathfind(map *m)
 }
 
 void generate_pokemon(monster &p) {
-  p.name = "OZOBOZO";  
+  int minLvl, maxLvl, i;
+  int manDist = (abs(world.cur_idx[dim_x] - (WORLD_SIZE / 2)) +
+                 abs(world.cur_idx[dim_y] - (WORLD_SIZE / 2)));
+  if(manDist <= 1) {
+    minLvl = 1;
+    maxLvl = 1;
+  }
+  else if(manDist <= 200) {
+    minLvl = 1;
+    maxLvl = manDist / 2;
+  } else {
+    minLvl = (manDist - 200) / 2;
+    maxLvl = 100;
+  }
+  int randomPkm = rand() % 1093;
+  p.level = (rand() % (maxLvl - minLvl + 1)) + minLvl;
+  p.name = pokemon[randomPkm].identifier;
+  p.name[0] = toupper(p.name[0]);
+
+
+  int spec_id = pokemon[randomPkm].species_id;
+  std::vector<pokemon_move_db> potential_moves;
+  std::vector<pokemon_move_db> selected_moves;
+
+  for(i = 0; i < 528239; i++) {
+    if(pokemon_moves[i].pokemon_id == spec_id       && 
+       pokemon_moves[i].pokemon_move_method_id == 1 && 
+       pokemon_moves[i].level <= p.level) {
+      potential_moves.push_back(pokemon_moves[i]);
+    }
+  }
+  std::default_random_engine rng(static_cast<unsigned int>(std::time(0)));
+  std::shuffle(potential_moves.begin(), potential_moves.end(), rng);
+
+  
+
+
+  int move1ID = potential_moves[0].move_id;  
+  int move2ID = potential_moves[1].move_id;
+  move_db instances[2];
+  for(i = 0; i < 845; i++) {
+    if(moves[i].id == move1ID) {
+      p.move1 = moves[i].identifier;
+      break;
+    }
+  }
+  for(i = 0; i < 845; i++) {
+    if(moves[i].id == move2ID && move1ID != move2ID) {
+      p.move2 = moves[i].identifier;
+      break;
+    }
+  }
+
+
+  
+
 }
