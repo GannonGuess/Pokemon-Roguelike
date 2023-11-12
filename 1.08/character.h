@@ -38,6 +38,14 @@ public:
   std::string move2;
   int level;
   char gender;
+  int hp;
+  int atk;
+  int def;
+  int spa;
+  int spd;
+  int spe;
+  int acc;
+  int eva;
 };
 
 class character {

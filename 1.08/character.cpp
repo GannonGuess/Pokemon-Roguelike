@@ -689,6 +689,51 @@ void generate_pokemon(monster &p) {
 
 
   int spec_id = pokemon[randomPkm].species_id;
+  p.hp += rand() % 16;
+  p.atk += rand() % 16;
+  p.def += rand() % 16;
+  p.spa += rand() % 16;
+  p.spd += rand() % 16;
+  p.spe += rand() % 16;
+  // std::vector<pokemon_stats_db> base_stats;
+  for(i = 0; i < 6553; i++) {
+    if(pokemon_stats[i].pokemon_id == spec_id) {
+      switch(pokemon_stats[i].stat_id) {
+        case 1:
+          p.hp += pokemon_stats[i].base_stat;
+          break;
+        case 2:
+          p.atk += pokemon_stats[i].base_stat;
+          break;
+        case 3:
+          p.def += pokemon_stats[i].base_stat;
+          break;
+        case 4:
+          p.spa += pokemon_stats[i].base_stat;
+          break;
+        case 5:
+          p.spd += pokemon_stats[i].base_stat;
+          break;
+        case 6:
+          p.atk += pokemon_stats[i].base_stat;
+          break;
+        case 7:
+          p.acc += pokemon_stats[i].base_stat;
+          break;
+        case 8:
+          p.eva += pokemon_stats[i].base_stat;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+
+
+
+
+
   std::vector<pokemon_move_db> potential_moves;
   std::vector<pokemon_move_db> selected_moves;
 
@@ -736,6 +781,8 @@ void generate_pokemon(monster &p) {
   if(shiny_odd == 0) {
     p.name += '*';
   }
+
+
 
 
   
