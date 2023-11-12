@@ -8,6 +8,9 @@
 #include <sys/time.h>
 #include <cassert>
 #include <unistd.h>
+#include <random>
+#include <chrono>
+#include <ctime>
 
 #include "heap.h"
 #include "poke327.h"
@@ -754,6 +757,15 @@ void new_hiker()
   c->symbol = HIKER_SYMBOL;
   c->next_turn = 0;
   c->seq_num = world.char_seq_num++;
+
+  generate_pokemon(c->pkm[0]);
+  double chance = static_cast<double>(rand()) / RAND_MAX;
+  int slot = 1;
+  while(chance <= 0.6 && slot < 6) {
+    generate_pokemon(c->pkm[slot]);
+    slot++;
+    chance = static_cast<double>(rand()) / RAND_MAX;
+  }
   heap_insert(&world.cur_map->turn, c);
 }
 
@@ -781,6 +793,15 @@ void new_rival()
   c->symbol = RIVAL_SYMBOL;
   c->next_turn = 0;
   c->seq_num = world.char_seq_num++;
+
+  generate_pokemon(c->pkm[0]);
+  double chance = static_cast<double>(rand()) / RAND_MAX;
+  int slot = 1;
+  while(chance <= 0.6 && slot <= 5) {
+    generate_pokemon(c->pkm[slot]);
+    slot++;
+    chance = static_cast<double>(rand()) / RAND_MAX;
+  }
   heap_insert(&world.cur_map->turn, c);
 }
 
@@ -804,6 +825,15 @@ void new_swimmer()
   c->symbol = SWIMMER_SYMBOL;
   c->next_turn = 0;
   c->seq_num = world.char_seq_num++;
+
+  generate_pokemon(c->pkm[0]);
+  double chance = static_cast<double>(rand()) / RAND_MAX;
+  int slot = 1;
+  while(chance <= 0.6 && slot <= 5) {
+    generate_pokemon(c->pkm[slot]);
+    slot++;
+    chance = static_cast<double>(rand()) / RAND_MAX;
+  }
   heap_insert(&world.cur_map->turn, c);
 }
 
@@ -846,6 +876,15 @@ void new_char_other()
   c->defeated = 0;
   c->next_turn = 0;
   c->seq_num = world.char_seq_num++;
+
+  generate_pokemon(c->pkm[0]);
+  double chance = static_cast<double>(rand()) / RAND_MAX;
+  int slot = 1;
+  while(chance <= 0.6 && slot <= 5) {
+    generate_pokemon(c->pkm[slot]);
+    slot++;
+    chance = static_cast<double>(rand()) / RAND_MAX;
+  }
   heap_insert(&world.cur_map->turn, c);
 }
 
@@ -1135,6 +1174,8 @@ void game_loop()
   }
 }
 
+
+
 void usage(char *s)
 {
   fprintf(stderr, "Usage: %s [-s|--seed <seed>]\n", s);
@@ -1258,6 +1299,8 @@ int main(int argc, char *argv[])
   } while (c != 'q');
 
   */
+
+  io_select_starter(world.pc);
 
   game_loop();
   
