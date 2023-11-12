@@ -37,6 +37,7 @@ public:
   std::string move1;
   std::string move2;
   int level;
+  char gender;
 };
 
 class character {
@@ -71,5 +72,6 @@ extern void (*move_func[num_movement_types])(character *, pair_t);
 int pc_move(char);
 bool is_pc(character *c);
 void generate_pokemon(monster &p);
+void level_up_stats(monster &p);
 
 #endif

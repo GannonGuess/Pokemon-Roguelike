@@ -396,7 +396,7 @@ void io_battle(character *aggressor, character *defender)
     if(n->pkm[i].name.empty()) {
       break;
     }
-    mvprintw(4 * i + 1, 0, "Pokemon #%d: %s lvl: %d", i + 1, n->pkm[i].name.c_str(), n->pkm[i].level);
+    mvprintw(4 * i + 1, 0, "Pokemon #%d: %s lvl: %d gender: %c", i + 1, n->pkm[i].name.c_str(), n->pkm[i].level, n->pkm[i].gender);
     mvprintw(4 * i + 2, 0, "Move 1: %s Move 2: %s", n->pkm[i].move1.c_str(), n->pkm[i].move2.c_str());
   }
   mvprintw(24, 0, "press any key to exit");
@@ -419,9 +419,9 @@ void io_select_starter(pc player) {
   generate_pokemon(p3);
   mvprintw(0, 0, "Welcome to the world of Pokemon!");
   mvprintw(1, 0, "Select your starter pokemon from the following using the associated number key:");
-  mvprintw(2, 0, "[1]: %s", (p1).name.c_str());
-  mvprintw(3, 0, "[2]: %s", (p2).name.c_str());
-  mvprintw(4, 0, "[3]: %s", (p3).name.c_str());
+  mvprintw(2, 0, "[1]: %s", p1.name.c_str());
+  mvprintw(3, 0, "[2]: %s", p2.name.c_str());
+  mvprintw(4, 0, "[3]: %s", p3.name.c_str());
 
   refresh();
 
@@ -430,8 +430,6 @@ void io_select_starter(pc player) {
     refresh();
     selection = getch();
   }
-  mvprintw(6, 0, "valid");
-  refresh();
   switch(selection) {
     case '1':
       player.pkm[0] = p1;
@@ -447,8 +445,11 @@ void io_select_starter(pc player) {
       break;
   }
   clear();
-  mvprintw(0, 0, "You selected %s as your starter!", player.pkm[0].name.c_str());
-  mvprintw(2, 0, "Press any key to continue");
+  mvprintw(0, 0, "You selected %s as your starter!", player.pkm[0].name.c_str(), player.pkm[0].gender);
+  mvprintw(1, 0, "%s's Details:", player.pkm[0].name.c_str());
+  mvprintw(2, 0, "Level: %d Gender: %c", player.pkm[0].level, player.pkm[0].gender);
+  mvprintw(3, 0, "Move 1: %s Move 2: %s", player.pkm[0].move1.c_str(), player.pkm[0].move2.c_str());
+  mvprintw(5, 0, "Press any key to continue");
   refresh();
   getch();
   clear();

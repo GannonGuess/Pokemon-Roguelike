@@ -663,6 +663,10 @@ void pathfind(map *m)
   heap_delete(&h);
 }
 
+void level_up_stats(monster &p) {
+
+}
+
 void generate_pokemon(monster &p) {
   int minLvl, maxLvl, i;
   int manDist = (abs(world.cur_idx[dim_x] - (WORLD_SIZE / 2)) +
@@ -698,6 +702,7 @@ void generate_pokemon(monster &p) {
     }
     if(potential_moves.size() == 0) {
       p.level += 1;
+      level_up_stats(p);
     }
   }
   std::default_random_engine rng(static_cast<unsigned int>(std::time(0)));
@@ -717,6 +722,19 @@ void generate_pokemon(monster &p) {
       p.move2 = moves[i].identifier;
       break;
     }
+  }
+
+  double gender_rate = static_cast<double>(rand()) / RAND_MAX;
+  if(gender_rate <= 0.5) {
+    p.gender = 'M';
+  }
+  else {
+    p.gender = 'F';
+  }
+
+  int shiny_odd = rand() % 8192;
+  if(shiny_odd == 0) {
+    p.name += '*';
   }
 
 
