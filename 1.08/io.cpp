@@ -5,7 +5,7 @@
 #include <climits>
 
 #include "io.h"
-#include "character.h"
+// #include "character.h"
 #include "poke327.h"
 
 typedef struct io_message {
@@ -385,10 +385,22 @@ void io_pokemon_center()
 
 void io_battle(character *aggressor, character *defender)
 {
+  int i;
   npc *n = (npc *) ((aggressor == &world.pc) ? defender : aggressor);
 
   io_display();
   mvprintw(0, 0, "Aww, how'd you get so strong?  You and your pokemon must share a special bond!");
+  clear();
+  mvprintw(0, 0, "Facing trainer %c at location x:%d y:%d", n->symbol, n->pos[dim_x], n->pos[dim_y]);
+  for(i = 0; i <= 6; i++) {
+    if(n->pkm[i].name.empty()) {
+      break;
+    }
+    mvprintw(4 * i + 1, 0, "Pokemon #%d: %s lvl: %d", i + 1, n->pkm[i].name.c_str(), n->pkm[i].level);
+    mvprintw(4 * i + 2, 0, "Move 1: %s Move 2: %s", n->pkm[i].move1.c_str(), n->pkm[i].move2.c_str());
+  }
+  mvprintw(24, 0, "press any key to exit");
+
   refresh();
   getch();
 
@@ -398,9 +410,49 @@ void io_battle(character *aggressor, character *defender)
   }
 }
 
-void io_select_starter() {
-  monster *p1, *p2, *p3;
+void io_select_starter(pc player) {
+  monster p1;
+  monster p2;
+  monster p3;
+  generate_pokemon(p1);
+  generate_pokemon(p2);
+  generate_pokemon(p3);
+  mvprintw(0, 0, "Welcome to the world of Pokemon!");
+  mvprintw(1, 0, "Select your starter pokemon from the following using the associated number key:");
+  mvprintw(2, 0, "[1]: %s", (p1).name.c_str());
+  mvprintw(3, 0, "[2]: %s", (p2).name.c_str());
+  mvprintw(4, 0, "[3]: %s", (p3).name.c_str());
 
+  refresh();
+
+  char selection = getch();
+  while(selection != '1' && selection != '2' && selection != '3') {
+    refresh();
+    selection = getch();
+  }
+  mvprintw(6, 0, "valid");
+  refresh();
+  switch(selection) {
+    case '1':
+      player.pkm[0] = p1;
+      break;
+    case '2':
+      player.pkm[0] = p2;
+      break;
+    case '3':
+      player.pkm[0] = p3;
+      break;
+    default:
+      selection = getch();
+      break;
+  }
+  clear();
+  mvprintw(0, 0, "You selected %s as your starter!", player.pkm[0].name.c_str());
+  mvprintw(2, 0, "Press any key to continue");
+  refresh();
+  getch();
+  clear();
+  refresh();
 }
 
 void io_pokemon_encounter() {
@@ -411,8 +463,10 @@ void io_pokemon_encounter() {
   clear();
   move(0,0);
   clrtoeol();
-  printw("You encountered a wild %s!", p.name.c_str());
-  mvprintw(1, 0, "Press any key to leave");
+  printw("You encountered a wild %s! Level %d", p.name.c_str(), p.level);
+  mvprintw(1, 0, "move 1: %s", p.move1.c_str());
+  mvprintw(2, 0, "move 2: %s", p.move2.c_str());
+  mvprintw(5, 0, "Press any key to leave");
   refresh();
   getch();
 }
