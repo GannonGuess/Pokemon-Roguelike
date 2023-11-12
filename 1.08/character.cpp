@@ -688,18 +688,20 @@ void generate_pokemon(monster &p) {
   std::vector<pokemon_move_db> potential_moves;
   std::vector<pokemon_move_db> selected_moves;
 
-  for(i = 0; i < 528239; i++) {
-    if(pokemon_moves[i].pokemon_id == spec_id       && 
-       pokemon_moves[i].pokemon_move_method_id == 1 && 
-       pokemon_moves[i].level <= p.level) {
-      potential_moves.push_back(pokemon_moves[i]);
+  while(potential_moves.size() == 0) {
+    for(i = 0; i < 528239; i++) {
+      if(pokemon_moves[i].pokemon_id == spec_id       && 
+        pokemon_moves[i].pokemon_move_method_id == 1 && 
+        pokemon_moves[i].level <= p.level) {
+        potential_moves.push_back(pokemon_moves[i]);
+      }
+    }
+    if(potential_moves.size() == 0) {
+      p.level += 1;
     }
   }
   std::default_random_engine rng(static_cast<unsigned int>(std::time(0)));
   std::shuffle(potential_moves.begin(), potential_moves.end(), rng);
-
-  
-
 
   int move1ID = potential_moves[0].move_id;  
   int move2ID = potential_moves[1].move_id;
