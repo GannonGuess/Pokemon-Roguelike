@@ -398,6 +398,7 @@ void io_battle(character *aggressor, character *defender)
     }
     mvprintw(4 * i + 1, 0, "Pokemon #%d: %s lvl: %d gender: %c", i + 1, n->pkm[i].name.c_str(), n->pkm[i].level, n->pkm[i].gender);
     mvprintw(4 * i + 2, 0, "Move 1: %s Move 2: %s", n->pkm[i].move1.c_str(), n->pkm[i].move2.c_str());
+    mvprintw(4 * i + 3, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", n->pkm[i].hp, n->pkm[i].atk, n->pkm[i].def, n->pkm[i].spa, n->pkm[i].spd, n->pkm[i].spe);
   }
   mvprintw(24, 0, "press any key to exit");
 
@@ -449,7 +450,8 @@ void io_select_starter(pc player) {
   mvprintw(1, 0, "%s's Details:", player.pkm[0].name.c_str());
   mvprintw(2, 0, "Level: %d Gender: %c", player.pkm[0].level, player.pkm[0].gender);
   mvprintw(3, 0, "Move 1: %s Move 2: %s", player.pkm[0].move1.c_str(), player.pkm[0].move2.c_str());
-  mvprintw(5, 0, "Press any key to continue");
+  mvprintw(4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", player.pkm[0].hp, player.pkm[0].atk, player.pkm[0].def, player.pkm[0].spa, player.pkm[0].spd, player.pkm[0].spe);
+  mvprintw(7, 0, "Press any key to continue");
   refresh();
   getch();
   clear();
@@ -467,6 +469,7 @@ void io_pokemon_encounter() {
   printw("You encountered a wild %s! Level %d", p.name.c_str(), p.level);
   mvprintw(1, 0, "move 1: %s", p.move1.c_str());
   mvprintw(2, 0, "move 2: %s", p.move2.c_str());
+  mvprintw(4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", p.hp, p.atk, p.def, p.spa, p.spd, p.spe);
   mvprintw(5, 0, "Press any key to leave");
   refresh();
   getch();

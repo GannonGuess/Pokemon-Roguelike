@@ -664,7 +664,12 @@ void pathfind(map *m)
 }
 
 void level_up_stats(monster &p) {
-
+  p.hp = floor((((p.hp_base + p.hp_iv) * 2) * p.level) / 100) + p.level + 10;
+  p.atk = floor((((p.atk_base + p.atk_iv) * 2) * p.level) / 100) + 5;
+  p.def = floor((((p.def_base + p.def_iv) * 2) * p.level) / 100) + 5;
+  p.spa = floor((((p.spa_base + p.spa_iv) * 2) * p.level) / 100) + 5;
+  p.spd = floor((((p.spd_base + p.spd_iv) * 2) * p.level) / 100) + 5;
+  p.spe = floor((((p.spe_base + p.spe_iv) * 2) * p.level) / 100) + 5;
 }
 
 void generate_pokemon(monster &p) {
@@ -686,53 +691,48 @@ void generate_pokemon(monster &p) {
   p.level = (rand() % (maxLvl - minLvl + 1)) + minLvl;
   p.name = pokemon[randomPkm].identifier;
   p.name[0] = toupper(p.name[0]);
+  p.exp = 0;
 
 
   int spec_id = pokemon[randomPkm].species_id;
-  p.hp += rand() % 16;
-  p.atk += rand() % 16;
-  p.def += rand() % 16;
-  p.spa += rand() % 16;
-  p.spd += rand() % 16;
-  p.spe += rand() % 16;
-  // std::vector<pokemon_stats_db> base_stats;
   for(i = 0; i < 6553; i++) {
     if(pokemon_stats[i].pokemon_id == spec_id) {
       switch(pokemon_stats[i].stat_id) {
         case 1:
-          p.hp += pokemon_stats[i].base_stat;
+          p.hp_base = pokemon_stats[i].base_stat;
+          p.hp_iv = rand() % 16;
+          p.hp = p.hp_base + p.hp_iv;
           break;
         case 2:
-          p.atk += pokemon_stats[i].base_stat;
+          p.atk_base = pokemon_stats[i].base_stat;
+          p.atk_iv = rand() % 16;
+          p.atk = p.atk_base + p.atk_iv;
           break;
         case 3:
-          p.def += pokemon_stats[i].base_stat;
+          p.def_base = pokemon_stats[i].base_stat;
+          p.def_iv = rand() % 16;
+          p.def = p.def_base + p.def_iv;
           break;
         case 4:
-          p.spa += pokemon_stats[i].base_stat;
+          p.spa_base = pokemon_stats[i].base_stat;
+          p.spa_iv = rand() % 16;
+          p.spa = p.spa_base + p.spa_iv;
           break;
         case 5:
-          p.spd += pokemon_stats[i].base_stat;
+          p.spd_base = pokemon_stats[i].base_stat;
+          p.spd_iv = rand() % 16;
+          p.spd = p.spd_base + p.spd_iv;
           break;
         case 6:
-          p.atk += pokemon_stats[i].base_stat;
-          break;
-        case 7:
-          p.acc += pokemon_stats[i].base_stat;
-          break;
-        case 8:
-          p.eva += pokemon_stats[i].base_stat;
+          p.spe_base = pokemon_stats[i].base_stat;
+          p.spe_iv = rand() % 16;
+          p.spe = p.spe_base + p.spe_iv;
           break;
         default:
           break;
       }
     }
   }
-
-
-
-
-
 
   std::vector<pokemon_move_db> potential_moves;
   std::vector<pokemon_move_db> selected_moves;
