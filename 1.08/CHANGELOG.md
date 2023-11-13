@@ -1,5 +1,19 @@
 ## Version 1.08
 
+11/12 21:55 - Updated README and packaged for submission.
+
+11/12 14:55 - 
+
+11/12 13:23 - character class now has storage for 6 monsters/pokemon
+            - NPC's now get a variable number of pokemon when they are created.
+            - added pokemon gender and shiny status
+
+11/12 12:45 - Added pokemon level generation and have them output when encountering a pkm
+
+11/12 12:10 - Added monster class for storing pokemon name, moves, level, etc.
+            - Added function that randomly chooses a pokemon from the database.
+            - Added tall-grass encounters that display pokemon name
+
 11/09 13:50 - Copied files over from instructor 1.07
 
 ## Version 1.07
