@@ -373,8 +373,13 @@ void io_pokemart()
 {
   clear();
   mvprintw(0, 0, "Welcome to the Pokemart!");
-  mvprintw(1, 0, "Seems like they're out of stock...");
-  mvprintw(2, 0, "You should come back later");
+
+  world.pc.revives = MAX_REVIVES;
+  world.pc.potions = MAX_POTIONS;
+  world.pc.pokeballs = MAX_POKEBALLS;
+
+  mvprintw(1, 0, "You've replinished all of your items");
+  mvprintw(2, 0, "Come again soon!");
   mvprintw(4, 0, "Press \'<\' to leave");
   char command = getch();
   while(command != (char)KEY_LEFT && command != '<') {
@@ -386,8 +391,15 @@ void io_pokemon_center()
 {
   clear();
   mvprintw(0, 0, "Welcome to the Pokemon Center!");
-  mvprintw(1, 0, "Seems that Nurse Joy isn't here right now...");
-  mvprintw(2, 0, "You should come back later");
+
+  for(pokemon *p : world.pc.buddy) {
+    if(p) {
+      p->current_hp = p->get_hp();
+    }
+  }
+
+  mvprintw(1, 0, "Nurse Joy healed all of your pokemon");
+  mvprintw(2, 0, "Come back soon!");
   mvprintw(4, 0, "Press \'<\' to leave");
   char command = getch();
   while(command != (char)KEY_LEFT && command != '<') {

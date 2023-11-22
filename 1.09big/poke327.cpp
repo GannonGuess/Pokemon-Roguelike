@@ -918,6 +918,10 @@ void init_pc()
 
   world.pc.seq_num = world.char_seq_num++;
 
+  world.pc.revives = MAX_REVIVES;
+  world.pc.potions = MAX_POTIONS;
+  world.pc.pokeballs = MAX_POKEBALLS;
+
   heap_insert(&world.cur_map->turn, &world.pc);
 
   io_choose_starter();

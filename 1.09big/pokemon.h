@@ -26,6 +26,7 @@ class pokemon {
   bool shiny;
   pokemon_gender gender;
  public:
+  int current_hp;
   pokemon();
   pokemon(int level);
   const char *get_species() const;

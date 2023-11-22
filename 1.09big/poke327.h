@@ -60,6 +60,10 @@
 #define SWIMMER_SYMBOL  'm'
 #define WANDERER_SYMBOL 'w'
 
+#define MAX_REVIVES     5
+#define MAX_POTIONS     10
+#define MAX_POKEBALLS   15
+
 #define mappair(pair) (m->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (m->map[y][x])
 #define heightpair(pair) (m->height[pair[dim_y]][pair[dim_x]])

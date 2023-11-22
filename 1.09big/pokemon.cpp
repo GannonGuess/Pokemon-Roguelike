@@ -112,7 +112,7 @@ pokemon::pokemon(int level) : level(level)
       effective_stat[i] += 5 + level;
     }
   }
-
+  current_hp = s->base_stat[0];
   shiny = (((rand() & 0x1fff) == 0x1fff) ? true : false);
   gender = ((rand() & 0x1) ? gender_female : gender_male);
 }

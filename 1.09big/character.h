@@ -52,6 +52,9 @@ class npc : public character {
 
 class pc : public character {
 public:
+  int revives;
+  int potions;
+  int pokeballs;
   virtual ~pc() {}
 };
 
