@@ -1,27 +1,19 @@
 #include <cstdio>
-#include <vector>
-#include "pair.h"
+#include "battleship.h"
 
-class Ship {
-    public:
-        int length;
-        pair_t head;
-        pair_t tail;
-};
 
-class map {
-    public:
-        int height;
-        int width;
-        std::vector<Ship> ships;
-};
+void io_init_terminal() {
 
-void initilize_map() {
+}
+
+void new_map() {
     
 }
 
 
 int main(int argc, char *argv[]) {
+    map player1, player2, hid_1, hid_2;
+
     
     return 0;
 }
