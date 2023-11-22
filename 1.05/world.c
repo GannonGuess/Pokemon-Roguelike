@@ -49,24 +49,6 @@ int room_print(struct room *r, actorMap *cmap) {
      printf("\n");
      for(y = 0; y < 21; y++) {
           for(x = 0; x < 80; x++) {
-               if(r->tiles[y][x] == PLAYER) {
-                    purple();
-               }
-               else if(r->tiles[y][x] == MART) {
-                    blue();
-               }
-               else if(r->tiles[y][x] == WATER) {
-                    cyan();
-               }
-               else if(r->tiles[y][x] == PATH) {
-                    yellow();
-               }
-               else if(r->tiles[y][x] == SHORT_GRASS || r->tiles[y][x] == TALL_GRASS) {
-                    green();
-               }
-               else if(r->tiles[y][x] == CENTER) {
-                    red();
-               }
                if(y != 0 && x != 0 && x != 79 && y != 20 && cmap->actorMap[y - 1][x - 1]) {
                     purple();
                     printf("%c", cmap->actorMap[y - 1][x - 1]->display);
