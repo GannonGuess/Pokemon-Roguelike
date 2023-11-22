@@ -1,8 +1,10 @@
 ## Version 1.09
 
-11/22 1
+11/22 17:10 - Added get_level method for pokemon
 
-11/22 15:53 - Copied files over from 1.08
+11/22 17:04 - Got code working and update IO output for marts, centers, and encounters
+
+11/22 15:53 - Copied files over from 1.08 instructor code
 
 ## Version 1.08
 

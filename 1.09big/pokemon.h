@@ -35,6 +35,7 @@ class pokemon {
   int get_spatk() const;
   int get_spdef() const;
   int get_speed() const;
+  int get_level() const;
   const char *get_gender_string() const;
   bool is_shiny() const;
   const char *get_move(int i) const;

@@ -152,6 +152,10 @@ int pokemon::get_speed() const
   return effective_stat[stat_speed];
 }
 
+int pokemon::get_level() const {
+  return level;
+}
+
 const char *pokemon::get_gender_string() const
 {
   return gender == gender_female ? "female" : "male";
