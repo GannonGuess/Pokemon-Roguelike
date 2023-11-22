@@ -371,41 +371,50 @@ static void io_list_trainers()
 
 void io_pokemart()
 {
-  mvprintw(0, 0, "Welcome to the Pokemart.  Could I interest you in some Pokeballs?");
-  refresh();
-  getch();
+  clear();
+  mvprintw(0, 0, "Welcome to the Pokemart!");
+  mvprintw(1, 0, "Seems like they're out of stock...");
+  mvprintw(2, 0, "You should come back later");
+  mvprintw(4, 0, "Press \'<\' to leave");
+  char command = getch();
+  while(command != (char)KEY_LEFT && command != '<') {
+    command = getch();
+  }
 }
 
 void io_pokemon_center()
 {
-  mvprintw(0, 0, "Welcome to the Pokemon Center.  How can Nurse Joy assist you?");
-  refresh();
-  getch();
+  clear();
+  mvprintw(0, 0, "Welcome to the Pokemon Center!");
+  mvprintw(1, 0, "Seems that Nurse Joy isn't here right now...");
+  mvprintw(2, 0, "You should come back later");
+  mvprintw(4, 0, "Press \'<\' to leave");
+  char command = getch();
+  while(command != (char)KEY_LEFT && command != '<') {
+    command = getch();
+  }
 }
 
 void io_battle(character *aggressor, character *defender)
 {
-  std::string s;
+int i;
   npc *n = (npc *) ((aggressor == &world.pc) ? defender : aggressor);
-  int i;
 
-  if (!n->buddy[1]) {
-    s = "My pokemon is " + std::string(n->buddy[0]->get_species());
-  } else {
-    s = "My pokemon are " + std::string(n->buddy[0]->get_species());
-  }
-
-  for (i = 1; i < 6 && n->buddy[i]; i++) {
-    s += ", ";
-    if (i == 4 || !n->buddy[i + 1]) {
-      s += "and ";
+  io_display();
+  mvprintw(0, 0, "Aww, how'd you get so strong?  You and your pokemon must share a special bond!");
+  clear();
+  mvprintw(0, 0, "Facing trainer %c at location x:%d y:%d. Press any key to exit.", n->symbol, n->pos[dim_x], n->pos[dim_y]);
+  for(i = 0; i <= 6; i++) {
+    if(!n->buddy[i]) {
+      break;
     }
-    s += n->buddy[i]->get_species();
-  }
-    
-  s += ".";
+    mvprintw(4 * i + 1, 0, "Pokemon #%d: %s", i + 1, n->buddy[i]->get_species());
+    // mvprintw(4 * i + 2, 0, "Move 1: %s Move 2: %s", n->pkm[i].move1.c_str(), n->pkm[i].move2.c_str());
+    // mvprintw(4 * i + 3, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", n->pkm[i].hp, n->pkm[i].atk, n->pkm[i].def, n->pkm[i].spa, n->pkm[i].spd, n->pkm[i].spe);
+  } 
 
-  io_queue_message("%s", s.c_str());
+  refresh();
+  getch();
 
   n->defeated = 1;
   if (n->ctype == char_hiker || n->ctype == char_rival) {
@@ -653,13 +662,16 @@ void io_encounter_pokemon()
 
   p = new pokemon();
 
-  io_queue_message("%s%s%s: HP:%d ATK:%d DEF:%d SPATK:%d SPDEF:%d SPEED:%d %s",
-                   p->is_shiny() ? "*" : "", p->get_species(),
-                   p->is_shiny() ? "*" : "", p->get_hp(), p->get_atk(),
-                   p->get_def(), p->get_spatk(), p->get_spdef(),
-                   p->get_speed(), p->get_gender_string());
-  io_queue_message("%s's moves: %s %s", p->get_species(),
-                   p->get_move(0), p->get_move(1));
+  clear();
+  move(0,0);
+  clrtoeol();
+  printw("You encountered a wild %s!", p->get_species());
+  // mvprintw(1, 0, "move 1: %s", p.move1.c_str());
+  // mvprintw(2, 0, "move 2: %s", p.move2.c_str());
+  // mvprintw(4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", p.hp, p.atk, p.def, p.spa, p.spd, p.spe);
+  // mvprintw(5, 0, "Press any key to leave");
+  refresh();
+  getch();
 
   // Later on, don't delete if captured
   delete p;
