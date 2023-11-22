@@ -391,7 +391,7 @@ void io_battle(character *aggressor, character *defender)
   io_display();
   mvprintw(0, 0, "Aww, how'd you get so strong?  You and your pokemon must share a special bond!");
   clear();
-  mvprintw(0, 0, "Facing trainer %c at location x:%d y:%d", n->symbol, n->pos[dim_x], n->pos[dim_y]);
+  mvprintw(0, 0, "Facing trainer %c at location x:%d y:%d. Press any key to exit.", n->symbol, n->pos[dim_x], n->pos[dim_y]);
   for(i = 0; i <= 6; i++) {
     if(n->pkm[i].name.empty()) {
       break;
@@ -399,8 +399,7 @@ void io_battle(character *aggressor, character *defender)
     mvprintw(4 * i + 1, 0, "Pokemon #%d: %s lvl: %d gender: %c", i + 1, n->pkm[i].name.c_str(), n->pkm[i].level, n->pkm[i].gender);
     mvprintw(4 * i + 2, 0, "Move 1: %s Move 2: %s", n->pkm[i].move1.c_str(), n->pkm[i].move2.c_str());
     mvprintw(4 * i + 3, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", n->pkm[i].hp, n->pkm[i].atk, n->pkm[i].def, n->pkm[i].spa, n->pkm[i].spd, n->pkm[i].spe);
-  }
-  mvprintw(24, 0, "press any key to exit");
+  } 
 
   refresh();
   getch();
@@ -411,7 +410,7 @@ void io_battle(character *aggressor, character *defender)
   }
 }
 
-void io_select_starter(pc player) {
+void io_select_starter(pc *player) {
   monster p1;
   monster p2;
   monster p3;
@@ -433,24 +432,24 @@ void io_select_starter(pc player) {
   }
   switch(selection) {
     case '1':
-      player.pkm[0] = p1;
+      player->pkm[0] = p1;
       break;
     case '2':
-      player.pkm[0] = p2;
+      player->pkm[0] = p2;
       break;
     case '3':
-      player.pkm[0] = p3;
+      player->pkm[0] = p3;
       break;
     default:
       selection = getch();
       break;
   }
   clear();
-  mvprintw(0, 0, "You selected %s as your starter!", player.pkm[0].name.c_str(), player.pkm[0].gender);
-  mvprintw(1, 0, "%s's Details:", player.pkm[0].name.c_str());
-  mvprintw(2, 0, "Level: %d Gender: %c", player.pkm[0].level, player.pkm[0].gender);
-  mvprintw(3, 0, "Move 1: %s Move 2: %s", player.pkm[0].move1.c_str(), player.pkm[0].move2.c_str());
-  mvprintw(4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", player.pkm[0].hp, player.pkm[0].atk, player.pkm[0].def, player.pkm[0].spa, player.pkm[0].spd, player.pkm[0].spe);
+  mvprintw(0, 0, "You selected %s as your starter!", player->pkm[0].name.c_str(), player->pkm[0].gender);
+  mvprintw(1, 0, "%s's Details:", player->pkm[0].name.c_str());
+  mvprintw(2, 0, "Level: %d Gender: %c", player->pkm[0].level, player->pkm[0].gender);
+  mvprintw(3, 0, "Move 1: %s Move 2: %s", player->pkm[0].move1.c_str(), player->pkm[0].move2.c_str());
+  mvprintw(4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", player->pkm[0].hp, player->pkm[0].atk, player->pkm[0].def, player->pkm[0].spa, player->pkm[0].spd, player->pkm[0].spe);
   mvprintw(7, 0, "Press any key to continue");
   refresh();
   getch();
@@ -474,6 +473,36 @@ void io_pokemon_encounter() {
   refresh();
   getch();
 }
+
+void io_list_pc_pokemon() {
+  clear();
+  int i = 0;
+  mvprintw(0, 0, "Your pokemon:");
+  for(i = 0; i < 6 && !world.pc.pkm[i].name.empty(); i++) {
+    mvprintw(4 * i + 1, 0, "%s", world.pc.pkm[i].name.c_str());
+    mvprintw(4 * i + 2, 0, "Level: %d Gender: %c", world.pc.pkm[i].level, world.pc.pkm[i].gender);
+    mvprintw(4 * i + 3, 0, "Move 1: %s Move 2: %s", world.pc.pkm[i].move1.c_str(), world.pc.pkm[i].move2.c_str());
+    mvprintw(4 * i + 4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", world.pc.pkm[i].hp, world.pc.pkm[i].atk, world.pc.pkm[i].def, world.pc.pkm[i].spa, world.pc.pkm[i].spd, world.pc.pkm[i].spe);
+  }
+
+  mvprintw(23, 0, "Press + to level up your pokemon and any other key to close");
+  refresh();
+
+  while(getch() == '+') {
+    for(i = 0; i < 6 && !world.pc.pkm[i].name.empty(); i++) {
+      if(world.pc.pkm[i].level < 100) {
+        world.pc.pkm[i].level += 1;
+      }
+      calc_stats_for_level(world.pc.pkm[i]);
+      mvprintw(4 * i + 1, 0, "%s", world.pc.pkm[i].name.c_str());
+      mvprintw(4 * i + 2, 0, "Level: %d Gender: %c", world.pc.pkm[i].level, world.pc.pkm[i].gender);
+      mvprintw(4 * i + 3, 0, "Move 1: %s Move 2: %s", world.pc.pkm[i].move1.c_str(), world.pc.pkm[i].move2.c_str());
+      mvprintw(4 * i + 4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", world.pc.pkm[i].hp, world.pc.pkm[i].atk, world.pc.pkm[i].def, world.pc.pkm[i].spa, world.pc.pkm[i].spd, world.pc.pkm[i].spe);
+    }
+  }
+  io_display();
+}
+
 
 uint32_t move_pc_dir(uint32_t input, pair_t dest)
 {
@@ -662,6 +691,10 @@ void io_handle_input(pair_t dest)
       break;
     case 't':
       io_list_trainers();
+      turn_not_consumed = 1;
+      break;
+    case 'i':
+      io_list_pc_pokemon();
       turn_not_consumed = 1;
       break;
     case 'p':

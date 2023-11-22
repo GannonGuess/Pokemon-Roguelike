@@ -1300,7 +1300,7 @@ int main(int argc, char *argv[])
 
   */
 
-  io_select_starter(world.pc);
+  io_select_starter(&world.pc); // select starter pokemon
 
   game_loop();
   

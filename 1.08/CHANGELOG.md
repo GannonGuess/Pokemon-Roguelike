@@ -2,11 +2,31 @@
 
 11/12 21:55 - Updated README and packaged for submission.
 
-11/12 14:55 - 
+11/12 21:35 - fixed bug with level up command going beyond 100.
+
+11/12 21:30 - Added `+` command while in `i` window so that the user can see the effect of level-up
+            - added function for calculating correct stats based on pokemons level
+
+11/12 21:00 - correctly changed how stats are calculated using formula 
+            - values are no longer incredibly high and now fall within range of pkm stat calculators online as they should
+            - base stats are supposed to be hidden values...
+
+11/12 19:50 - added `i` command so that the player can view their pokemon and stats at any time.
+
+11/12 18:14 - After selecting a starter, its information is displayed to the user
+
+11/12 17:45 - added pkm stat output when encountering trainers or wild pokemon.
+            - created battle window for trainer battles.
+
+11/12 17:33 - added pokemon stats variables so that each pokemon get base stats
+            - pokemon each get unique, randomly generated stat IV's during pokemon generation.
+
+11/12 14:55 - Added variable for storing pokemon move names.
+            - Pokemon moves are assigned during pokemon generation.
 
 11/12 13:23 - character class now has storage for 6 monsters/pokemon
             - NPC's now get a variable number of pokemon when they are created.
-            - added pokemon gender and shiny status
+            - added pokemon gender and shiny status (denoted by `*`)
 
 11/12 12:45 - Added pokemon level generation and have them output when encountering a pkm
 

@@ -1,5 +1,27 @@
 # 327 Pokemon Game README - Gannon Guess
 
+## Version 1.08
+This version adds pokemon to the game, including selecting a starter, encountering pokemon in the tall grass, and seeing the pokemon that other trainers have.
+- monster class created to hold pokemon information.
+- character class now has an array of monsters of size 6 so that each trainer and the user can have up to 6 pokemon.
+- All Pokemon are chosen at random from the database upon generation
+- 3 lvl 1 starter pokemon are generated and presented to the player on start-up.
+  - Starter pokemon is selected by user through associated number key.
+- 15% chance of encountering ANY pokemon when walking into a tall grass tile.
+- All trainers have at least 1 pokemon, and then a 60% of having n+1 additional pokemon when they are at n pokemon.
+- Added a command `i` when on the map-view to view the list of pokemon the player has (currently limited to 1 as there is no battle or capture). Press any key to leave this view.
+  - While on the pokemon list view, the `+` command levels up your pokemon by one level (up to 100) so you can see how stats are affected.
+- The Pokemon stats that are shown to the player are calculated using a formula that takes inputs of "hidden" base stats (the player never sees these) from the database, generated IV values, and the pokemons current level.
+  - IV values are a number between 0 and 15 inclusive that are calculated upon pokemon generation.
+- The chosen starter pokemon stats are shown upon selecting the starter. They can be checked again at any time with `i`. Press any key to exit. Not all starter stats are shown to stay in line with MSGs.
+- NPC Trainer pokemon stats are shown upon encountering an NPC trainer. Press any key to exit.
+- Wild pokemon stats are shown upon encountering a wild pokemon. Press any key to exit.
+- Pokemon gender is 50/50 male or female and is denoted by `M` for male and `F` for female.
+- A pokemon has a 1/8192 chance of being shiny. Shiny pokemone currently have a `*` star after their name to denote their status
+- Pokemon levels are generated according to the specified requirements. The further from the origin, the higher of level pokemon you will encounter. Only level 1's are found at the origin and only level 100's are found at the furthest points.
+- Pokemon move ID's are found based on the pokemon species, and then the moves database is searched by move ID for the move. If no move exists for the pokemon at its current level, the pokemon is leveled up until it can have a move. Only on-level-up moves are allowed.
+- If a pokemon only has one available move at its level, its move slot is left blank on output.
+
 ## Version 1.07
 This version adds the pokedex database. The user cannot play the game, but instead chooses an option of what information from the database to store in a vector. That vector's information is then stored printed to the terminal.
 - The command given by the user is passed in with the call to the game.

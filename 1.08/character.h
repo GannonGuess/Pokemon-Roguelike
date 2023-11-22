@@ -31,7 +31,7 @@ typedef enum __attribute__ ((__packed__)) character_type {
 
 extern const char *char_type_name[num_character_types];
 
-class monster {
+class monster { // class for storing pokemon information
 public:
   std::string name;
   std::string move1;
@@ -81,6 +81,6 @@ extern void (*move_func[num_movement_types])(character *, pair_t);
 int pc_move(char);
 bool is_pc(character *c);
 void generate_pokemon(monster &p);
-void level_up_stats(monster &p);
+void calc_stats_for_level(monster &p);
 
 #endif
