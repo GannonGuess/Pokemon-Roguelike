@@ -1,9 +1,15 @@
 #include <climits>
+#include <thread>
+#include <chrono>
 
 #include "character.h"
 #include "poke327.h"
 #include "io.h"
-#include "pokemon.h"
+#include "db_parse.h"
+#include <vector>
+#include <algorithm>
+#include <random>
+#include <ctime>
 
 /* Just to make the following table fit in 80 columns */
 #define PM DIJKSTRA_PATH_MAX
@@ -407,17 +413,6 @@ int32_t cmp_char_turns(const void *key, const void *with)
            ((character *) with)->next_turn));
 }
 
-character::~character()
-{
-  int i;
-
-  for (i = 0; i < 6; i++) {
-    if (buddy[i]) {
-      delete buddy[i];
-    }
-  }
-}
-
 void delete_character(void *v)
 {
   if (v != &world.pc) {
@@ -668,4 +663,131 @@ void pathfind(map *m)
     }
   }
   heap_delete(&h);
+}
+
+void calc_stats_for_level(monster &p) { // function for calculating stats on levelup
+  p.hp = floor((((p.hp_base + p.hp_iv) * 2) * p.level) / 100) + p.level + 10;
+  p.atk = floor((((p.atk_base + p.atk_iv) * 2) * p.level) / 100) + 5;
+  p.def = floor((((p.def_base + p.def_iv) * 2) * p.level) / 100) + 5;
+  p.spa = floor((((p.spa_base + p.spa_iv) * 2) * p.level) / 100) + 5;
+  p.spd = floor((((p.spd_base + p.spd_iv) * 2) * p.level) / 100) + 5;
+  p.spe = floor((((p.spe_base + p.spe_iv) * 2) * p.level) / 100) + 5;
+}
+
+void generate_pokemon(monster &p) { // generates a random pokemon
+  int minLvl, maxLvl, i;
+  int manDist = (abs(world.cur_idx[dim_x] - (WORLD_SIZE / 2)) +
+                 abs(world.cur_idx[dim_y] - (WORLD_SIZE / 2)));
+  if(manDist <= 1) {
+    minLvl = 1;
+    maxLvl = 1;
+  }
+  else if(manDist <= 200) {
+    minLvl = 1;
+    maxLvl = manDist / 2;
+  } else {
+    minLvl = (manDist - 200) / 2;
+    maxLvl = 100;
+  }
+  int randomPkm = rand() % 1093;
+  p.level = (rand() % (maxLvl - minLvl + 1)) + minLvl;
+  p.name = pokemon[randomPkm].identifier;
+  p.name[0] = toupper(p.name[0]);
+  p.exp = 0;
+
+
+  int spec_id = pokemon[randomPkm].species_id;
+  for(i = 0; i < 6553; i++) {
+    if(pokemon_stats[i].pokemon_id == spec_id) {
+      switch(pokemon_stats[i].stat_id) {
+        case 1:
+          p.hp_base = pokemon_stats[i].base_stat;
+          p.hp_iv = rand() % 16;
+          break;
+        case 2:
+          p.atk_base = pokemon_stats[i].base_stat;
+          p.atk_iv = rand() % 16;
+          break;
+        case 3:
+          p.def_base = pokemon_stats[i].base_stat;
+          p.def_iv = rand() % 16;
+          break;
+        case 4:
+          p.spa_base = pokemon_stats[i].base_stat;
+          p.spa_iv = rand() % 16;
+          break;
+        case 5:
+          p.spd_base = pokemon_stats[i].base_stat;
+          p.spd_iv = rand() % 16;
+          break;
+        case 6:
+          p.spe_base = pokemon_stats[i].base_stat;
+          p.spe_iv = rand() % 16;
+          break;
+        case 7:
+          p.acc = pokemon_stats[i].base_stat;
+          break;
+        case 8:
+          p.eva = pokemon_stats[i].base_stat;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  calc_stats_for_level(p);
+
+  std::vector<pokemon_move_db> potential_moves; 
+
+  while(potential_moves.size() == 0) {
+    for(i = 0; i < 528239; i++) {
+      if(pokemon_moves[i].pokemon_id == spec_id       &&  // get possible moves the pokemon can have
+         pokemon_moves[i].pokemon_move_method_id == 1 &&   // only level-up moves
+         pokemon_moves[i].level <= p.level) {              // only moves pokemon can know at its current level
+          potential_moves.push_back(pokemon_moves[i]);
+      }
+    }
+    if(potential_moves.size() == 0) {
+      p.level += 1;
+      calc_stats_for_level(p);
+    }
+  }
+  
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::shuffle(potential_moves.begin(), potential_moves.end(), gen);
+  
+  int move1ID = potential_moves[0].move_id;
+  int move2ID = potential_moves[0].move_id;
+  if(potential_moves.size() > 1){
+    move2ID = potential_moves[1].move_id;
+  } 
+  
+  move_db instances[2];
+  for(i = 0; i < 845; i++) {
+    if(moves[i].id == move1ID) {
+      p.move1 = moves[i].identifier;
+      break;
+    }
+  }
+  for(i = 0; i < 845; i++) {
+    if(moves[i].id == move2ID && move1ID != move2ID) {
+      p.move2 = moves[i].identifier;
+      break;
+    }
+  }
+
+  double gender_rate = static_cast<double>(rand()) / RAND_MAX;
+  if(gender_rate <= 0.5) {
+    p.gender = 'M';
+  }
+  else {
+    p.gender = 'F';
+  }
+
+  int shiny_odd = rand() % 8192;
+  if(shiny_odd == 0) {
+    p.name += '*';
+  }
 }

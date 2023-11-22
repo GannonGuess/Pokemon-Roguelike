@@ -3,12 +3,10 @@
 #include <cctype>
 #include <cstdlib>
 #include <climits>
-#include <string>
 
 #include "io.h"
-#include "character.h"
+// #include "character.h"
 #include "poke327.h"
-#include "pokemon.h"
 
 typedef struct io_message {
   /* Will print " --more-- " at end of line when another message follows. *
@@ -378,40 +376,133 @@ void io_pokemart()
 
 void io_pokemon_center()
 {
-  mvprintw(0, 0, "Welcome to the Pokemon Center.  How can Nurse Joy assist you?");
+  move(0,0);
+  clrtoeol();
+  printw("Welcome to the Pokemon Center.  How can Nurse Joy assist you?");
   refresh();
   getch();
 }
 
 void io_battle(character *aggressor, character *defender)
 {
-  std::string s;
-  npc *n = (npc *) ((aggressor == &world.pc) ? defender : aggressor);
   int i;
+  npc *n = (npc *) ((aggressor == &world.pc) ? defender : aggressor);
 
-  if (!n->buddy[1]) {
-    s = "My pokemon is " + std::string(n->buddy[0]->get_species());
-  } else {
-    s = "My pokemon are " + std::string(n->buddy[0]->get_species());
-  }
-
-  for (i = 1; i < 6 && n->buddy[i]; i++) {
-    s += ", ";
-    if (i == 4 || !n->buddy[i + 1]) {
-      s += "and ";
+  io_display();
+  mvprintw(0, 0, "Aww, how'd you get so strong?  You and your pokemon must share a special bond!");
+  clear();
+  mvprintw(0, 0, "Facing trainer %c at location x:%d y:%d. Press any key to exit.", n->symbol, n->pos[dim_x], n->pos[dim_y]);
+  for(i = 0; i <= 6; i++) {
+    if(n->pkm[i].name.empty()) {
+      break;
     }
-    s += n->buddy[i]->get_species();
-  }
-    
-  s += ".";
+    mvprintw(4 * i + 1, 0, "Pokemon #%d: %s lvl: %d gender: %c", i + 1, n->pkm[i].name.c_str(), n->pkm[i].level, n->pkm[i].gender);
+    mvprintw(4 * i + 2, 0, "Move 1: %s Move 2: %s", n->pkm[i].move1.c_str(), n->pkm[i].move2.c_str());
+    mvprintw(4 * i + 3, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", n->pkm[i].hp, n->pkm[i].atk, n->pkm[i].def, n->pkm[i].spa, n->pkm[i].spd, n->pkm[i].spe);
+  } 
 
-  io_queue_message("%s", s.c_str());
+  refresh();
+  getch();
 
   n->defeated = 1;
   if (n->ctype == char_hiker || n->ctype == char_rival) {
     n->mtype = move_wander;
   }
 }
+
+void io_select_starter(pc *player) {
+  monster p1;
+  monster p2;
+  monster p3;
+  generate_pokemon(p1);
+  generate_pokemon(p2);
+  generate_pokemon(p3);
+  mvprintw(0, 0, "Welcome to the world of Pokemon!");
+  mvprintw(1, 0, "Select your starter pokemon from the following using the associated number key:");
+  mvprintw(2, 0, "[1]: %s", p1.name.c_str());
+  mvprintw(3, 0, "[2]: %s", p2.name.c_str());
+  mvprintw(4, 0, "[3]: %s", p3.name.c_str());
+
+  refresh();
+
+  char selection = getch();
+  while(selection != '1' && selection != '2' && selection != '3') {
+    refresh();
+    selection = getch();
+  }
+  switch(selection) {
+    case '1':
+      player->pkm[0] = p1;
+      break;
+    case '2':
+      player->pkm[0] = p2;
+      break;
+    case '3':
+      player->pkm[0] = p3;
+      break;
+    default:
+      selection = getch();
+      break;
+  }
+  clear();
+  mvprintw(0, 0, "You selected %s as your starter!", player->pkm[0].name.c_str(), player->pkm[0].gender);
+  mvprintw(1, 0, "%s's Details:", player->pkm[0].name.c_str());
+  mvprintw(2, 0, "Level: %d Gender: %c", player->pkm[0].level, player->pkm[0].gender);
+  mvprintw(3, 0, "Move 1: %s Move 2: %s", player->pkm[0].move1.c_str(), player->pkm[0].move2.c_str());
+  mvprintw(4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", player->pkm[0].hp, player->pkm[0].atk, player->pkm[0].def, player->pkm[0].spa, player->pkm[0].spd, player->pkm[0].spe);
+  mvprintw(7, 0, "Press any key to continue");
+  refresh();
+  getch();
+  clear();
+  refresh();
+}
+
+void io_pokemon_encounter() {
+  monster p;
+  generate_pokemon(p);
+
+
+  clear();
+  move(0,0);
+  clrtoeol();
+  printw("You encountered a wild %s! Level %d", p.name.c_str(), p.level);
+  mvprintw(1, 0, "move 1: %s", p.move1.c_str());
+  mvprintw(2, 0, "move 2: %s", p.move2.c_str());
+  mvprintw(4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", p.hp, p.atk, p.def, p.spa, p.spd, p.spe);
+  mvprintw(5, 0, "Press any key to leave");
+  refresh();
+  getch();
+}
+
+void io_list_pc_pokemon() {
+  clear();
+  int i = 0;
+  mvprintw(0, 0, "Your pokemon:");
+  for(i = 0; i < 6 && !world.pc.pkm[i].name.empty(); i++) {
+    mvprintw(4 * i + 1, 0, "%s", world.pc.pkm[i].name.c_str());
+    mvprintw(4 * i + 2, 0, "Level: %d Gender: %c", world.pc.pkm[i].level, world.pc.pkm[i].gender);
+    mvprintw(4 * i + 3, 0, "Move 1: %s Move 2: %s", world.pc.pkm[i].move1.c_str(), world.pc.pkm[i].move2.c_str());
+    mvprintw(4 * i + 4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", world.pc.pkm[i].hp, world.pc.pkm[i].atk, world.pc.pkm[i].def, world.pc.pkm[i].spa, world.pc.pkm[i].spd, world.pc.pkm[i].spe);
+  }
+
+  mvprintw(23, 0, "Press + to level up your pokemon and any other key to close");
+  refresh();
+
+  while(getch() == '+') {
+    for(i = 0; i < 6 && !world.pc.pkm[i].name.empty(); i++) {
+      if(world.pc.pkm[i].level < 100) {
+        world.pc.pkm[i].level += 1;
+      }
+      calc_stats_for_level(world.pc.pkm[i]);
+      mvprintw(4 * i + 1, 0, "%s", world.pc.pkm[i].name.c_str());
+      mvprintw(4 * i + 2, 0, "Level: %d Gender: %c", world.pc.pkm[i].level, world.pc.pkm[i].gender);
+      mvprintw(4 * i + 3, 0, "Move 1: %s Move 2: %s", world.pc.pkm[i].move1.c_str(), world.pc.pkm[i].move2.c_str());
+      mvprintw(4 * i + 4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", world.pc.pkm[i].hp, world.pc.pkm[i].atk, world.pc.pkm[i].def, world.pc.pkm[i].spa, world.pc.pkm[i].spd, world.pc.pkm[i].spe);
+    }
+  }
+  io_display();
+}
+
 
 uint32_t move_pc_dir(uint32_t input, pair_t dest)
 {
@@ -474,10 +565,17 @@ uint32_t move_pc_dir(uint32_t input, pair_t dest)
       dest[dim_y] = world.pc.pos[dim_y];
     }
   }
-  
+
   if (move_cost[char_pc][world.cur_map->map[dest[dim_y]][dest[dim_x]]] ==
       DIJKSTRA_PATH_MAX) {
     return 1;
+  }
+
+  int encounter_chance = rand() % 100;
+
+  if(world.cur_map->map[dest[dim_y]][dest[dim_x]] == ter_grass &&
+      encounter_chance < ENCOUNTER_RATE) {
+    io_pokemon_encounter();
   }
 
   if (world.cur_map->map[dest[dim_y]][dest[dim_x]] == ter_gate &&
@@ -595,6 +693,10 @@ void io_handle_input(pair_t dest)
       io_list_trainers();
       turn_not_consumed = 1;
       break;
+    case 'i':
+      io_list_pc_pokemon();
+      turn_not_consumed = 1;
+      break;
     case 'p':
       /* Teleport the PC to a random place in the map.              */
       io_teleport_pc(dest);
@@ -645,59 +747,4 @@ void io_handle_input(pair_t dest)
     }
     refresh();
   } while (turn_not_consumed);
-}
-
-void io_encounter_pokemon()
-{
-  pokemon *p;
-
-  p = new pokemon();
-
-  io_queue_message("%s%s%s: HP:%d ATK:%d DEF:%d SPATK:%d SPDEF:%d SPEED:%d %s",
-                   p->is_shiny() ? "*" : "", p->get_species(),
-                   p->is_shiny() ? "*" : "", p->get_hp(), p->get_atk(),
-                   p->get_def(), p->get_spatk(), p->get_spdef(),
-                   p->get_speed(), p->get_gender_string());
-  io_queue_message("%s's moves: %s %s", p->get_species(),
-                   p->get_move(0), p->get_move(1));
-
-  // Later on, don't delete if captured
-  delete p;
-}
-
-void io_choose_starter()
-{
-  class pokemon *choice[3];
-  int i;
-  bool again = true;
-  
-  choice[0] = new class pokemon();
-  choice[1] = new class pokemon();
-  choice[2] = new class pokemon();
-
-  echo();
-  curs_set(1);
-  do {
-    mvprintw( 4, 20, "Before you are three Pokemon, each of");
-    mvprintw( 5, 20, "which wants absolutely nothing more");
-    mvprintw( 6, 20, "than to be your best buddy forever.");
-    mvprintw( 8, 20, "Unfortunately for them, you may only");
-    mvprintw( 9, 20, "pick one.  Choose wisely.");
-    mvprintw(11, 20, "   1) %s", choice[0]->get_species());
-    mvprintw(12, 20, "   2) %s", choice[1]->get_species());
-    mvprintw(13, 20, "   3) %s", choice[2]->get_species());
-    mvprintw(15, 20, "Enter 1, 2, or 3: ");
-
-    refresh();
-    i = getch();
-
-    if (i == '1' || i == '2' || i == '3') {
-      world.pc.buddy[0] = choice[(i - '0') - 1];
-      delete choice[(i - '0') % 3];
-      delete choice[((i - '0') + 1) % 3];
-      again = false;
-    }
-  } while (again);
-  noecho();
-  curs_set(0);
 }

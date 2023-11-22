@@ -8,13 +8,15 @@
 #include <sys/time.h>
 #include <cassert>
 #include <unistd.h>
+#include <random>
+#include <chrono>
+#include <ctime>
 
 #include "heap.h"
 #include "poke327.h"
 #include "character.h"
 #include "io.h"
 #include "db_parse.h"
-#include "pokemon.h"
 
 typedef struct queue_node {
   int x, y;
@@ -732,20 +734,6 @@ void rand_pos(pair_t pos)
   pos[dim_y] = (rand() % (MAP_Y - 2)) + 1;
 }
 
-static void make_buddies(npc *c)
-{
-  int i;
-
-  i = 0;
-  do {
-    c->buddy[i] = new class pokemon();
-    i++;
-  } while ((i < 6) && ((rand() % 100) < ADD_TRAINER_POK_PROB));
-  for (; i < 6; i++) {
-    c->buddy[i] = NULL;
-  }
-}
-
 void new_hiker()
 {
   pair_t pos;
@@ -769,8 +757,16 @@ void new_hiker()
   c->symbol = HIKER_SYMBOL;
   c->next_turn = 0;
   c->seq_num = world.char_seq_num++;
+
+  generate_pokemon(c->pkm[0]);
+  double chance = static_cast<double>(rand()) / RAND_MAX;
+  int slot = 1;
+  while(chance <= 0.6 && slot < 6) {
+    generate_pokemon(c->pkm[slot]);
+    slot++;
+    chance = static_cast<double>(rand()) / RAND_MAX;
+  }
   heap_insert(&world.cur_map->turn, c);
-  make_buddies(c);
 }
 
 void new_rival()
@@ -797,8 +793,16 @@ void new_rival()
   c->symbol = RIVAL_SYMBOL;
   c->next_turn = 0;
   c->seq_num = world.char_seq_num++;
+
+  generate_pokemon(c->pkm[0]);
+  double chance = static_cast<double>(rand()) / RAND_MAX;
+  int slot = 1;
+  while(chance <= 0.6 && slot <= 5) {
+    generate_pokemon(c->pkm[slot]);
+    slot++;
+    chance = static_cast<double>(rand()) / RAND_MAX;
+  }
   heap_insert(&world.cur_map->turn, c);
-  make_buddies(c);
 }
 
 void new_swimmer()
@@ -821,8 +825,16 @@ void new_swimmer()
   c->symbol = SWIMMER_SYMBOL;
   c->next_turn = 0;
   c->seq_num = world.char_seq_num++;
+
+  generate_pokemon(c->pkm[0]);
+  double chance = static_cast<double>(rand()) / RAND_MAX;
+  int slot = 1;
+  while(chance <= 0.6 && slot <= 5) {
+    generate_pokemon(c->pkm[slot]);
+    slot++;
+    chance = static_cast<double>(rand()) / RAND_MAX;
+  }
   heap_insert(&world.cur_map->turn, c);
-  make_buddies(c);
 }
 
 void new_char_other()
@@ -864,8 +876,16 @@ void new_char_other()
   c->defeated = 0;
   c->next_turn = 0;
   c->seq_num = world.char_seq_num++;
+
+  generate_pokemon(c->pkm[0]);
+  double chance = static_cast<double>(rand()) / RAND_MAX;
+  int slot = 1;
+  while(chance <= 0.6 && slot <= 5) {
+    generate_pokemon(c->pkm[slot]);
+    slot++;
+    chance = static_cast<double>(rand()) / RAND_MAX;
+  }
   heap_insert(&world.cur_map->turn, c);
-  make_buddies(c);
 }
 
 void place_characters()
@@ -919,8 +939,6 @@ void init_pc()
   world.pc.seq_num = world.char_seq_num++;
 
   heap_insert(&world.cur_map->turn, &world.pc);
-
-  io_choose_starter();
 }
 
 void place_pc()
@@ -1149,18 +1167,14 @@ void game_loop()
     c->next_turn += move_cost[n ? n->ctype : char_pc]
                              [world.cur_map->map[d[dim_y]][d[dim_x]]];
 
-    if (p && (c->pos[dim_y] != d[dim_y] || c->pos[dim_x] != d[dim_x]) &&
-        (world.cur_map->map[d[dim_y]][d[dim_x]] == ter_grass) &&
-        (rand() % 100 < ENCOUNTER_PROB)) {
-      io_encounter_pokemon();
-    }
-
     c->pos[dim_y] = d[dim_y];
     c->pos[dim_x] = d[dim_x];
 
     heap_insert(&world.cur_map->turn, c);
   }
 }
+
+
 
 void usage(char *s)
 {
@@ -1178,6 +1192,8 @@ int main(int argc, char *argv[])
   //  char c;
   //  int x, y;
   int i;
+
+  db_parse(false);
 
   do_seed = 1;
   
@@ -1217,8 +1233,6 @@ int main(int argc, char *argv[])
   printf("Using seed: %u\n", seed);
   srand(seed);
 
-  db_parse(false);
-  
   io_init_terminal();
   
   init_world();
@@ -1285,6 +1299,8 @@ int main(int argc, char *argv[])
   } while (c != 'q');
 
   */
+
+  io_select_starter(&world.pc); // select starter pokemon
 
   game_loop();
   

@@ -1,8 +1,6 @@
 #ifndef DB_PARSE_H
 # define DB_PARSE_H
 
-#include <vector>
-
 struct pokemon_db {
   int id;
   char identifier[30];
@@ -47,8 +45,6 @@ struct levelup_move {
 };
 
 struct pokemon_species_db {
-  pokemon_species_db() : levelup_moves() {}
-  virtual ~pokemon_species_db() {}
   int id;
   char identifier[30];
   int generation_id;
@@ -69,9 +65,6 @@ struct pokemon_species_db {
   int is_mythical;
   int order;
   int conquest_order;
-
-  std::vector<levelup_move> levelup_moves;
-  int base_stat[6];
 };
 
 struct experience_db {
