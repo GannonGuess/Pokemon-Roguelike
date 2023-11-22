@@ -1,5 +1,10 @@
 ## Version 1.09
 
+11/22 17:51 - Added basic items for pokeballs, potions, and revives
+            - Centers now fully heal all PC pokemon
+            - Marts now restock all PC items
+            - Added a current hp parameter to pokemon and init to its max hp
+
 11/22 17:10 - Added get_level method for pokemon
 
 11/22 17:04 - Got code working and update IO output for marts, centers, and encounters
