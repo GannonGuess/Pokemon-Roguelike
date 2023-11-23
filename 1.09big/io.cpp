@@ -264,8 +264,24 @@ uint32_t io_teleport_pc(pair_t dest)
            move_cost[char_pc][world.cur_map->map[dest[dim_y]]
                                                 [dest[dim_x]]] ==
              DIJKSTRA_PATH_MAX                                            ||
+           world.rival_dist[dest[dim_y]][dest[dim_x]] < 0);
+
+  return 0;
+}
+
+uint32_t io_teleport_pc_path(pair_t dest)
+{
+  /* Just for fun. And debugging.  Mostly debugging. */
+
+  do {
+    dest[dim_x] = rand_range(1, MAP_X - 2);
+    dest[dim_y] = rand_range(1, MAP_Y - 2);
+  } while (world.cur_map->cmap[dest[dim_y]][dest[dim_x]]                  ||
+           move_cost[char_pc][world.cur_map->map[dest[dim_y]]
+                                                [dest[dim_x]]] ==
+             DIJKSTRA_PATH_MAX                                            ||
            world.rival_dist[dest[dim_y]][dest[dim_x]] < 0                 ||
-           world.cur_map->map[dest[dim_y]][dest[dim_x]] != ter_center);
+           world.cur_map->map[dest[dim_y]][dest[dim_x]] != ter_path);
 
   return 0;
 }
@@ -696,7 +712,8 @@ int calculate_damage(pokemon *attacker, int power, int type_id) {
   return damage;
 }
 
-void attack(pokemon *pc, pokemon *npc, int attacked) {
+int attack_trainer(pokemon *pc, character *npc_trainer, int *npc_pkm_idx, int attacked) {
+  pokemon * npc = npc_trainer->buddy[*npc_pkm_idx];
   int * pc_move_index = pc->get_move_index();
   int * npc_move_index = npc->get_move_index();
   int npc_move = rand() % 2;
@@ -725,23 +742,103 @@ void attack(pokemon *pc, pokemon *npc, int attacked) {
   if(npc_power == INT_MAX) {
     npc_power = 0;
   }
-
+  int pc_dmg_taken;
+  int npc_dmg_taken;
+  std::vector<pokemon *> turn_order;
   if(attacked == -1) {
-    int damag = calculate_damage(npc, npc_power, npc_type_id);
-    pc->current_hp -= damag;
-    if(pc->current_hp <= 0) {
-      pc->current_hp = 0;
-      io_select_pokemon(1);
-      return;
-    }
-    mvprintw(20, 0, "damage dealt: %d %d", damag, pc->current_hp);
+    pc_dmg_taken = calculate_damage(npc, npc_power, npc_type_id);
+    pc->current_hp -= pc_dmg_taken;
+    mvprintw(18, 0, "The opposing %s used %s\n", npc->get_species(), moves[npc_move_index[npc_move]].identifier);
+    printw("%s took %d damage!\n", pc->get_species(), pc_dmg_taken);
     refresh();
     getch();
-    return;
+    if(pc->current_hp <= 0) {
+      if(hasLivingPokemon(&world.pc)) {
+        printw("%s fainted! Press any key to choose your next pokemon", pc->get_species());
+      } else {
+        printw("All of your pokemon have fainted. You black out and wake up healed on the side of the road");
+      }
+      refresh();
+      getch();
+      pc->current_hp = 0;
+      io_select_pokemon(1);
+      return 0;
+    }
+    return 0;
   }
   else if(pc_prio > npc_prio) {
-    
+    turn_order.push_back(pc);
+    turn_order.push_back(npc);
   }
+  else if(npc_prio > pc_prio) {
+    turn_order.push_back(npc);
+    turn_order.push_back(pc);
+  }
+  else if(pc_prio == npc_prio) {
+    if(pc->get_speed() > npc->get_speed()) {
+      turn_order.push_back(pc);
+      turn_order.push_back(npc);
+    }
+    else if (npc->get_speed() > pc->get_speed()) {
+      turn_order.push_back(npc);
+      turn_order.push_back(pc);
+    }
+    else {
+      if(rand() % 2 == 0) {
+        turn_order.push_back(pc);
+        turn_order.push_back(npc);
+      }
+      else {
+        turn_order.push_back(npc);
+        turn_order.push_back(pc);
+      }
+    }
+  }
+
+  for(pokemon * p : turn_order) {
+    if(p == pc) {
+      npc_dmg_taken = calculate_damage(pc, pc_power, pc_type_id);
+      npc->current_hp -= npc_dmg_taken;
+      mvprintw(18, 0, "Your %s used %s\n", pc->get_species(), moves[pc_move_index[attacked]].identifier);
+      printw("%s took %d damage!\n", npc->get_species(), npc_dmg_taken);
+      refresh(); 
+      getch();
+      if(npc->current_hp <= 0) {
+        printw("The opposing %s fainted.\n", npc->get_species());
+        if(hasLivingPokemon(npc_trainer)) {
+          npc_pkm_idx++;
+          printw("Your foe sends out %s!", npc_trainer->buddy[*npc_pkm_idx]->get_species()); 
+        }
+        else {
+          printw("The opposing trainer has no more pokemon. You win!");
+        }
+        refresh();
+        getch();
+        return 1;
+      }
+    }
+    else if(p == npc) {
+      pc_dmg_taken = calculate_damage(npc, npc_power, npc_type_id);
+      pc->current_hp -= pc_dmg_taken;
+      mvprintw(18, 0, "The opposing %s used %s\n", npc->get_species(), moves[npc_move_index[npc_move]].identifier);
+      printw("%s took %d damage!\n", pc->get_species(), pc_dmg_taken);
+      refresh();
+      getch();
+      if(pc->current_hp <= 0) {
+        if(hasLivingPokemon(&world.pc)) {
+          printw("%s fainted! Press any key to choose your next pokemon", pc->get_species());
+        } else {
+          printw("All of your pokemon have fainted. You black out and wake up healed on the side of the road");
+        }
+        refresh();
+        getch();
+        pc->current_hp = 0;
+        io_select_pokemon(1);
+        return 0;
+      }
+    }
+  }
+  return 0;
 }
 
 void io_battle(character *aggressor, character *defender) {
@@ -769,6 +866,14 @@ void io_battle(character *aggressor, character *defender) {
   refresh();
   getch();
   clear();
+  for(pokemon *p : n->buddy) {
+      if(p) {
+      printw("%s\n", p->get_species());
+      }
+  }
+  refresh();
+  getch();
+  clear();
   
   while(battling) {
     int confirmed = 0;
@@ -776,6 +881,7 @@ void io_battle(character *aggressor, character *defender) {
     
     mvprintw(0, 0, "Opponent's %s\n HP: %d / %d", n->buddy[npc_pkm_idx]->get_species(), n->buddy[npc_pkm_idx]->current_hp, n->buddy[npc_pkm_idx]->get_hp());
     mvprintw(5, 0, "My %s\n HP: %d / %d", world.pc.buddy[pc_pkm_idx]->get_species(), world.pc.buddy[pc_pkm_idx]->current_hp, world.pc.buddy[pc_pkm_idx]->get_hp());
+
     
     while(!confirmed) {
       clear();
@@ -842,20 +948,34 @@ void io_battle(character *aggressor, character *defender) {
         }
       }
     }
+    int kill;
     switch(selected) {
       case 0:
-        attack(world.pc.buddy[pc_pkm_idx], n->buddy[0],  -1); // change final value here IMPORTANT
+        kill = attack_trainer(world.pc.buddy[pc_pkm_idx], n, &npc_pkm_idx, attacked); // change final value here IMPORTANT
         
         if(!hasLivingPokemon(&world.pc)) {
           battling = 0;
-          mvprintw(15, 0, "All of your pokemon have fainted. You black out and wake up in the pokemon center");
-          world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = nullptr;
-          io_teleport_pc(world.pc.pos);
+          world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+          io_teleport_pc_path(world.pc.pos);
           io_pokemon_center();
+          io_display();
+          refresh();
+          for(pokemon * p : n->buddy) {
+            if(p) {
+              p->current_hp = p->get_hp();
+            }
+          }
           break;
         }
-        
-        //mvprintw(15, 0, "NPC dealt %d damage", damage);
+        if(hasLivingPokemon(n) && kill) {
+          npc_pkm_idx++;
+          break;
+        }
+        else if(!hasLivingPokemon(n) && kill) {
+          battling = 0;
+          win = 1;
+          break;
+        }
         break;
       case 1:
         mvprintw(15, 0, "You spend your turn swapping pokemon");
