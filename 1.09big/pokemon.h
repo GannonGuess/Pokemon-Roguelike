@@ -37,6 +37,15 @@ class pokemon {
   int get_spdef() const;
   int get_speed() const;
   int get_level() const;
+  void use_potion() {
+    current_hp += 20;
+    if(current_hp > get_hp()) {
+      current_hp = get_hp();
+    }
+  } 
+  void use_revive() {
+    current_hp += get_hp() / 2;
+  }
   const char *get_gender_string() const;
   bool is_shiny() const;
   const char *get_move(int i) const;

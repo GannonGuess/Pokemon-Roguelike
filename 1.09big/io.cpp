@@ -23,6 +23,7 @@ void io_init_terminal(void)
 {
   initscr();
   raw();
+  set_escdelay(0);
   noecho();
   curs_set(0);
   keypad(stdscr, TRUE);
@@ -407,6 +408,139 @@ void io_pokemon_center()
   }
 }
 
+void io_bag(int isBattle, int isWild) {
+  
+  std::vector<std::pair<std::string, int>> options = {
+    {"Potions: " + std::to_string(world.pc.potions), world.pc.potions},
+    {"Revives: " + std::to_string(world.pc.revives), world.pc.revives},
+    {"Pokeballs: " + std::to_string(world.pc.pokeballs), world.pc.pokeballs}
+  };
+  int selected = 0;
+  int done = 0;
+  int validInput = 0;
+  int slots = 0;
+  clear();
+  
+  while(!done) {
+    mvprintw(0, 0, "You check your bag: (Select item with arrow keys and ENTER key)\n");
+
+    for(size_t i = 0; i < options.size(); i++) {
+      if (i == selected) {
+        printw("* ");
+      } else {
+        printw("  ");
+      }
+      printw("%s\n", options[i].first.c_str());
+    }
+
+    refresh();
+
+    int ch = getch(); // Get user input
+    switch (ch) {
+      case KEY_UP:
+        if (selected > 0) {
+        selected--;
+        }
+        break;
+      case KEY_DOWN:
+        if (selected < static_cast<int>(options.size()) - 1) {
+          selected++;
+        }
+        break;
+      case 10: // ENTER key
+        // Do something with the selected option (e.g., print it)
+        done = 1;
+        break;
+      case 27: // ESC key
+        if(!isBattle) {
+          io_display();
+        }
+        return;
+    }
+  }
+  switch(selected) {
+    case 0: // Potion
+      clear();
+      mvprintw(0, 0, "Use potion on which pokemon?\n");
+      slots = 0;
+      for(pokemon *p : world.pc.buddy) {
+        if(p) {
+          slots += 1;
+          printw("%d: %s (%d / %d)\n", slots, p->get_species(), p->current_hp, p->get_hp());
+        }
+        refresh();
+          
+
+      }
+      printw("Select value 1 - %d: ", slots);
+      while(!validInput) {
+        char choice = getch();
+        if(choice == 27) {
+          if(!isBattle) {
+            io_display();
+          }
+          return;
+        }
+        selected = choice -'0';
+        if(selected >= 1 && selected <= slots && 
+          (world.pc.buddy[selected - 1]->current_hp < world.pc.buddy[selected - 1]->get_hp()) &&
+          (world.pc.buddy[selected - 1]->current_hp > 0)) {
+          validInput = 1;
+        }
+      }
+      world.pc.buddy[selected - 1]->use_potion();
+      world.pc.potions--;
+      break;
+    case 1:
+      clear();
+      mvprintw(0, 0, "Use revive on which pokemon?\n");
+      slots = 0;
+      for(pokemon *p : world.pc.buddy) {
+        if(p) {
+          slots += 1;
+          printw("%d: %s (%d / %d)\n", slots, p->get_species(), p->current_hp, p->get_hp());
+        }
+        refresh();
+          
+
+      }
+      printw("Select value 1 - %d: ", slots);
+      while(!validInput) {
+        char choice = getch();
+        if(choice == 27) {
+          if(!isBattle) {
+            io_display();
+          }
+          return;
+        }
+        selected = choice -'0';
+        if(selected >= 1 && selected <= slots && 
+          (world.pc.buddy[selected - 1]->current_hp == 0)) {
+          validInput = 1;
+        }
+      }
+      world.pc.buddy[selected - 1]->use_revive();
+      world.pc.revives--;
+      break;
+    case 2:
+      if(isBattle) {
+        world.pc.pokeballs--;
+      }
+      break;
+
+
+
+  }
+  if(!isBattle) {
+    io_display();
+  }
+
+  // mvprintw(1, 1, "Potions: %d", world.pc.potions);
+  // mvprintw(2, 1, "Revives: %d", world.pc.revives);
+  // mvprintw(3, 1, "Pokeballs: %d", world.pc.pokeballs);
+}
+
+
 void io_battle(character *aggressor, character *defender)
 {
 int i;
@@ -626,6 +760,10 @@ void io_handle_input(pair_t dest)
       io_teleport_world(dest);
       turn_not_consumed = 0;
       break;    
+    case 'B':
+      io_bag(0, 0);
+      turn_not_consumed = 1;
+      break;
     case 'q':
       /* Demonstrate use of the message queue.  You can use this for *
        * printf()-style debugging (though gdb is probably a better   *
