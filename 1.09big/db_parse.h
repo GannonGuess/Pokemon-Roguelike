@@ -102,7 +102,7 @@ struct pokemon_types_db {
 };
 
 extern pokemon_move_db pokemon_moves[528239];
-extern pokemon_db pokemon[1093];
+extern pokemon_db all_pokemon[1093];
 extern char *types[19];
 extern move_db moves[845];
 extern pokemon_species_db species[899];

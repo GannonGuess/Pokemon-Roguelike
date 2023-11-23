@@ -55,6 +55,7 @@ public:
   int revives;
   int potions;
   int pokeballs;
+  int active_idx;
   virtual ~pc() {}
 };
 

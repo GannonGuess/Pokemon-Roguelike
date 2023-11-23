@@ -115,6 +115,15 @@ pokemon::pokemon(int level) : level(level)
   current_hp = effective_stat[0];
   shiny = (((rand() & 0x1fff) == 0x1fff) ? true : false);
   gender = ((rand() & 0x1) ? gender_female : gender_male);
+  for(pokemon_types_db pkmtype : pokemon_types) {
+    if(pkmtype.pokemon_id == s->id && pkmtype.slot == 1) {
+      type1 = pkmtype.type_id;
+    }
+    if(pkmtype.pokemon_id == s->id && pkmtype.slot == 2) {
+      type2 = pkmtype.type_id;
+    }
+  }
+  base_speed = s->base_stat[stat_speed];
 }
 
 const char *pokemon::get_species() const

@@ -27,6 +27,9 @@ class pokemon {
   pokemon_gender gender;
  public:
   int current_hp;
+  int type1;
+  int type2;
+  int base_speed;
   pokemon();
   pokemon(int level);
   const char *get_species() const;
@@ -37,6 +40,9 @@ class pokemon {
   int get_spdef() const;
   int get_speed() const;
   int get_level() const;
+  const char *get_gender_string() const;
+  bool is_shiny() const;
+  const char *get_move(int i) const;
   void use_potion() {
     current_hp += 20;
     if(current_hp > get_hp()) {
@@ -46,9 +52,9 @@ class pokemon {
   void use_revive() {
     current_hp += get_hp() / 2;
   }
-  const char *get_gender_string() const;
-  bool is_shiny() const;
-  const char *get_move(int i) const;
+  int* get_move_index() {
+    return move_index;
+  }
 };
 
 #endif
