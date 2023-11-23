@@ -1,5 +1,10 @@
 ## Version 1.09
 
+11/22 19:27 - Added overworld access to bag and items
+            - Potions and revives can now be used from overworld
+            - Trying to use pokeball does nothing
+            - Potions and revives only work if selected pokemon is within certain hp range
+
 11/22 17:51 - Added basic items for pokeballs, potions, and revives
             - Centers now fully heal all PC pokemon
             - Marts now restock all PC items
