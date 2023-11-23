@@ -480,7 +480,16 @@ int io_bag(int isBattle, int isWild) {
         break;
       case 10: // ENTER key
         // Do something with the selected option (e.g., print it)
-        done = 1;
+        if(selected == 0 && world.pc.potions > 0) {
+          done = 1;
+        }
+        if(selected == 1 && world.pc.revives > 0) {
+          done = 1;
+        }
+        if(selected == 2 && world.pc.pokeballs > 0) {
+          done = 1;
+        }
+        
         break;
       case 27: // ESC key
         if(!isBattle) {
@@ -554,10 +563,6 @@ int io_bag(int isBattle, int isWild) {
       world.pc.revives--;
       break;
     case 2:
-      if(isBattle && world.pc.pokeballs > 0) {
-        world.pc.pokeballs--;
-        item_used = 2;
-      }
       if(isBattle && !isWild && world.pc.pokeballs > 0) {
         printw("This enemy trainer blocked your pokeball! What a waste. Press any key to continue");
         refresh();
@@ -565,12 +570,20 @@ int io_bag(int isBattle, int isWild) {
         clrtoeol();
         refresh();
       }
+      else if(isBattle && isWild && world.pc.pokeballs > 0) {
+        printw("You throw a pokeball!");
+
+      }
       else if(!isBattle) {
         printw("There are no pokemon nearby. Press any key to continue");
         refresh();
         getch();
         clrtoeol();
         refresh();
+      }
+      if(isBattle && world.pc.pokeballs > 0) {
+        world.pc.pokeballs--;
+        item_used = 2;
       }
       break;
 
@@ -604,7 +617,7 @@ int io_select_pokemon(int wasDeath) {
     if(!hasLivingPokemon(&world.pc)) {
       return -1;
     }
-    mvprintw(10, 0, "Select your next pokemon (ESC to go back)\n");
+    mvprintw(10, 0, "Select your next pokemon\n");
   }
   else {
     mvprintw(10, 0, "Which pokemon would you like to swap to? (ESC to go back)\n");
@@ -651,7 +664,9 @@ int io_select_pokemon(int wasDeath) {
         }
         break;
       case 27:
-        return -1;
+        if(!wasDeath) {
+          return -1;
+        }
     }
   }
   return -1;
@@ -667,7 +682,7 @@ int io_select_move(int pkm_idx) {
     int numMoves = 0;
     move(11, 0);
     for(size_t i = 0; i < 2; i++) {
-      if(world.pc.buddy[pkm_idx]->get_move(i) != nullptr) {
+      if(world.pc.buddy[pkm_idx]->get_move(i) != NULL) {
         numMoves++;
         if (i == selected) {
           printw("* ");
@@ -712,7 +727,7 @@ int calculate_damage(pokemon *attacker, int power, int type_id) {
   return damage;
 }
 
-int attack_trainer(pokemon *pc, character *npc_trainer, int *npc_pkm_idx, int attacked) {
+int attack_trainer(pokemon *pc, character *npc_trainer, int *npc_pkm_idx, int attacked, int *pc_pkm_idx) {
   pokemon * npc = npc_trainer->buddy[*npc_pkm_idx];
   int * pc_move_index = pc->get_move_index();
   int * npc_move_index = npc->get_move_index();
@@ -761,7 +776,10 @@ int attack_trainer(pokemon *pc, character *npc_trainer, int *npc_pkm_idx, int at
       refresh();
       getch();
       pc->current_hp = 0;
-      io_select_pokemon(1);
+      int next_index = io_select_pokemon(1);
+      world.pc.active_idx = next_index;
+      *pc_pkm_idx = next_index;
+      world.pc.active_idx = next_index;
       return 0;
     }
     return 0;
@@ -833,7 +851,137 @@ int attack_trainer(pokemon *pc, character *npc_trainer, int *npc_pkm_idx, int at
         refresh();
         getch();
         pc->current_hp = 0;
-        io_select_pokemon(1);
+        int next_index = io_select_pokemon(1);
+        world.pc.active_idx = next_index;
+        *pc_pkm_idx = next_index;
+        world.pc.active_idx = next_index;
+        return 0;
+      }
+    }
+  }
+  return 0;
+}
+
+int attack_wild(pokemon *pc, pokemon *npc, int attacked, int *pc_pkm_idx) {  
+  int * pc_move_index = pc->get_move_index();
+  int * npc_move_index = npc->get_move_index();
+  int npc_move = rand() % 2;
+  if(!npc->get_move(1)) {
+    npc_move = 0;
+  }
+  int pc_acc = moves[pc_move_index[attacked]].accuracy;;
+  int npc_acc = moves[npc_move_index[npc_move]].accuracy;
+  int pc_prio = moves[pc_move_index[attacked]].priority;
+  int npc_prio = moves[npc_move_index[npc_move]].priority;
+  int pc_power = moves[pc_move_index[attacked]].power;
+  int npc_power = moves[npc_move_index[npc_move]].power;
+  int npc_attacked = 0;
+  int pc_attacked = 0;
+  int pc_type_id = moves[pc_move_index[attacked]].type_id;
+  int npc_type_id = moves[npc_move_index[npc_move]].type_id; 
+  if(pc_acc == INT_MAX) {
+    pc_acc = 0;
+  }
+  if(npc_acc == INT_MAX) {
+    npc_acc = 0;
+  }
+  if(pc_power == INT_MAX) {
+    pc_power = 0;
+  }
+  if(npc_power == INT_MAX) {
+    npc_power = 0;
+  }
+  int pc_dmg_taken;
+  int npc_dmg_taken;
+
+  std::vector<pokemon *> turn_order;
+  if(attacked == -1) {
+    pc_dmg_taken = calculate_damage(npc, npc_power, npc_type_id);
+    pc->current_hp -= pc_dmg_taken;
+    mvprintw(18, 0, "The wild %s used %s\n", npc->get_species(), moves[npc_move_index[npc_move]].identifier);
+    printw("%s took %d damage!\n", pc->get_species(), pc_dmg_taken);
+    refresh();
+    getch();
+    if(pc->current_hp <= 0) {
+      if(hasLivingPokemon(&world.pc)) {
+        printw("%s fainted! Press any key to choose your next pokemon", pc->get_species());
+      } else {
+        printw("All of your pokemon have fainted. You black out and wake up healed on the side of the road");
+      }
+      refresh();
+      getch();
+      pc->current_hp = 0;
+      int next_index = io_select_pokemon(1);
+      world.pc.active_idx = next_index;
+      *pc_pkm_idx = next_index;
+      world.pc.active_idx = next_index;
+      return 0;
+    }
+    return 0;
+  }
+  else if(pc_prio > npc_prio) {
+    turn_order.push_back(pc);
+    turn_order.push_back(npc);
+  }
+  else if(npc_prio > pc_prio) {
+    turn_order.push_back(npc);
+    turn_order.push_back(pc);
+  }
+  else if(pc_prio == npc_prio) {
+    if(pc->get_speed() > npc->get_speed()) {
+      turn_order.push_back(pc);
+      turn_order.push_back(npc);
+    }
+    else if (npc->get_speed() > pc->get_speed()) {
+      turn_order.push_back(npc);
+      turn_order.push_back(pc);
+    }
+    else {
+      if(rand() % 2 == 0) {
+        turn_order.push_back(pc);
+        turn_order.push_back(npc);
+      }
+      else {
+        turn_order.push_back(npc);
+        turn_order.push_back(pc);
+      }
+    }
+  }
+  for(pokemon * p : turn_order) {
+    if(p == pc) {
+      npc_dmg_taken = calculate_damage(pc, pc_power, pc_type_id);
+      npc->current_hp -= npc_dmg_taken;
+      mvprintw(18, 0, "Your %s used %s\n", pc->get_species(), moves[pc_move_index[attacked]].identifier);
+      printw("%s took %d damage!\n", npc->get_species(), npc_dmg_taken);
+      refresh(); 
+      getch();
+      if(npc->current_hp <= 0) {
+        printw("The wild %s fainted. You win!\n", npc->get_species());
+        refresh();
+        getch();
+        return 1;
+      }
+    }
+    else if(p == npc) {
+      pc_dmg_taken = calculate_damage(npc, npc_power, npc_type_id);
+      pc->current_hp -= pc_dmg_taken;
+      mvprintw(18, 0, "The wild %s used %s\n", npc->get_species(), moves[npc_move_index[npc_move]].identifier);
+      printw("%s took %d damage!\n", pc->get_species(), pc_dmg_taken);
+      refresh();
+      getch();
+      if(pc->current_hp <= 0) {
+        if(hasLivingPokemon(&world.pc)) {
+          printw("%s fainted! Press any key to choose your next pokemon", pc->get_species());
+        } else {
+          printw("All of your pokemon have fainted. You black out and wake up healed on the side of the road");
+        }
+        refresh();
+        getch();
+        pc->current_hp = 0;
+        int next_index = io_select_pokemon(1);
+        world.pc.active_idx = next_index;
+        *pc_pkm_idx = next_index;
+        world.pc.active_idx = next_index;
         return 0;
       }
     }
@@ -847,6 +995,16 @@ void io_battle(character *aggressor, character *defender) {
   int battling = 1;
   int npc_pkm_idx = 0;
   int pc_pkm_idx = 0;
+  for(pokemon *p : world.pc.buddy) {
+    if(p) {
+      if(p->current_hp == 0) {
+        pc_pkm_idx++;
+      }
+      else {
+        break;
+      }
+    }
+  }
   int next_idx = pc_pkm_idx;
   int selected = 0;
   int choice = 0;
@@ -855,7 +1013,7 @@ void io_battle(character *aggressor, character *defender) {
 
   
 
-  std::vector<std::string> options = {"Fight", "Pokemon", "Bag", "Run"};
+  std::vector<std::string> options = {"FIGHT", "POKEMON", "BAG", "RUN"};
 
   clear();
   mvprintw(0, 0, "Trainer %c at location x:%d y:%d has challenged you to a battle!\n", n->symbol, n->pos[dim_x], n->pos[dim_y]);
@@ -863,14 +1021,6 @@ void io_battle(character *aggressor, character *defender) {
   printw("Go, %s!\n", world.pc.buddy[pc_pkm_idx]->get_species());
 
   printw("Press any key to begin the battle!");
-  refresh();
-  getch();
-  clear();
-  for(pokemon *p : n->buddy) {
-      if(p) {
-      printw("%s\n", p->get_species());
-      }
-  }
   refresh();
   getch();
   clear();
@@ -919,17 +1069,18 @@ void io_battle(character *aggressor, character *defender) {
       if(choice >= 0) {
         choice = -1;
         switch(selected) {
-          case 0:
+          case 0: // FIGHT
             attacked = io_select_move(pc_pkm_idx);
             if(attacked != -1) {
               confirmed = 1;
             }
             break;
-          case 1:
+          case 1: // POKEMON
             next_idx = io_select_pokemon(0);
             if(next_idx != -1) {
               pc_pkm_idx = next_idx;
               confirmed = 1;
+              world.pc.active_idx = pc_pkm_idx;
             }
             break;
           case 2:
@@ -951,7 +1102,7 @@ void io_battle(character *aggressor, character *defender) {
     int kill;
     switch(selected) {
       case 0:
-        kill = attack_trainer(world.pc.buddy[pc_pkm_idx], n, &npc_pkm_idx, attacked); // change final value here IMPORTANT
+        kill = attack_trainer(world.pc.buddy[pc_pkm_idx], n, &npc_pkm_idx, attacked, &pc_pkm_idx); // change final value here IMPORTANT
         
         if(!hasLivingPokemon(&world.pc)) {
           battling = 0;
@@ -978,8 +1129,8 @@ void io_battle(character *aggressor, character *defender) {
         }
         break;
       case 1:
-        mvprintw(15, 0, "You spend your turn swapping pokemon");
-        kill = attack_trainer(world.pc.buddy[pc_pkm_idx], n, &npc_pkm_idx, attacked);
+        mvprintw(17, 0, "You spend your turn swapping pokemon");
+        kill = attack_trainer(world.pc.buddy[pc_pkm_idx], n, &npc_pkm_idx, attacked, &pc_pkm_idx);
         if(!hasLivingPokemon(&world.pc)) {
           battling = 0;
           world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
@@ -997,8 +1148,8 @@ void io_battle(character *aggressor, character *defender) {
         refresh();
         break;
       case 2:
-        mvprintw(15, 0, "You spend your turn using an item");
-        kill = attack_trainer(world.pc.buddy[pc_pkm_idx], n, &npc_pkm_idx, attacked);
+        mvprintw(17, 0, "You spend your turn using an item");
+        kill = attack_trainer(world.pc.buddy[pc_pkm_idx], n, &npc_pkm_idx, attacked, &pc_pkm_idx);
         if(!hasLivingPokemon(&world.pc)) {
           battling = 0;
           world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
@@ -1269,25 +1420,229 @@ void io_handle_input(pair_t dest)
   } while (turn_not_consumed);
 }
 
+int throw_pokeball(character *ch, pokemon *p) {
+  int i;
+  for(i = 0; i < 6; i++) {
+    if(!ch->buddy[i]) {
+      ch->buddy[i] = p;
+      return 1;
+    }
+  }
+  return 0;
+}
+
 void io_encounter_pokemon()
 {
   pokemon *p;
-
   p = new pokemon();
+  int battling = 1;
+  std::vector<std::string> options = {"FIGHT", "POKEMON", "BAG", "RUN"};
+  int pc_pkm_idx = 0;
+  for(pokemon *p : world.pc.buddy) {
+    if(p) {
+      if(p->current_hp == 0) {
+        pc_pkm_idx++;
+      }
+      else {
+        break;
+      }
+    }
+  }
+  int next_idx = pc_pkm_idx;
+  int item_used = 0;
+  int selected = 0;
+  int captured = 0;
+  int ran = 0;
 
   clear();
   move(0,0);
   clrtoeol();
-  printw("You encountered a wild %s!", p->get_species());
+  printw("You encountered a wild %s!\n", p->get_species());
+  printw("Go, %s!\n", world.pc.buddy[pc_pkm_idx]->get_species());
+
+  printw("Press any key to begin the battle!");
+  refresh();
+  getch();
+  
+
+  while(battling) {
+    int confirmed = 0;
+    int attacked = -1;
+    
+    mvprintw(0, 0, "Wild %s\n HP: %d / %d", p->get_species(), p->current_hp, p->get_hp());
+    mvprintw(5, 0, "My %s\n HP: %d / %d", world.pc.buddy[pc_pkm_idx]->get_species(), world.pc.buddy[pc_pkm_idx]->current_hp, world.pc.buddy[pc_pkm_idx]->get_hp());
+
+    
+    while(!confirmed) {
+      clear();
+      mvprintw(0, 0, "Wild %s\n HP: %d / %d", p->get_species(), p->current_hp, p->get_hp());
+      mvprintw(5, 0, "My %s\n HP: %d / %d", world.pc.buddy[pc_pkm_idx]->get_species(), world.pc.buddy[pc_pkm_idx]->current_hp, world.pc.buddy[pc_pkm_idx]->get_hp());
+      move(10, 0);
+      int choice = -1;
+      for(size_t i = 0; i < options.size(); i++) {
+        if (i == selected) {
+          printw("* ");
+        } else {
+          printw("  ");
+        }
+        printw("%s\n", options[i].c_str());
+      }
+
+      refresh();
+
+      int ch = getch();
+      switch (ch) {
+        case KEY_UP:
+          if (selected > 0) {
+          selected--;
+          }
+          break;
+        case KEY_DOWN:
+          if (selected < static_cast<int>(options.size()) - 1) {
+            selected++;
+          }
+          break;
+        case 10: // ENTER key
+          choice = selected;
+          break;
+      }
+      if(choice >= 0) {
+        choice = -1;
+        switch(selected) {
+          case 0: // FIGHT
+            attacked = io_select_move(pc_pkm_idx);
+            if(attacked != -1) {
+              confirmed = 1;
+            }
+            break;
+          case 1: // POKEMON
+            next_idx = io_select_pokemon(0);
+            if(next_idx != -1) {
+              pc_pkm_idx = next_idx;
+              confirmed = 1;
+              world.pc.active_idx = pc_pkm_idx;
+            }
+            break;
+          case 2: // BAG
+            item_used = io_bag(1, 1);
+            if(item_used > 0) {
+              confirmed = 1;
+            }
+            if(item_used == 2) {
+              captured = throw_pokeball(&world.pc, p);
+              if(captured == 1) {
+                battling = 0;
+                io_clear_options();
+                mvprintw(10, 0, "You captured a %s", p->get_species());
+                
+              }
+              else {
+                io_clear_options();
+                mvprintw(10, 0, "You have too many pokemon already");
+              }
+              refresh();
+              getch();
+            }
+            break;
+          case 3: // RUN
+            io_clear_options();
+            mvprintw(10, 0, "You attempt to flee! (Press any key)\n");
+            if(rand() % 10 <= 3) {
+              printw("Could not get away!\n");
+            }
+            else {
+              printw("Got away safely!\n");
+              battling = 0;
+            }
+            refresh();
+            getch();
+            
+            confirmed = 1;
+            break;
+        }
+      }
+    }
+    int kill;
+    if(battling){
+    switch(selected) {
+      case 0: // FIGHT
+        kill = attack_wild(world.pc.buddy[pc_pkm_idx], p, attacked, &pc_pkm_idx); // change final value here IMPORTANT
+        
+        if(!hasLivingPokemon(&world.pc)) {
+          battling = 0;
+          world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+          io_teleport_pc_path(world.pc.pos);
+          io_pokemon_center();
+          io_display();
+          refresh();
+          break;
+        }
+        else if(p->current_hp <= 0 && kill) {
+          battling = 0;
+          break;
+        }
+        break;
+
+      case 1: // POKEMON
+        mvprintw(17, 0, "You spend your turn swapping pokemon");
+        kill = attack_wild(world.pc.buddy[pc_pkm_idx], p, attacked, &pc_pkm_idx);
+        if(!hasLivingPokemon(&world.pc)) {
+          battling = 0;
+          world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+          io_teleport_pc_path(world.pc.pos);
+          io_pokemon_center();
+          io_display();
+          refresh();
+          break;
+        }
+        refresh();
+        break;
+      case 2: // BAG
+        mvprintw(17, 0, "You spend your turn using an item");
+        kill = attack_wild(world.pc.buddy[pc_pkm_idx], p, attacked, &pc_pkm_idx);
+        if(!hasLivingPokemon(&world.pc)) {
+          battling = 0;
+          world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+          io_teleport_pc_path(world.pc.pos);
+          io_pokemon_center();
+          io_display();
+          refresh();
+          break;
+        }
+        refresh();
+        break;
+      case 3: // RUN
+        mvprintw(17, 0, "You spend your turn trying to flee");
+        kill = attack_wild(world.pc.buddy[pc_pkm_idx], p, attacked, &pc_pkm_idx);
+        if(!hasLivingPokemon(&world.pc)) {
+          battling = 0;
+          world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+          io_teleport_pc_path(world.pc.pos);
+          io_pokemon_center();
+          io_display();
+          refresh();
+          break;
+        }
+        refresh();
+        break;
+
+    }
+    }
+
+  }
+
+
+
   // mvprintw(1, 0, "move 1: %s", p.move1.c_str());
   // mvprintw(2, 0, "move 2: %s", p.move2.c_str());
   // mvprintw(4, 0, "HP: %d ATK: %d DEF: %d SP-ATK: %d SP-DEF: %d SPE: %d", p.hp, p.atk, p.def, p.spa, p.spd, p.spe);
   // mvprintw(5, 0, "Press any key to leave");
   refresh();
-  getch();
 
   // Later on, don't delete if captured
-  delete p;
+  if(!captured) {
+    delete p;
+  }
 }
 
 void io_choose_starter()
