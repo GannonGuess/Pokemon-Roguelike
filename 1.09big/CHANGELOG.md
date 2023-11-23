@@ -1,5 +1,8 @@
 ## Version 1.09
 
+11/23 16:10 - Added wild pokemon battles
+            - Allow capture of wild pokemon
+
 11/23 12:59 - Using an item or switching pokemon uses up PC move
 
 11/23 12:45 - Trainer battle mechanics finished
