@@ -979,21 +979,47 @@ void io_battle(character *aggressor, character *defender) {
         break;
       case 1:
         mvprintw(15, 0, "You spend your turn swapping pokemon");
+        kill = attack_trainer(world.pc.buddy[pc_pkm_idx], n, &npc_pkm_idx, attacked);
+        if(!hasLivingPokemon(&world.pc)) {
+          battling = 0;
+          world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+          io_teleport_pc_path(world.pc.pos);
+          io_pokemon_center();
+          io_display();
+          refresh();
+          for(pokemon * p : n->buddy) {
+            if(p) {
+              p->current_hp = p->get_hp();
+            }
+          }
+          break;
+        }
         refresh();
-        getch();
         break;
       case 2:
         mvprintw(15, 0, "You spend your turn using an item");
+        kill = attack_trainer(world.pc.buddy[pc_pkm_idx], n, &npc_pkm_idx, attacked);
+        if(!hasLivingPokemon(&world.pc)) {
+          battling = 0;
+          world.cur_map->cmap[world.pc.pos[dim_y]][world.pc.pos[dim_x]] = NULL;
+          io_teleport_pc_path(world.pc.pos);
+          io_pokemon_center();
+          io_display();
+          refresh();
+          for(pokemon * p : n->buddy) {
+            if(p) {
+              p->current_hp = p->get_hp();
+            }
+          }
+          break;
+        }
         refresh();
-        getch();
         break;
       case 3:
-        mvprintw(15, 0, "You spend your turn attempting to flee");
-        refresh();
-        getch();
         break;
     }
   }
+
   io_display();
   refresh();
   if(win) {

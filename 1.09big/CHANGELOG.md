@@ -1,5 +1,9 @@
 ## Version 1.09
 
+11/23 12:59 - Using an item or switching pokemon uses up PC move
+
+11/23 12:45 - Trainer battle mechanics finished
+
 11/22 19:27 - Added overworld access to bag and items
             - Potions and revives can now be used from overworld
             - Trying to use pokeball does nothing
