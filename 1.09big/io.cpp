@@ -495,6 +495,8 @@ int io_bag(int isBattle, int isWild) {
           
 
       }
+      printw("\n\nSelect value 1 - %d", slots);
+      refresh();
       while(!validInput) {
         char choice = getch();
         if(choice == 27) {
@@ -525,7 +527,8 @@ int io_bag(int isBattle, int isWild) {
         }
         refresh();
       }
-      printw("\nSelect value 1 - %d: ", slots);
+      printw("\n\nSelect value 1 - %d", slots);
+      refresh();
       while(!validInput) {
         char choice = getch();
         if(choice == 27) {
