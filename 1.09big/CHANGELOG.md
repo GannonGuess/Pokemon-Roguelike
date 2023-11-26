@@ -1,5 +1,29 @@
 ## Version 1.09
 
+11/26 16:34 - Commented code for submission
+
+11/25 23:40 - Baileys can now no longer have trees and boulders
+            - Commented out unused variable
+
+11/25 23:32 - Readded -Wall and -Werror to makefile
+
+11/25 23:30 - Removed unused variables
+            - Fixed damage calculation in one case to only be applied if hit
+
+11/24 00:05 - Bag now shows how to select pokemon to use item on better
+
+11/23 23:20 - Added item descriptions in bag
+            - Added move info (POW and ACC)
+            - NPC Pokemon moves are displayed to the player
+            - Damage calculation changed to fit more in line with main series games
+            - Active pokemon levels are displayed in battle
+
+11/23 20:14 - Player no longer teleports after a loss
+            - Active pkm index set correctly to first living pokemon is bag
+            - Added move accuracy
+            - damage only dealt if move connects
+            - Null move slots cannot be selected now
+
 11/23 16:10 - Added wild pokemon battles
             - Allow capture of wild pokemon
 
