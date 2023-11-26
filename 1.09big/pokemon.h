@@ -43,13 +43,13 @@ class pokemon {
   const char *get_gender_string() const;
   bool is_shiny() const;
   const char *get_move(int i) const;
-  void use_potion() {
+  void use_potion() { // use potion on pokemon
     current_hp += 20;
     if(current_hp > get_hp()) {
       current_hp = get_hp();
     }
   } 
-  void use_revive() {
+  void use_revive() { // use revive on pokemon
     current_hp += get_hp() / 2;
   }
   int* get_move_index() {
