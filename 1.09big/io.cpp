@@ -616,7 +616,6 @@ int io_select_pokemon(int wasDeath) {
   }
   int done = 0;
   int selected = 0;
-  int choice;
   while(!done) {
     move(11, 0);
     for(size_t i = 0; i < pokemon_list.size(); i++) {
@@ -743,8 +742,6 @@ int attack_trainer(pokemon *pc, character *npc_trainer, int *npc_pkm_idx, int at
   int npc_prio = moves[npc_move_index[npc_move]].priority;
   int pc_power = moves[pc_move_index[attacked]].power;
   int npc_power = moves[npc_move_index[npc_move]].power;
-  int npc_attacked = 0;
-  int pc_attacked = 0;
   int pc_type_id = moves[pc_move_index[attacked]].type_id;
   int npc_type_id = moves[npc_move_index[npc_move]].type_id; 
   if(pc_acc == INT_MAX) {
@@ -763,10 +760,10 @@ int attack_trainer(pokemon *pc, character *npc_trainer, int *npc_pkm_idx, int at
   int npc_dmg_taken;
   std::vector<pokemon *> turn_order;
   if(attacked == -1) {
-    pc_dmg_taken = calculate_damage(npc, pc, npc_power, npc_type_id);
-    pc->current_hp -= pc_dmg_taken;
+    pc_dmg_taken = calculate_damage(npc, pc, npc_power, npc_type_id); 
     mvprintw(18, 0, "The opposing %s used %s\n", npc->get_species(), moves[npc_move_index[npc_move]].identifier);
     if(rand() % 100 < npc_acc) {
+      pc->current_hp -= pc_dmg_taken;
       printw("%s took %d damage!\n", pc->get_species(), pc_dmg_taken);
     }
     else {
@@ -893,8 +890,6 @@ int attack_wild(pokemon *pc, pokemon *npc, int attacked, int *pc_pkm_idx) {
   int npc_prio = moves[npc_move_index[npc_move]].priority;
   int pc_power = moves[pc_move_index[attacked]].power;
   int npc_power = moves[npc_move_index[npc_move]].power;
-  int npc_attacked = 0;
-  int pc_attacked = 0;
   int pc_type_id = moves[pc_move_index[attacked]].type_id;
   int npc_type_id = moves[npc_move_index[npc_move]].type_id; 
   if(pc_acc == INT_MAX) {
@@ -1023,7 +1018,6 @@ int attack_wild(pokemon *pc, pokemon *npc, int attacked, int *pc_pkm_idx) {
 }
 
 void io_battle(character *aggressor, character *defender) {
-  int i;
   npc *n = (npc *) ((aggressor == &world.pc) ? defender : aggressor);
   int battling = 1;
   int npc_pkm_idx = 0;
@@ -1041,7 +1035,6 @@ void io_battle(character *aggressor, character *defender) {
   world.pc.active_idx = pc_pkm_idx;
   int next_idx = pc_pkm_idx;
   int selected = 0;
-  int choice = 0;
   int item_used = 0;
   int win = 0;
   int num_pkm = 0;
@@ -1491,7 +1484,7 @@ void io_encounter_pokemon()
   int item_used = 0;
   int selected = 0;
   int captured = 0;
-  int ran = 0;
+
 
   clear();
   move(0,0);
