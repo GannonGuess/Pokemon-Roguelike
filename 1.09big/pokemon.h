@@ -18,7 +18,7 @@ enum pokemon_gender {
 class pokemon {
  private:
   int level;
-  int pokemon_index;
+  //int pokemon_index;
   int move_index[4];
   int pokemon_species_index;
   int IV[6];
