@@ -1591,6 +1591,7 @@ void io_encounter_pokemon()
                 battling = 0;
                 io_clear_options();
                 mvprintw(10, 0, "You captured a %s", p->get_species());
+                battling = 0;
                 
               }
               else {
@@ -1620,6 +1621,12 @@ void io_encounter_pokemon()
       }
     }
     int kill;
+    if(rand() % 100 < 9 && battling) { // 10% change for pkm to flee battle
+      mvprintw(17, 0, "The wild %s fled the battle! Press any key to continue", p->get_species()); 
+      battling = 0;
+      refresh();
+      getch();
+    }
     if(battling){
     switch(selected) {
       case 0: // FIGHT

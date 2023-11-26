@@ -1,5 +1,7 @@
 ## Version 1.09
 
+11/26 17:26 - Added fleeing for wild pokemon 
+
 11/26 16:34 - Commented code for submission
 
 11/25 23:40 - Baileys can now no longer have trees and boulders
