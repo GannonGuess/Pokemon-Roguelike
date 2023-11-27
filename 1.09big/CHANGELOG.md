@@ -1,6 +1,8 @@
 ## Version 1.09
 
-11/26 17:26 - Added fleeing for wild pokemon 
+11/26 18:25 - Pokemon now flee if pokeball fails
+
+11/26 17:26 - Added fleeing for wild pokemon
 
 11/26 16:34 - Commented code for submission
 
