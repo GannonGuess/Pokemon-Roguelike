@@ -1591,13 +1591,12 @@ void io_encounter_pokemon()
                 battling = 0;
                 io_clear_options();
                 mvprintw(10, 0, "You captured a %s", p->get_species());
-                battling = 0;
-                
               }
               else {
                 io_clear_options();
-                mvprintw(10, 0, "You have too many pokemon already");
+                mvprintw(10, 0, "The wild %s broke free! It fled!", p->get_species());
               }
+              battling = 0;
               refresh();
               getch();
             }
