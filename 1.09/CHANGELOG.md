@@ -1,8 +1,57 @@
 ## Version 1.09
 
-11/22 1
+11/26 18:46 - Updated README and packaged for submission
 
-11/22 15:53 - Copied files over from 1.08
+11/26 18:25 - Pokemon now flee if pokeball fails
+
+11/26 17:26 - Added fleeing for wild pokemon
+
+11/26 16:34 - Commented code for submission
+
+11/25 23:40 - Baileys can now no longer have trees and boulders
+            - Commented out unused variable
+
+11/25 23:32 - Readded -Wall and -Werror to makefile
+
+11/25 23:30 - Removed unused variables
+            - Fixed damage calculation in one case to only be applied if hit
+
+11/24 00:05 - Bag now shows how to select pokemon to use item on better
+
+11/23 23:20 - Added item descriptions in bag
+            - Added move info (POW and ACC)
+            - NPC Pokemon moves are displayed to the player
+            - Damage calculation changed to fit more in line with main series games
+            - Active pokemon levels are displayed in battle
+
+11/23 20:14 - Player no longer teleports after a loss
+            - Active pkm index set correctly to first living pokemon is bag
+            - Added move accuracy
+            - damage only dealt if move connects
+            - Null move slots cannot be selected now
+
+11/23 16:10 - Added wild pokemon battles
+            - Allow capture of wild pokemon
+
+11/23 12:59 - Using an item or switching pokemon uses up PC move
+
+11/23 12:45 - Trainer battle mechanics finished
+
+11/22 19:27 - Added overworld access to bag and items
+            - Potions and revives can now be used from overworld
+            - Trying to use pokeball does nothing
+            - Potions and revives only work if selected pokemon is within certain hp range
+
+11/22 17:51 - Added basic items for pokeballs, potions, and revives
+            - Centers now fully heal all PC pokemon
+            - Marts now restock all PC items
+            - Added a current hp parameter to pokemon and init to its max hp
+
+11/22 17:10 - Added get_level method for pokemon
+
+11/22 17:04 - Got code working and update IO output for marts, centers, and encounters
+
+11/22 15:53 - Copied files over from 1.08 instructor code
 
 ## Version 1.08
 

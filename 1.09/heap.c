@@ -297,7 +297,7 @@ static void heap_cascading_cut(heap_t *h, heap_node_t *n)
       n->mark = 1;
     } else {
       heap_cut(h, n, p);
-      heap_cascading_cut(h, p);
+      heap_cascading_cut(h, n);
     }
   }
 }

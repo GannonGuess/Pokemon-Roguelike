@@ -34,6 +34,8 @@
 
 #define MIN_TRAINERS     7
 #define ADD_TRAINER_PROB 60
+#define ENCOUNTER_PROB       10
+#define ADD_TRAINER_POK_PROB 60
 
 #define MOUNTAIN_SYMBOL       '%'
 #define BOULDER_SYMBOL        '0'
@@ -57,6 +59,10 @@
 #define PACER_SYMBOL    'p'
 #define SWIMMER_SYMBOL  'm'
 #define WANDERER_SYMBOL 'w'
+
+#define MAX_REVIVES     5
+#define MAX_POTIONS     10
+#define MAX_POKEBALLS   15
 
 #define mappair(pair) (m->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (m->map[y][x])

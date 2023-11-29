@@ -1,6 +1,49 @@
 # 327 Pokemon Game README - Gannon Guess
 
 ## Version 1.09
+This verion adds the pokemon battle minigame, trainer battles, wild pokemon battles, and bag mechanics.
+- Using the instructor code lost me the ability to display the PC's party in the overworld map. I did not readd this to this version as it has never been needed, but plan on adding it for version 1.10. 
+- `NOTE:` Because battle-loss behavior was left unspecified in the instructions for this version, I am planning on implementing it the next version. In it, I will be sending the PC to the origin map's pokemon center. For now, the PC remains where it lost and the pokemon center screen is activated to heal all pokemon. The PC will therefore continue to battle the NPC that they just faced until the PC wins or teleports away with `p`. Using `p` to teleport will have the NPC try to battle the player one last time. Finishing this battle should place the PC in their new, teleported to, location. I figured the new functionality would be good for the final assignment.
+- All pokemon battles give the PC an option of `FIGHT`, `POKEMON`, `BAG`, or `RUN/FLEE` on their turn.
+  - These menus are navigated with the `UP` and `DOWN` arrow keys, with a `*` to denote the currently selected item.
+    - All battle menus use a similar style of selection
+  - The `RETURN` or `ENTER` key is used to verify the users selection. `ESC` can be used to go back
+- The `FIGHT` option lists the current active pokemon's moves alongside the moves' `POWER` (POW) and `ACCURACY` (ACC) values
+  - Selecting a move with `0 POWER` does the minimal amount of damage a move can do (usually 2)
+  - Selecting a move with `0 ACCURACY` means that the move will miss
+    - This means that you could get unlucky with a starting pokemon that can never damage enemies. Very sad, but not something I need to account for. Thats just how those moves work, even in the Main Series Games.
+- The `POKEMON` option lists all of the PC's pokemon and their current HP. The user can select a pokemon to swap out to
+  - Swapping pokemon uses the PC's turn just like in the Main Series Games (MSG)
+  - PC cannot swap to a pokemon that has fainted or to their currrently active pokemon
+- The `BAG` option lists the items in the PC's bag and a menu to select which one to use.
+  - The number of items remaining of a particular type are listed alongside the item names, as well as a description of what the item does
+  - Attempting to use an item that the PC has 0 of does nothing
+  - Potions can only be used on pokemon that have taken damage and have more than 0 HP
+  - Revives can only be used on fainted pokemon (0 HP)
+  - Pokeballs will always capture wild pokemon, and pokeballs used in trainer battles will be lost and do nothing just like in the MSGs.
+    - Pokeball will fail to capture a wild pokemon if the PC has 6 pokemon already and the pokmeon will flee.
+  - `ESC` can be used to back out of the bag
+  - The `BAG` can also be accessed with the `B` command outside of battle in the overworld. Here, pokemon can be healed or revived, but pokeballs do nothing. `ESC` or using an item exits the bag without consuming a turn.
+  - Using an item during a battle uses the PC's turn.
+- The `RUN/FLEE` option does not work in trainer battles. In wild pkmn encounters, the trainer has 66% chance of getting away safely
+  - Wild pokemon also have a 10% chance of fleeing during their turn.
+  - Failing to flee a wild pkmn encounter uses the PC's turn
+- Visiting a PKM Center will heal all of the PC's pokemon to full health
+- Visiting a Pokemart will restock all of the PC's items
+- All PC pokemon fainting during trainer battle will result in the end of the battle. The PC and enemy trainer remain in their current positions, and all PC and enemy trainer pokemon are healed for rematch.
+- I changed damage calculations slightly from the specified instructions since low level pokemon would deal thousands of damage to each other with the given formula. I balanced the damage by drawing from the calculations of Generation 1 from the main series games. The new calculation starts with low damage at low levels (usually 2-4), but prevents all attacks from one-shotting everything at high levels. I found this to be more enjoyable to play and much more balanced. The variables used in damage calculation remain the same, but some round down occurs to keep values from being too high and an extra instance of integer division is used.
+  - With the way attack and defence are calculated, higher level pokemon deal less damage to pokemon of a similar level, and more damage to lower level pokemon. The inverse is true for low level pokemon. They do less damage to high level pokemon.
+- If an attack does more damage than the remaining HP of the defending pokemon, the attack amound displayed to the user is the remaining HP of the defender just like the MSGs.
+- Enemy trainers will send out their pokemon in order, only switching when the active one faints just like in the MSGs. They will chose a random move for their currently active pokemon to use on their turn.
+- During trainer battles, the enemy trainer pokemons' moves are displayed, but without POW or ACC stats. The number of pokemon they have is also displayed next to the name of their current pokemon.
+- If a PC pokemon faints during battle, the pokemon selection screen is displayed if the PC has another pokemon to use. Otherwise the battle ends in a loss.
+- If all of the enemy trainers pokemon faint during the battle, the PC wins and the NPC is set to the loss state added in a prev version.
+- The pokemon with the higher move priority attacks first. If priority are equal for both pokemon moves, the pokemon with more speed goes first
+- A move only hits and deals damage if an accuracy check is passed. If its not passed, the player is told that the move misses
+- Pokemon HP display is changed after both trainers have made their move. 
+- Enemy trainer PKMN are only healed if they win the battle. This is to allow for rematches like the MSGs
+- Pokemon levels are displayed during battle.
+- The PC using any command other than FIGHT causes the selected command to go first. (Ex. PC healing takes priority over NPC attack)
 
 
 ## Version 1.08

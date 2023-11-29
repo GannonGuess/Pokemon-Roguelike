@@ -2,11 +2,12 @@
 # define CHARACTER_H
 
 # include <cstdint>
-# include <string>
 
 # include "pair.h"
 
 #define DIJKSTRA_PATH_MAX (INT_MAX / 2)
+
+class pokemon;
 
 typedef enum __attribute__ ((__packed__)) movement_type {
   move_hiker,
@@ -31,32 +32,14 @@ typedef enum __attribute__ ((__packed__)) character_type {
 
 extern const char *char_type_name[num_character_types];
 
-class monster { // class for storing pokemon information
-public:
-  std::string name;
-  std::string move1;
-  std::string move2;
-  int level;
-  int exp;
-  char gender;
-  int hp, hp_iv, hp_base;
-  int atk, atk_iv, atk_base;
-  int def, def_iv, def_base;
-  int spa, spa_iv, spa_base;
-  int spd, spd_iv, spd_base;
-  int spe, spe_iv, spe_base;
-  int acc;
-  int eva;
-};
-
 class character {
  public:
-  virtual ~character() {}
+  virtual ~character();
   pair_t pos;
   char symbol;
   int next_turn;
   int seq_num;
-  monster pkm[6];
+  class pokemon *buddy[6];
 };
 
 class npc : public character {
@@ -68,6 +51,12 @@ class npc : public character {
 };
 
 class pc : public character {
+public:
+  int revives;
+  int potions;
+  int pokeballs;
+  int active_idx;
+  virtual ~pc() {}
 };
 
 /* character is defined in poke327.h to allow an instance of character
@@ -80,7 +69,5 @@ extern void (*move_func[num_movement_types])(character *, pair_t);
 
 int pc_move(char);
 bool is_pc(character *c);
-void generate_pokemon(monster &p);
-void calc_stats_for_level(monster &p);
 
 #endif
