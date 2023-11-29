@@ -369,18 +369,28 @@ static void io_list_trainers()
 
 void io_pokemart()
 {
-  mvprintw(0, 0, "Welcome to the Pokemart.  Could I interest you in some Pokeballs?");
-  refresh();
-  getch();
+  clear();
+  mvprintw(0, 0, "Welcome to the Pokemart!");
+  mvprintw(1, 0, "Seems like they're out of stock...");
+  mvprintw(2, 0, "You should come back later");
+  mvprintw(4, 0, "Press \'<\' to leave");
+  char command = getch();
+  while(command != (char)KEY_LEFT && command != '<') {
+    command = getch();
+  }
 }
 
 void io_pokemon_center()
 {
-  move(0,0);
-  clrtoeol();
-  printw("Welcome to the Pokemon Center.  How can Nurse Joy assist you?");
-  refresh();
-  getch();
+  clear();
+  mvprintw(0, 0, "Welcome to the Pokemon Center!");
+  mvprintw(1, 0, "Seems that Nurse Joy isn't here right now...");
+  mvprintw(2, 0, "You should come back later");
+  mvprintw(4, 0, "Press \'<\' to leave");
+  char command = getch();
+  while(command != (char)KEY_LEFT && command != '<') {
+    command = getch();
+  }
 }
 
 void io_battle(character *aggressor, character *defender)
