@@ -1,3 +1,18 @@
+## Version 1.10
+- Money
+- pokeball types
+- shopping
+- walk through defeated trainers
+- Function on loss
+- Gym battles
+- looking at owned pokemon
+- Storing extra pokemon
+- retrieving extra pokemon from pokecenter
+- capture mechanics
+
+
+11/29 15:21 - Copied files over from 1.09 
+
 ## Version 1.09
 
 11/26 18:46 - Updated README and packaged for submission

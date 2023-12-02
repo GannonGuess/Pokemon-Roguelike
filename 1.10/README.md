@@ -1,5 +1,9 @@
 # 327 Pokemon Game README - Gannon Guess
 
+## Version 1.10
+
+
+
 ## Version 1.09
 This verion adds the pokemon battle minigame, trainer battles, wild pokemon battles, and bag mechanics.
 - Using the instructor code lost me the ability to display the PC's party in the overworld map. I did not readd this to this version as it has never been needed, but plan on adding it for version 1.10. 
