@@ -1065,6 +1065,7 @@ void init_world()
   world.cur_idx[dim_x] = world.cur_idx[dim_y] = WORLD_SIZE / 2;
   world.char_seq_num = 0;
   new_map(0);
+  world.storage.storing = 0;
 }
 
 void delete_world()

@@ -412,16 +412,19 @@ void io_access_storage() {
   
   refresh();
   while(!done) {
+    int num_pkm = 0;
+    for(pokemon *i : world.storage.box) {
+      if(i) {
+        num_pkm++;
+      }
+    }
 
-    if(world.storage.storing == 0) {
-      mvprintw(1, 0, "You have no pokemon in storage"); 
-    }
-    else {
-      mvprintw(1, 0, "You have %d pokemon in storage. Use left and right arrow keys to view more.", world.storage.storing);
-      printw("\n Press 'r' to release a pokemon from the box.");
-      printw("\nPress 'g' to get a pokemon from storage and 's' to store one");
-    }
-    mvprintw(4, 0, "Box %d", page);
+  
+    mvprintw(1, 0, "You have %d pokemon in storage. Use left and right arrow keys to view more.", num_pkm);
+    printw("\nPress 'r' to release a pokemon from the box.");
+    printw("\nPress 'g' to get a pokemon from storage and 's' to store one");
+
+    mvprintw(4, 0, "Box %d", page + 1);
     move(5, 0);
     clrtobot();
     for(i = page * 10; i < (page * 10) + 10; i++) {
@@ -465,7 +468,7 @@ void io_access_storage() {
         }
         break;
       case 'g':
-        if(on_hand < 6 && world.storage.storing > 0) {
+        if(on_hand < 6 && num_pkm > 0) {
         printw("Select number of the pokemon that you want to get (0 to go back): ");
         echo();
         curs_set(1);
@@ -502,7 +505,7 @@ void io_access_storage() {
         }
         break;
       case 'r':
-        if(world.storage.storing != 0) {
+        if(num_pkm > 0) {
           printw("Select number of the pokemon to release from the box (0 to go back): ");
           echo();
           curs_set(1);
@@ -533,7 +536,7 @@ void io_access_storage() {
         }
         break;
       case 's':
-        if(on_hand > 1 && world.storage.storing < 30) {
+        if(on_hand > 1 && num_pkm < 30) {
         
           printw("Select number of the on-hand pokemon that you want to store (0 to go back): ");
           echo();
@@ -980,6 +983,7 @@ void io_list_pc_pokemon() {
   clear();
   int num_pkm = 0;
   mvprintw(0, 0, "Inspect your pokemon with left and right arrow keys. ESC to back out.\n");
+  printw("Press 's' to swap currently viewing pokemon to first slot");
   int done = 0;
   int viewing_idx = 0;
   for(pokemon *p : world.pc.buddy) {
@@ -1011,6 +1015,13 @@ void io_list_pc_pokemon() {
         }
         if(viewing_idx == num_pkm) {
           viewing_idx = 0;
+        }
+        break;
+      case 's':
+        if(viewing_idx != 0) {
+          pokemon *tmp = world.pc.buddy[viewing_idx];
+          world.pc.buddy[viewing_idx] = world.pc.buddy[0];
+          world.pc.buddy[0] = tmp;
         }
         break;
       case 'q':
