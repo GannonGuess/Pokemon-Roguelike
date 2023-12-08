@@ -52,9 +52,14 @@ class npc : public character {
 
 class pc : public character {
 public:
+  int battles_won;
+  int battles_lost;
+  int pokedollars;
+  int total_pokedollars;
+  int pokemon_captured;
   int revives;
   int potions;
-  int pokeballs;
+  int pokeballs[3];
   int active_idx;
   virtual ~pc() {}
 };

@@ -922,8 +922,11 @@ void init_pc()
 
   world.pc.revives = MAX_REVIVES;
   world.pc.potions = MAX_POTIONS;
-  world.pc.pokeballs = MAX_POKEBALLS;
+  world.pc.pokeballs[0] = MAX_POKEBALLS;
+  world.pc.pokeballs[1] = 5;
+  world.pc.pokeballs[2] = 1;
   world.pc.active_idx = 0;
+  world.pc.pokedollars = 600;
 
   heap_insert(&world.cur_map->turn, &world.pc);
 

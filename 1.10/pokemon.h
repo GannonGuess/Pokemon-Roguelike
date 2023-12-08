@@ -30,6 +30,7 @@ class pokemon {
   int type1;
   int type2;
   int base_speed;
+  int capture_rate;
   pokemon();
   pokemon(int level);
   const char *get_species() const;
