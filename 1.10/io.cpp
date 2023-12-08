@@ -397,6 +397,27 @@ void shift_pokemon() {
   world.pc.buddy[i] = NULL;
 }
 
+void io_print_poke_info(pokemon *p) {
+
+  int * pc_move_index = p->get_move_index();
+  int pwr_1 = (moves[pc_move_index[0]].power == INT_MAX) ? 0 : moves[pc_move_index[0]].power;
+  int acc_1 = (moves[pc_move_index[0]].accuracy == INT_MAX) ? 0 : moves[pc_move_index[0]].accuracy; 
+  int pwr_2 = (moves[pc_move_index[1]].power == INT_MAX) ? 0 : moves[pc_move_index[1]].power;
+  int acc_2 = (moves[pc_move_index[1]].accuracy == INT_MAX) ? 0 : moves[pc_move_index[1]].accuracy; 
+  printw("%-12s %s",p->get_species(), types[p->type1]);
+  if(types[p->type2] != NULL) {
+    printw("\t%s", types[p->type2]);
+  }
+  
+  printw("\nHP: %d / %d\n", p->current_hp, p->get_hp());
+  printw("Level: %-3d\tGender: %s\n", p->get_level(), p->get_gender_string());
+  printw("Move 1: %-27s POWER: %-3d ACCURACY: %-3d\n", p->get_move(0), pwr_1, acc_1);
+  printw("Move 2: %-27s POWER: %-3d ACCURACY: %-3d\n", p->get_move(1), pwr_2, acc_2);
+  printw("\nATK:    %-3d\tDEF:    %-3d\nSP-ATK: %-3d\tSP-DEF: %-3d\nSPE:    %-3d\n", p->get_atk(), p->get_def(), p->get_spatk(), p->get_spdef(), p->get_speed());
+
+
+}
+
 void io_access_storage() {
   int on_hand = 0;
   for(pokemon *p : world.pc.buddy) {
@@ -421,7 +442,7 @@ void io_access_storage() {
 
   
     mvprintw(1, 0, "You have %d pokemon in storage. Use left and right arrow keys to view more.", num_pkm);
-    printw("\nPress 'r' to release a pokemon from the box.");
+    printw("\nPress 'i' to inspect a pokemon from the box. 'r' to relesase a pokemon.");
     printw("\nPress 'g' to get a pokemon from storage and 's' to store one");
 
     mvprintw(4, 0, "Box %d", page + 1);
@@ -435,7 +456,7 @@ void io_access_storage() {
         mvprintw(5 + (i % 10), 0, "%d:", i + 1);
       }
     }
-    mvprintw(16, 0, "%d On-Hand:\n", on_hand);
+    mvprintw(16, 0, "On-Hand:\n", on_hand);
     int x = 1;
     for(pokemon *i : world.pc.buddy) {
       if(i) {
@@ -523,7 +544,7 @@ void io_access_storage() {
           noecho();
           curs_set(0);
           if(pokeslot > 0) {
-            printw("Are you sure you would like to release %s? [Y/N]\n", world.storage.box[pokeslot - 1]->get_species());
+            printw("Are you sure you would like to release %s? [Y/ANY]\n", world.storage.box[pokeslot - 1]->get_species());
             confirm = getch();
             if(confirm == 'Y') {
               printw("%s was successfully sent out into the wild. Goodbye!", world.storage.box[pokeslot - 1]->get_species());
@@ -571,6 +592,34 @@ void io_access_storage() {
           }
         }
         break;
+      case 'i':
+        if(num_pkm > 0) {
+          printw("Select number of the pokemon to view from the box (0 to go back): ");
+          echo();
+          curs_set(1);
+          scanw((char *) "%d", &pokeslot);
+          while(pokeslot < 1 || pokeslot > 30 || !world.storage.box[pokeslot - 1]) {
+            if(pokeslot == 0) {
+              break;
+            }
+            move(20, 0);
+            clrtoeol();
+            printw("Invalid box selection. Please make another selection (0 to go back): ");
+            clrtoeol();
+            scanw((char *) "%d", &pokeslot);
+          }
+          noecho();
+          curs_set(0);
+          if(pokeslot != 0) {
+            clear();
+            io_print_poke_info(world.storage.box[pokeslot - 1]);
+            refresh();
+            getch();
+
+          }
+        }
+        break;
+        
       case 27:
         done = 1;
         break;
@@ -936,26 +985,6 @@ int io_bag(int isBattle, int isWild) {
   // mvprintw(3, 1, "Pokeballs: %d", world.pc.pokeballs);
 }
 
-void io_print_poke_info(pokemon *p) {
-
-  int * pc_move_index = p->get_move_index();
-  int pwr_1 = (moves[pc_move_index[0]].power == INT_MAX) ? 0 : moves[pc_move_index[0]].power;
-  int acc_1 = (moves[pc_move_index[0]].accuracy == INT_MAX) ? 0 : moves[pc_move_index[0]].accuracy; 
-  int pwr_2 = (moves[pc_move_index[1]].power == INT_MAX) ? 0 : moves[pc_move_index[1]].power;
-  int acc_2 = (moves[pc_move_index[1]].accuracy == INT_MAX) ? 0 : moves[pc_move_index[1]].accuracy; 
-  printw("%-12s %s",p->get_species(), types[p->type1]);
-  if(types[p->type2] != NULL) {
-    printw("\t%s", types[p->type2]);
-  }
-  
-  printw("\nHP: %d / %d\n", p->current_hp, p->get_hp());
-  printw("Level: %-3d\tGender: %s\n", p->get_level(), p->get_gender_string());
-  printw("Move 1: %-27s POWER: %-3d ACCURACY: %-3d\n", p->get_move(0), pwr_1, acc_1);
-  printw("Move 2: %-27s POWER: %-3d ACCURACY: %-3d\n", p->get_move(1), pwr_2, acc_2);
-  printw("\nATK:    %-3d\tDEF:    %-3d\nSP-ATK: %-3d\tSP-DEF: %-3d\nSPE:    %-3d\n", p->get_atk(), p->get_def(), p->get_spatk(), p->get_spdef(), p->get_speed());
-
-
-}
 
 void io_print_trainer_info() {
   clear();
