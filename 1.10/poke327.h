@@ -101,9 +101,16 @@ class map {
   int8_t n, s, e, w;
 };
 
+class storage_computer {
+  public:
+    pokemon *box[30];
+    int storing;
+};
+
 class world {
  public:
   map *world[WORLD_SIZE][WORLD_SIZE];
+  storage_computer storage;
   pair_t cur_idx;
   map *cur_map;
   /* Please distance maps in world, not map, since *

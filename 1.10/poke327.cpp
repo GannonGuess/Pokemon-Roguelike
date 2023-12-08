@@ -1185,8 +1185,6 @@ int main(int argc, char *argv[])
   uint32_t seed;
   int long_arg;
   int do_seed;
-  //  char c;
-  //  int x, y;
   int i;
 
   do_seed = 1;

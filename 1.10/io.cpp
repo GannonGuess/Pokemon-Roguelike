@@ -379,20 +379,22 @@ static void io_list_trainers()
 }
 
 void shift_pokemon() {
-  int blank_index = 0;
+  int blank_index = -1;
   int i = 0;
   for(i = 0; i < 6; i++) {
     if(i != 5) {
-      if(!world.pc.buddy[i] && world.pc.buddy[i + 1]) {
+      if(world.pc.buddy[i] == NULL && world.pc.buddy[i + 1] != NULL) {
         blank_index = i;
       }
     }
+  }
+  if(blank_index == -1) {
+    return;
   }
   for(i = blank_index; i < 5; i++) {
     world.pc.buddy[i] = world.pc.buddy[i + 1];
   }
   world.pc.buddy[i] = NULL;
-  
 }
 
 void io_access_storage() {
@@ -407,22 +409,16 @@ void io_access_storage() {
   mvprintw(0, 0, "Welcome to the Pokemon storage computer! Press ESC to leave");
   int i = 0;
   int page = 0;
-  // int num_pkm = 0;
-  
   
   refresh();
   while(!done) {
-    // for(i = 0; i < 30; i++) {
-    //   if(world.storage.box[i]) {
-    //     num_pkm++;
-    //   }
-    // }
+
     if(world.storage.storing == 0) {
       mvprintw(1, 0, "You have no pokemon in storage"); 
     }
     else {
-      mvprintw(1, 0, "You have %d pokemon in storage.", world.storage.storing);
-      printw("\nUse left and right arrow keys to  view more pokemon. Press 'r' to release a pokemon.");
+      mvprintw(1, 0, "You have %d pokemon in storage. Use left and right arrow keys to view more.", world.storage.storing);
+      printw("\n Press 'r' to release a pokemon from the box.");
       printw("\nPress 'g' to get a pokemon from storage and 's' to store one");
     }
     mvprintw(4, 0, "Box %d", page);
@@ -436,7 +432,7 @@ void io_access_storage() {
         mvprintw(5 + (i % 10), 0, "%d:", i + 1);
       }
     }
-    mvprintw(16, 0, "On hand %d:\n", on_hand);
+    mvprintw(16, 0, "%d On-Hand:\n", on_hand);
     int x = 1;
     for(pokemon *i : world.pc.buddy) {
       if(i) {
@@ -456,6 +452,7 @@ void io_access_storage() {
     char choice = getch();
     int pokeslot = -1;
     int index = 0;
+    char confirm;
     switch(choice) {
       case (char) KEY_LEFT:
         if(page > 0) {
@@ -468,7 +465,7 @@ void io_access_storage() {
         }
         break;
       case 'g':
-        if(on_hand < 6) {
+        if(on_hand < 6 && world.storage.storing > 0) {
         printw("Select number of the pokemon that you want to get (0 to go back): ");
         echo();
         curs_set(1);
@@ -477,8 +474,9 @@ void io_access_storage() {
           if(pokeslot == 0) {
             break;
           }
-          mvprintw(21, 0, "Invalid box selection\n");
+          move(20, 0);
           clrtoeol();
+          printw("Invalid box selection. Please make another selection (0 to go back): ");
           scanw((char *) "%d", &pokeslot);
         }
         noecho();
@@ -489,6 +487,7 @@ void io_access_storage() {
         for(pokemon *p : world.pc.buddy) {
           if(!p) {
             world.pc.buddy[index] = world.storage.box[pokeslot - 1];
+            world.pc.buddy[index]->current_hp = world.pc.buddy[index]->get_hp();
             world.storage.box[pokeslot - 1] = NULL;
             world.storage.storing--;
             printw("You withdrew %s", world.pc.buddy[index]->get_species());
@@ -503,40 +502,70 @@ void io_access_storage() {
         }
         break;
       case 'r':
+        if(world.storage.storing != 0) {
+          printw("Select number of the pokemon to release from the box (0 to go back): ");
+          echo();
+          curs_set(1);
+          scanw((char *) "%d", &pokeslot);
+          while(pokeslot < 1 || pokeslot > 30 || !world.storage.box[pokeslot - 1]) {
+            if(pokeslot == 0) {
+              break;
+            }
+            move(20, 0);
+            clrtoeol();
+            printw("Invalid box selection. Please make another selection (0 to go back): ");
+            clrtoeol();
+            scanw((char *) "%d", &pokeslot);
+          }
+          noecho();
+          curs_set(0);
+          if(pokeslot > 0) {
+            printw("Are you sure you would like to release %s? [Y/N]\n", world.storage.box[pokeslot - 1]->get_species());
+            confirm = getch();
+            if(confirm == 'Y') {
+              printw("%s was successfully sent out into the wild. Goodbye!", world.storage.box[pokeslot - 1]->get_species());
+              delete world.storage.box[pokeslot - 1];
+              world.storage.box[pokeslot - 1] = NULL;
+              world.storage.storing--;
+            }
+            refresh();
+          }
+        }
         break;
       case 's':
         if(on_hand > 1 && world.storage.storing < 30) {
         
-        printw("Select number of the pokemon that you want to store (0 to go back): ");
-        echo();
-        curs_set(1);
-        scanw((char *) "%d", &pokeslot);
-        while(pokeslot < 0 || pokeslot > on_hand || !world.pc.buddy[pokeslot - 1]) {
-          if(pokeslot == 0) {
-            break;
-          }
-          mvprintw(21, 0, "Invalid storage selection\n");
-          clrtoeol();
+          printw("Select number of the on-hand pokemon that you want to store (0 to go back): ");
+          echo();
+          curs_set(1);
           scanw((char *) "%d", &pokeslot);
-        }
-        noecho();
-        curs_set(0);
-        if(pokeslot > 0) {
-        for(pokemon *i : world.storage.box) {
-          if(!i) {
-            world.storage.box[index] = world.pc.buddy[pokeslot - 1];
-            world.pc.buddy[pokeslot - 1] = NULL;
-            world.storage.storing++;
-            printw("You successfully stored %s", world.storage.box[index]->get_species());
-            shift_pokemon();
-            on_hand--;
-            break;
+          while(pokeslot < 1 || pokeslot > on_hand || !world.pc.buddy[pokeslot - 1]) {
+            if(pokeslot == 0) {
+              break;
+            }
+            move(20, 0);
+            clrtoeol();
+            printw("Invalid box selection. Please make another selection (0 to go back): ");
+            scanw((char *) "%d", &pokeslot);
           }
-          index++;
-        }
-        refresh();
-        getch();
-        }
+          noecho();
+          curs_set(0);
+          if(pokeslot > 0) {
+            for(pokemon *i : world.storage.box) {
+              if(!i) {
+                world.storage.box[index] = world.pc.buddy[pokeslot - 1];
+                world.pc.buddy[pokeslot - 1] = NULL;
+                world.storage.storing++;
+                printw("You successfully stored %s", world.storage.box[index]->get_species());
+                on_hand--;
+                shift_pokemon();
+                break;
+              }
+              index++;
+            }
+            refresh();
+            getch();
+          }
         }
         break;
       case 27:
@@ -1958,7 +1987,7 @@ int throw_pokeball(character *ch, pokemon *p, int ball_type) {
     }
   }
   int index = 0;
-  if(ch->buddy[5] && f >= M && world.storage.storing < 540) {
+  if(ch->buddy[5] && f >= M && world.storage.storing < 30) {
     for(pokemon *i : world.storage.box) {
       if(!i && world.storage.storing < 30) {
         world.storage.box[index] = p;
