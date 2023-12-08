@@ -378,19 +378,184 @@ static void io_list_trainers()
   io_display();
 }
 
+void shift_pokemon() {
+  int blank_index = 0;
+  int i = 0;
+  for(i = 0; i < 6; i++) {
+    if(i != 5) {
+      if(!world.pc.buddy[i] && world.pc.buddy[i + 1]) {
+        blank_index = i;
+      }
+    }
+  }
+  for(i = blank_index; i < 5; i++) {
+    world.pc.buddy[i] = world.pc.buddy[i + 1];
+  }
+  world.pc.buddy[i] = NULL;
+  
+}
+
+void io_access_storage() {
+  int on_hand = 0;
+  for(pokemon *p : world.pc.buddy) {
+    if(p) {
+      on_hand++;
+    }
+  }
+  int done = 0;
+  clear();
+  mvprintw(0, 0, "Welcome to the Pokemon storage computer! Press ESC to leave");
+  int i = 0;
+  int page = 0;
+  // int num_pkm = 0;
+  
+  
+  refresh();
+  while(!done) {
+    // for(i = 0; i < 30; i++) {
+    //   if(world.storage.box[i]) {
+    //     num_pkm++;
+    //   }
+    // }
+    if(world.storage.storing == 0) {
+      mvprintw(1, 0, "You have no pokemon in storage"); 
+    }
+    else {
+      mvprintw(1, 0, "You have %d pokemon in storage.", world.storage.storing);
+      printw("\nUse left and right arrow keys to  view more pokemon. Press 'r' to release a pokemon.");
+      printw("\nPress 'g' to get a pokemon from storage and 's' to store one");
+    }
+    mvprintw(4, 0, "Box %d", page);
+    move(5, 0);
+    clrtobot();
+    for(i = page * 10; i < (page * 10) + 10; i++) {
+      if(world.storage.box[i]) {
+        mvprintw(5 + (i % 10), 0, "%d: %s", i + 1, world.storage.box[i]->get_species());
+      }
+      else {
+        mvprintw(5 + (i % 10), 0, "%d:", i + 1);
+      }
+    }
+    mvprintw(16, 0, "On hand %d:\n", on_hand);
+    int x = 1;
+    for(pokemon *i : world.pc.buddy) {
+      if(i) {
+        printw("%d: %s", x, i->get_species());
+        
+      }
+      if(x % 2 == 1) {
+        printw("\t");
+      }
+      else {
+        printw("\n");
+      }
+      x++;
+    }
+    
+    refresh();
+    char choice = getch();
+    int pokeslot = -1;
+    int index = 0;
+    switch(choice) {
+      case (char) KEY_LEFT:
+        if(page > 0) {
+          page --;
+        }
+        break;
+      case (char) KEY_RIGHT:
+        if(page < 2) {
+          page++;
+        }
+        break;
+      case 'g':
+        if(on_hand < 6) {
+        printw("Select number of the pokemon that you want to get (0 to go back): ");
+        echo();
+        curs_set(1);
+        scanw((char *) "%d", &pokeslot);
+        while(pokeslot < 1 || pokeslot > 30 || !world.storage.box[pokeslot - 1]) {
+          if(pokeslot == 0) {
+            break;
+          }
+          mvprintw(21, 0, "Invalid box selection\n");
+          clrtoeol();
+          scanw((char *) "%d", &pokeslot);
+        }
+        noecho();
+        curs_set(0);
+        if(pokeslot > 0) {
+          
+        
+        for(pokemon *p : world.pc.buddy) {
+          if(!p) {
+            world.pc.buddy[index] = world.storage.box[pokeslot - 1];
+            world.storage.box[pokeslot - 1] = NULL;
+            world.storage.storing--;
+            printw("You withdrew %s", world.pc.buddy[index]->get_species());
+            on_hand++;
+            break;
+          }
+          index++;
+        }
+        refresh();
+        getch();
+        }
+        }
+        break;
+      case 'r':
+        break;
+      case 's':
+        if(on_hand > 1 && world.storage.storing < 30) {
+        
+        printw("Select number of the pokemon that you want to store (0 to go back): ");
+        echo();
+        curs_set(1);
+        scanw((char *) "%d", &pokeslot);
+        while(pokeslot < 0 || pokeslot > on_hand || !world.pc.buddy[pokeslot - 1]) {
+          if(pokeslot == 0) {
+            break;
+          }
+          mvprintw(21, 0, "Invalid storage selection\n");
+          clrtoeol();
+          scanw((char *) "%d", &pokeslot);
+        }
+        noecho();
+        curs_set(0);
+        if(pokeslot > 0) {
+        for(pokemon *i : world.storage.box) {
+          if(!i) {
+            world.storage.box[index] = world.pc.buddy[pokeslot - 1];
+            world.pc.buddy[pokeslot - 1] = NULL;
+            world.storage.storing++;
+            printw("You successfully stored %s", world.storage.box[index]->get_species());
+            shift_pokemon();
+            on_hand--;
+            break;
+          }
+          index++;
+        }
+        refresh();
+        getch();
+        }
+        }
+        break;
+      case 27:
+        done = 1;
+        break;
+    }
+  }
+  
+
+}
+
 void io_pokemart()
 {
   clear();
   mvprintw(0, 0, "Welcome to the Pokemart!");
-  
-  
-
-  
 
   int selected = 0;
   int done = 0;
   int exit = 0;
-
   
   // Wait for user to select correct item
   while(!exit) {
@@ -490,21 +655,67 @@ void io_pokemart()
 void io_pokemon_center()
 {
   clear();
-  mvprintw(0, 0, "Welcome to the Pokemon Center!");
+  std::vector<std::string> options = {
+    {"PC"}
+  }; 
+  mvprintw(0, 0, "Welcome to the PokeCenter!\nSelect a faculty with arrow keys and ENTER key. < to leave\n");
+    for(pokemon *p : world.pc.buddy) {
+      if(p) {
+        p->current_hp = p->get_hp();
+      }
+    }
+  printw("Your pokemon have all been restored to full health!");
+  int selected = 0;
+  int done = 0;
+  int exit = 0;
+  while(!done) {
+    move(3, 0);
+    for(size_t i = 0; i < options.size(); i++) {
+      if (i == selected) {
+        printw("* ");
+      } else {
+        printw("  ");
+      }
+      printw("%s\n", options[i].c_str());
+    }
 
-  for(pokemon *p : world.pc.buddy) {
-    if(p) {
-      p->current_hp = p->get_hp();
+    refresh();
+
+    int ch = getch(); // Get user input
+    switch (ch) {
+      case KEY_UP:
+        if (selected > 0) {
+        selected--;
+        }
+        break;
+      case KEY_DOWN:
+        if (selected < static_cast<int>(options.size()) - 1) {
+          selected++;
+        }
+        break;
+      case 10: // ENTER key
+        // Only allow selection if user has enough of the item
+        done = 1;
+        break;
+      case '<': // ESC key to go back
+        done = 1;
+        exit = 1;
     }
   }
-
-  mvprintw(1, 0, "Welcome to the Pokemon Center! Nurse Joy healed all of your Pokemon!");
-  mvprintw(2, 0, "Come back soon!");
-  mvprintw(4, 0, "Press \'<\' to leave");
-  char command = getch();
-  while(command != (char)KEY_LEFT && command != '<') {
-    command = getch();
+  if(!done || !exit) {
+    switch(selected) {
+      case 0:
+        io_access_storage();
+        break;
+    }
+    done = 0;
   }
+
+  clear();
+  mvprintw(0, 0, "Come again soon!");
+  refresh();
+  getch();
+  io_display();
 }
 
 // clears terminal section for displaying information to user
@@ -1746,6 +1957,18 @@ int throw_pokeball(character *ch, pokemon *p, int ball_type) {
       return 1;
     }
   }
+  int index = 0;
+  if(ch->buddy[5] && f >= M && world.storage.storing < 540) {
+    for(pokemon *i : world.storage.box) {
+      if(!i && world.storage.storing < 30) {
+        world.storage.box[index] = p;
+        world.storage.storing++;
+        return 1;
+      }
+      index++;
+    }
+    
+  }
   return 0;
 }
 
@@ -1754,6 +1977,12 @@ void io_encounter_pokemon()
 {
   pokemon *p;
   p = new pokemon();
+  for(pokemon *i : world.storage.box) {
+    if(!i) {
+      i = p;
+      world.storage.storing++;
+    }
+  }
   int battling = 1;
   // battle options
   std::vector<std::string> options = {"FIGHT", "POKEMON", "BAG", "RUN"};

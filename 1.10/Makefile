@@ -6,7 +6,7 @@ RM = rm -f
 TERM = "F2023"
 
 CFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
-CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM) -std=c++11
+CXXFLAGS =  -ggdb -funroll-loops -DTERM=$(TERM) -std=c++11
 
 LDFLAGS = -lncurses
 
