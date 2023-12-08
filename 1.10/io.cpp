@@ -450,7 +450,7 @@ void io_access_storage() {
     clrtobot();
     for(i = page * 10; i < (page * 10) + 10; i++) {
       if(world.storage.box[i]) {
-        mvprintw(5 + (i % 10), 0, "%d: %s", i + 1, world.storage.box[i]->get_species());
+        mvprintw(5 + (i % 10), 0, "%d: %s\tlvl: %d", i + 1, world.storage.box[i]->get_species(), world.storage.box[i]->get_level());
       }
       else {
         mvprintw(5 + (i % 10), 0, "%d:", i + 1);
@@ -460,7 +460,7 @@ void io_access_storage() {
     int x = 1;
     for(pokemon *i : world.pc.buddy) {
       if(i) {
-        printw("%d: %s", x, i->get_species());
+        printw("%d: %s\tlvl: %d", x, i->get_species(), i->get_level());
         
       }
       if(x % 2 == 1) {
