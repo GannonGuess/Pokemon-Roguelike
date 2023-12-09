@@ -1066,6 +1066,7 @@ void init_world()
   world.char_seq_num = 0;
   new_map(0);
   world.storage.storing = 0;
+  world.storage.box[0] = new class pokemon();
 }
 
 void delete_world()

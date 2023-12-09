@@ -124,7 +124,7 @@ pokemon::pokemon(int level) : level(level)
     }
   }
   base_speed = s->base_stat[stat_speed];
-  capture_rate = species[pokemon_species_index].capture_rate;
+  capture_rate = species[pokemon_species_index].capture_rate; // capture rate set
 }
 
 const char *pokemon::get_species() const

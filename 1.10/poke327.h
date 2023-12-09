@@ -67,6 +67,8 @@
 #define START_ULTRABALLS  1
 #define START_CASH        600
 
+#define STORAGE_SIZE      30
+
 #define mappair(pair) (m->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (m->map[y][x])
 #define heightpair(pair) (m->height[pair[dim_y]][pair[dim_x]])
@@ -101,16 +103,16 @@ class map {
   int8_t n, s, e, w;
 };
 
-class storage_computer {
+class storage_computer { // storage computere for housing pokemon. Has up to 30 slots
   public:
-    pokemon *box[30];
+    pokemon *box[STORAGE_SIZE];
     int storing;
 };
 
 class world {
  public:
   map *world[WORLD_SIZE][WORLD_SIZE];
-  storage_computer storage;
+  storage_computer storage; // storage is a property of the world
   pair_t cur_idx;
   map *cur_map;
   /* Please distance maps in world, not map, since *

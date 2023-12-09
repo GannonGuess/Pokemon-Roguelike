@@ -378,6 +378,7 @@ static void io_list_trainers()
   io_display();
 }
 
+// Moves all PC pokemon to the lowest available slot to prevent storage issues
 void shift_pokemon() {
   int blank_index = -1;
   int i = 0;
@@ -397,6 +398,7 @@ void shift_pokemon() {
   world.pc.buddy[i] = NULL;
 }
 
+// Displays information about the passed-in pokemon
 void io_print_poke_info(pokemon *p) {
 
   int * pc_move_index = p->get_move_index();
@@ -418,6 +420,7 @@ void io_print_poke_info(pokemon *p) {
 
 }
 
+// Displays storage to PC and allows for different uses like inspecting, releasing, or swapping pokemon
 void io_access_storage() {
   int on_hand = 0;
   for(pokemon *p : world.pc.buddy) {
@@ -629,6 +632,7 @@ void io_access_storage() {
 
 }
 
+//Pokemarts now require purchases
 void io_pokemart()
 {
   clear();
@@ -733,11 +737,12 @@ void io_pokemart()
   io_display();
 }
 
+//Pokemon center now allows for accessing storage computer
 void io_pokemon_center()
 {
   clear();
   std::vector<std::string> options = {
-    {"PC"}
+    {"Pokemon Storage Computer"}
   }; 
   mvprintw(0, 0, "Welcome to the PokeCenter!\nSelect a faculty with arrow keys and ENTER key. < to leave\n");
     for(pokemon *p : world.pc.buddy) {
@@ -831,6 +836,9 @@ int io_bag(int isBattle, int isWild) {
   
   // Wait for user to select correct item
   while(!done) {
+    if(!isBattle) {
+      mvprintw(8, 0, "You have $%d to spend.", world.pc.pokedollars);
+    }
     mvprintw(10, 0, "Select item with arrow keys and ENTER key. ESC to back out\n");
     for(size_t i = 0; i < options.size(); i++) {
       if (i == selected) {
@@ -979,13 +987,9 @@ int io_bag(int isBattle, int isWild) {
     io_display();
   }
   return item_used;
-
-  // mvprintw(1, 1, "Potions: %d", world.pc.potions);
-  // mvprintw(2, 1, "Revives: %d", world.pc.revives);
-  // mvprintw(3, 1, "Pokeballs: %d", world.pc.pokeballs);
 }
 
-
+// Displays some stats about the PC to use user
 void io_print_trainer_info() {
   clear();
   float win_percent = ((float)world.pc.battles_won / (float)(world.pc.battles_lost + world.pc.battles_won)) * 100.0;
@@ -1008,6 +1012,7 @@ void io_print_trainer_info() {
   io_display();
 }
 
+// Allows the PC to inspect their pokemon while in the overworld.
 void io_list_pc_pokemon() {
   clear();
   int num_pkm = 0;
@@ -1046,7 +1051,7 @@ void io_list_pc_pokemon() {
           viewing_idx = 0;
         }
         break;
-      case 's':
+      case 's': // swaps the viewed pokemon with the first slot
         if(viewing_idx != 0) {
           pokemon *tmp = world.pc.buddy[viewing_idx];
           world.pc.buddy[viewing_idx] = world.pc.buddy[0];
@@ -1155,6 +1160,7 @@ int calculate_damage(pokemon *attacker, pokemon *defender, int power, int type_i
   return (int) final_damage;
 }
 
+// Function to calculate the amount of prize money earned based on MSG method
 int calculate_earnings(character *npc, pokemon *p) {
   int level = p->get_level();
   int base;
@@ -1357,7 +1363,7 @@ int attack_trainer(pokemon *pc, character *npc_trainer, int *npc_pkm_idx, int at
           world.pc.total_pokedollars += earnings;
           world.pc.battles_won++;
           printw("The opposing trainer has no more pokemon. You win!\n");
-          printw("You receive %d pokedollars!", earnings);
+          printw("You receive %d pokedollars!", earnings); // money now won from battle
           
         }
         refresh();
@@ -1932,12 +1938,12 @@ void io_handle_input(pair_t dest)
       io_bag(0, 0);
       turn_not_consumed = 1;
       break;
-    case 'P':
+    case 'P': // lists trainer pokemon
       io_list_pc_pokemon();
       turn_not_consumed = 1;
       break;
     case 'i':
-    case 'I':
+    case 'I': // prints some information about the trainer
       io_print_trainer_info();
       turn_not_consumed = 1;
       break;
@@ -1983,7 +1989,7 @@ void io_handle_input(pair_t dest)
   } while (turn_not_consumed);
 }
 
-// throw a pokeball at a wild pokemon. For now, always catches
+// throw a pokeball at a wild pokemon. Changed to use Gen I capture mechanics
 int throw_pokeball(character *ch, pokemon *p, int ball_type) {
   int i;
   int N = 0;
@@ -1991,7 +1997,7 @@ int throw_pokeball(character *ch, pokemon *p, int ball_type) {
   if(ball_type == greatball) {
     ball_value = 8;
   }
-  switch(ball_type) {
+  switch(ball_type) { // different ball types affect capture rate
     case pokeball:
       N = rand() % 256;
       break;

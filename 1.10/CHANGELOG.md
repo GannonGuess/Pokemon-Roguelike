@@ -1,16 +1,47 @@
 ## Version 1.10
-- Money
-- pokeball types
-- shopping
-- walk through defeated trainers
-- Function on loss
-- Gym battles
-- looking at owned pokemon
-- Storing extra pokemon
-- retrieving extra pokemon from pokecenter
-- capture mechanics
+
+12/08 21:45 - Added a pokemon to storage by default for testing in submission
+
+12/08 21:40 - Updated README and packaged for submission
+
+12/08 21:10 - Cleaned up and commented code
+
+12/08 20:56 - Display amount of money that the player has on hand inside of bag menu in overworld
+
+12/08 14:23 - Pokemon levels are now displayed alongside their name in the storage box to help identify which is which.
+
+12/08 13:18 - Added 'i' option inside of box to inspect a stored pokemon. Similar to 'P' in the overworld.
+
+12/08 12:52 - The number of stored pokemon is re-calculated every time the storage menu reloads
+                - prevents a lot of issues with old calculation method
+                - Inside of pokemon viewer accessed with 'P' in overworld, 's' will swap the viewed pokemon into the first slot
+                - Changed outline of storage commands for user
+
+12/08 06:41 - Added 'r' function to storage that will release a stored pokemon into the wild
+            - Can no longer try to 'get' a pokemon from storage if none are stored
 
 
+12/08 05:37 - Finished adding pokemon storage system
+                - Shift pokemon function for moving trainer pokemon to first slots
+            - Storage accessed from pokemon centers
+            - 's' command used to place a pokemon into storage
+            - 'g' command used to obtain a pokemon from storage
+
+12/07 23:20 - Created variables for initilization of new starting items
+
+12/07 23:14 - Pokemon capture mechanics changed to be more in line with main series
+                - Pokemon are not guranteed to be caught
+
+
+12/07 23:01 - Money for purchases
+                - Prize money from winning trainer battles
+                - Shops no longer restock items, they must be purchased
+
+12/07 20:19 - Added various features to the game
+                - 'I' command to list some trainer stats
+                - Different pokeball types
+                - Added a pokemon information screen accessed with 'P'
+                
 11/29 15:21 - Copied files over from 1.09 
 
 ## Version 1.09

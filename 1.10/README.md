@@ -1,8 +1,41 @@
 # 327 Pokemon Game README - Gannon Guess
 
 ## Version 1.10
-
-
+This version of the game includes many quality of life updates focused on the player experience and adding more depth to the mechanics of the game. Prize money is now earned for winning trainer battles and can be spent on items in the shops. New pokeballs interact with the new capture mechanics so that there are more stakes in battle, rather than alway capturing a pokemon. The bulk of new content comes in the form of the Pokemon Storage Computer that has been added to every Pokemon Center.
+- In the overworld, the new `i` or `I` command can be used to view info about the player character
+  - Such info includes the player's win and loss rates, how much money they have made, and how many pokemon they have caught
+- Opening the bag with `B` in the overworld now displays the total amount of money that the player currently has on them
+  - The player starts with $600, the price of a Great Ball.
+- Great Balls and Ultra Balls have been added to the game. The player starts with 5 Great and 1 Ultra ball. More of them can be purchased at the shop for the price of the items in the main series of games.
+- New shop item costs are as follows:
+  - Potion: 200
+  - Revive: 2000
+  - Poke Ball: 200
+  - Great Ball: 600
+  - Ultra Ball: 800
+- In the overworld, the `P` (capital) command will display the player's pokemon and their stats, moves, gender, level, and typing
+  - If the player has more than one pokemon, the arrow keys (left and right) can be used to view the other pokemon
+  - In this menu, when not viewing the pokemon in the first slot, the `s` command will swap the currently viewed pokemon and the pokemon in the first slot
+    - This allows the player to choose which pokemon will be used first in battle.
+- Money earned from trainer battles is calculated as it is in the MSGs. Every enemy trainer type has a default value of money that is multiplied by the level of the trainers last pokemon to get the total earnings from the battle
+- Pokemon capture mechanics are now in line with the Generation I video game. More can be found here: https://bulbapedia.bulbagarden.net/wiki/Catch_rate if you would like an in-depth explanation.
+  - This means that pokemon are not always caught
+  - If the PC has 6 pokemon on hand, captured pokemon are sent to the pokemon storage system.
+  - If both the PC and storage system are full on pokemon, pokemon will always break free
+  - In some cases, a Great Ball is better than an Ultra Ball due to the calculations
+- The Pokemon Storage Computers are located inside of pokemon centers (if testing the game, use `p` to teleport around to one if battles are too unfair)
+- Storage holds up to 30 pokemon, with 10 per box. Use the left and right arrow keys to view the other boxes.
+- In storage, level is displayed to help identify the stronger pokemon easier
+- Various commands can be used in storage. These commands are combined with the pokemon storage number:
+  - `i` - Inspect a pokemon that is in storage, allowing the player to view its info, like the command in the overworld
+  - `r` - Releases a pokemon that is in storage into the wild, effectively deleting it from the game.
+    - Releasing a pokemon requires confirmation of the `Y` key. Any other key cancles the release.
+  - `g` - Gets a pokemon from the box and places it into the players first empty slot. Player must have room available on-hand
+  - `s` - Stores a pokemon. The player selects an on-hand pokemon to place into the box. All PC pokemon are shifted to the lowest available slot after a pokemon is stored.
+    - Commands called on storage slots that have no pokemon request that the user choose a different slot
+  - Picking a slot of `0` will cancle the command in case the player didnt mean to choose that slot.
+  - These commands only work if there are pokemon in the box, except for the store command which requires more than one on-hand pokemon
+- NOTE: I added a pokemon to the storage system by default for testing so you dont have to capture any.
 
 ## Version 1.09
 This verion adds the pokemon battle minigame, trainer battles, wild pokemon battles, and bag mechanics.
